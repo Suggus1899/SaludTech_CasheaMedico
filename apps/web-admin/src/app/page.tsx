@@ -43,6 +43,8 @@ import {
   Shield,
   CalendarDays,
   Send,
+  HeartPulse,
+  ShieldAlert,
 } from "lucide-react";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -90,7 +92,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: "comercios", label: "Comercios", icon: Store },
   { id: "financiamientos", label: "Financiamientos", icon: CreditCard },
   { id: "triajes", label: "Triajes", icon: HeartPulse },
-  { id: "elder-care", label: "Elder Care", icon: ShieldHeart },
+  { id: "elder-care", label: "Elder Care", icon: ShieldAlert },
   { id: "suscripciones", label: "Suscripciones", icon: CalendarDays },
 ];
 
