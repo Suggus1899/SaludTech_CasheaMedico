@@ -15,8 +15,8 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "SaludTech - Admin",
-  description: "Backoffice para administración de SaludTech",
+  title: "SaludTech - Portal Comercios",
+  description: "Portal de gestión para comercios afiliados a SaludTech",
 };
 
 export default function RootLayout({

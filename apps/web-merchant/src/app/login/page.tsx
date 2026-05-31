@@ -10,7 +10,7 @@ import Logo from "../../components/Logo";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 
-export default function AdminLoginPage() {
+export default function MerchantLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,9 +19,9 @@ export default function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleDemoMode = () => {
-    const demoUser = { id: "admin-001", email: "admin@saludtech.com", firstName: "Admin", lastName: "Demo", role: "ADMIN" };
+    const demoUser = { id: "mc-001", email: "comercio@saludtech.com", firstName: "Clínica", lastName: "Santa María", role: "MERCHANT", merchantId: "m-001" };
     localStorage.setItem("jwt_token", "demo-token");
-    localStorage.setItem("admin_user", JSON.stringify(demoUser));
+    localStorage.setItem("merchant_user", JSON.stringify(demoUser));
     document.cookie = "jwt_token=demo-token; path=/; max-age=86400; SameSite=Lax";
     router.push("/");
   };
@@ -42,7 +42,7 @@ export default function AdminLoginPage() {
       }
       const data = await res.json();
       localStorage.setItem("jwt_token", data.token);
-      localStorage.setItem("admin_user", JSON.stringify(data.user));
+      localStorage.setItem("merchant_user", JSON.stringify(data.user));
       document.cookie = `jwt_token=${data.token}; path=/; max-age=86400; SameSite=Lax`;
       router.push("/");
     } catch (err: unknown) {
@@ -59,9 +59,9 @@ export default function AdminLoginPage() {
         <div className="flex flex-col items-center mb-8">
           <Logo size="lg" className="mb-4" />
           <h1 className="text-2xl font-bold font-(family-name:--font-syne) text-foreground">
-            Panel de Administración
+            Portal Comercio
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">SaludTech — Acceso restringido</p>
+          <p className="text-sm text-muted-foreground mt-1">SaludTech — Plataforma BNPL Médica</p>
         </div>
 
         {/* Card */}
@@ -76,7 +76,7 @@ export default function AdminLoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@saludtech.com"
+                placeholder="comercio@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -138,7 +138,10 @@ export default function AdminLoginPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Solo para personal autorizado de SaludTech.
+          ¿Problemas para acceder? Contacta a{" "}
+          <a href="mailto:soporte@saludtech.com" className="text-primary hover:underline">
+            soporte@saludtech.com
+          </a>
         </p>
       </div>
     </div>
