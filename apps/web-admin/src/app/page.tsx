@@ -48,6 +48,7 @@ import {
 } from "lucide-react";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Logo from "../components/Logo";
 import {
   Dialog,
   DialogContent,
@@ -789,11 +790,8 @@ function SidebarContent({
   return (
     <>
       <div className="p-6 flex-1">
-        <div className="flex items-center gap-2.5 mb-10">
-          <div className="bg-primary p-2 rounded-xl">
-            <Stethoscope className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="font-bold text-xl tracking-tight font-(family-name:--font-syne)">SaludTech</span>
+        <div className="mb-10">
+          <Logo size="md" />
         </div>
         <nav className="space-y-1" aria-label="Navegación principal">
           {NAV_ITEMS.map((item) => {

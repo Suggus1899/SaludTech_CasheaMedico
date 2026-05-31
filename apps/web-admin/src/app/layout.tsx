@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Outfit, Syne } from "next/font/google";
+import { Inter, Syne } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-outfit",
+  variable: "--font-inter",
 });
 
 const syne = Syne({
   subsets: ["latin"],
   variable: "--font-syne",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -26,11 +26,11 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${outfit.variable} ${syne.variable} font-sans h-full`}
+      className={`${inter.variable} ${syne.variable} font-sans h-full`}
       suppressHydrationWarning
     >
       <head>
-        <meta name="theme-color" content="#fbbf24" />
+        <meta name="theme-color" content="#1a6b8a" />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var m=localStorage.getItem('theme');if(m==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
