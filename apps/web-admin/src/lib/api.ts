@@ -1,4 +1,4 @@
-export const API_URL = 'http://localhost:8080/api/v1';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api/v1';
 
 // We mock an admin token for now or leave it empty if we just login as admin
 // In a real flow, this would come from a Context/Local Storage after admin login.

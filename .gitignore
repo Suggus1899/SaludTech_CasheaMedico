@@ -58,3 +58,6 @@ docker-compose.override.yml
 **.node-persist**
 **_IGNORE_**
 # end managed
+
+.vercel
+.env*
