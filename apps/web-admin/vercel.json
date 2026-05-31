@@ -2,5 +2,14 @@
   "framework": "nextjs",
   "installCommand": "corepack enable pnpm && pnpm install --frozen-lockfile",
   "buildCommand": "pnpm build",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "headers": [
+    {
+      "source": "/mockServiceWorker.js",
+      "headers": [
+        { "key": "Content-Type", "value": "application/javascript" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    }
+  ]
 }
