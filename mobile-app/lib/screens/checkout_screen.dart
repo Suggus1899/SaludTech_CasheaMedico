@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../core/theme.dart';
+import '../core/responsive.dart';
 import '../services/api_service.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -99,111 +100,117 @@ class CheckoutScreenState extends State<CheckoutScreen> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Column(
-                  children: [
-                    const Icon(
-                      LucideIcons.store,
-                      size: 48,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      merchantName,
-                      style: GoogleFonts.outfit(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '\$${amount.toStringAsFixed(2)}',
-                      style: GoogleFonts.outfit(
-                        fontSize: 42,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Monto Total a Financiar',
-                      style: GoogleFonts.outfit(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Desglose de Pago ($numInstallments cuotas)',
-                style: GoogleFonts.outfit(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              _buildInstallmentRow(
-                'Inicial (Al instante)',
-                '\$${downPayment.toStringAsFixed(2)}',
-                true,
-              ),
-
-              if (schedule != null)
-                ...schedule.map((inst) {
-                  final num = inst['number'] ?? 0;
-                  final amt = (inst['amount'] ?? 0.0).toDouble();
-                  final due = inst['dueDate'] ?? 'en ${num * 14} días';
-                  return _buildInstallmentRow(
-                    'Cuota $num ($due)',
-                    '\$${amt.toStringAsFixed(2)}',
-                    false,
-                  );
-                })
-              else
-                ...List.generate(numInstallments, (i) {
-                  final instAmt = (amount - downPayment) / numInstallments;
-                  return _buildInstallmentRow(
-                    'Cuota ${i + 1} (en ${(i + 1) * 14} días)',
-                    '\$${instAmt.toStringAsFixed(2)}',
-                    false,
-                  );
-                }),
-
-              const Spacer(),
-              ElevatedButton(
-                onPressed: _isProcessing ? null : _confirmPayment,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+          padding: EdgeInsets.symmetric(
+            horizontal: Responsive.horizontalPadding(context),
+            vertical: 24,
+          ),
+          child: Responsive.constrained(
+            context,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.border),
                   ),
-                ),
-                child: _isProcessing
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(
-                        'Confirmar y Pagar',
+                  child: Column(
+                    children: [
+                      const Icon(
+                        LucideIcons.store,
+                        size: 48,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        merchantName,
                         style: GoogleFonts.outfit(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primaryForeground,
                         ),
                       ),
-              ),
-            ],
+                      const SizedBox(height: 8),
+                      Text(
+                        '\$${amount.toStringAsFixed(2)}',
+                        style: GoogleFonts.outfit(
+                          fontSize: 42,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Monto Total a Financiar',
+                        style: GoogleFonts.outfit(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Desglose de Pago ($numInstallments cuotas)',
+                  style: GoogleFonts.outfit(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                _buildInstallmentRow(
+                  'Inicial (Al instante)',
+                  '\$${downPayment.toStringAsFixed(2)}',
+                  true,
+                ),
+
+                if (schedule != null)
+                  ...schedule.map((inst) {
+                    final num = inst['number'] ?? 0;
+                    final amt = (inst['amount'] ?? 0.0).toDouble();
+                    final due = inst['dueDate'] ?? 'en ${num * 14} días';
+                    return _buildInstallmentRow(
+                      'Cuota $num ($due)',
+                      '\$${amt.toStringAsFixed(2)}',
+                      false,
+                    );
+                  })
+                else
+                  ...List.generate(numInstallments, (i) {
+                    final instAmt = (amount - downPayment) / numInstallments;
+                    return _buildInstallmentRow(
+                      'Cuota ${i + 1} (en ${(i + 1) * 14} días)',
+                      '\$${instAmt.toStringAsFixed(2)}',
+                      false,
+                    );
+                  }),
+
+                const Spacer(),
+                ElevatedButton(
+                  onPressed: _isProcessing ? null : _confirmPayment,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: _isProcessing
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                          'Confirmar y Pagar',
+                          style: GoogleFonts.outfit(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryForeground,
+                          ),
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -28,10 +28,10 @@ function Hero() {
           <Award className="w-4 h-4 text-primary" />
           <span className="text-primary text-xs font-semibold tracking-widest uppercase">Líneas de Crédito Médico</span>
         </div>
-        <h1 className="font-display text-5xl sm:text-6xl font-bold text-white mb-6 leading-tight">
+        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
           Tres líneas para
           <br />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+          <span className="bg-clip-text text-transparent bg-linear-to-r from-primary to-secondary">
             cada necesidad de salud
           </span>
         </h1>
@@ -127,7 +127,7 @@ function LineasDetalle() {
               key={l.nombre}
               className={`rounded-3xl border ${l.border} overflow-hidden ${l.featured ? "shadow-xl shadow-primary/10" : "shadow-sm"}`}
             >
-              <div className={`grid md:grid-cols-3 ${l.featured ? "bg-hero-gradient" : "bg-white"}`}>
+              <div className={`grid grid-cols-1 md:grid-cols-3 ${l.featured ? "bg-hero-gradient" : "bg-white"}`}>
                 {/* Header col */}
                 <div className={`p-8 ${l.featured ? "" : `${l.lightBg}`}`}>
                   <div className={`w-14 h-14 rounded-2xl ${l.featured ? "bg-white/15" : l.lightBg} flex items-center justify-center mb-4`}>
@@ -141,7 +141,7 @@ function LineasDetalle() {
                 </div>
 
                 {/* Stats col */}
-                <div className={`p-8 border-l ${l.featured ? "border-white/10" : "border-slate-100"}`}>
+                <div className={`p-6 md:p-8 border-t md:border-t-0 md:border-l ${l.featured ? "border-white/10" : "border-slate-100"}`}>
                   <div className="space-y-5">
                     {[
                       { label: "Límite disponible", value: l.limite, icon: TrendingUp },
@@ -162,7 +162,7 @@ function LineasDetalle() {
                 </div>
 
                 {/* Use cases col */}
-                <div className={`p-8 border-l ${l.featured ? "border-white/10" : "border-slate-100"}`}>
+                <div className={`p-6 md:p-8 border-t md:border-t-0 md:border-l ${l.featured ? "border-white/10" : "border-slate-100"}`}>
                   <p className={`text-xs font-semibold uppercase tracking-wider mb-4 ${l.featured ? "text-white/50" : "text-slate-400"}`}>
                     Casos de uso
                   </p>
@@ -250,7 +250,7 @@ function ComoCrece() {
 
 function CTAFinal() {
   return (
-    <section className="py-20 bg-gradient-to-r from-primary to-secondary">
+    <section className="py-20 bg-linear-to-r from-primary to-secondary">
       <div className="max-w-3xl mx-auto px-4 text-center">
         <h2 className="font-display text-4xl font-bold text-white mb-4">
           Activa tu línea en 3 minutos
@@ -258,7 +258,7 @@ function CTAFinal() {
         <p className="text-white/80 text-lg mb-8">
           Descarga la app, regístrate y accede a tu línea de crédito médico sin interés.
         </p>
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <Link
             href="/#descarga"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white text-primary font-bold text-base hover:bg-primary-50 transition-colors"

@@ -1,27 +1,67 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap");
 
 @import "tailwindcss";
 @theme {
-  --color-primary: #1A6B8A;
-  --color-primary-dark: #134E6B;
-  --color-secondary: #17A589;
-  --color-accent: #0D4F6B;
-  --color-dark: #0A2535;
+  /* ── Primary (deep navy blue) ── */
+  --color-primary: #1a6b8a;
+  --color-primary-dark: #134e6b;
+  --color-primary-light: #2a8faf;
+  --color-primary-50: #ebf6fa;
+  --color-primary-100: #c9e8f2;
+
+  /* ── Secondary (teal) ── */
+  --color-secondary: #17a589;
+  --color-secondary-dark: #0e7b65;
+  --color-secondary-light: #1fc8a5;
+  --color-secondary-50: #e8f8f5;
+
+  /* ── Accent (mid-tone blue) ── */
+  --color-accent: #0d4f6b;
+  --color-accent-dark: #083b52;
+  --color-accent-light: #1a6b8a;
+  --color-accent-50: #e3f0f5;
+
+  /* ── Neutral ── */
+  --color-dark: #0a2535;
+  --color-surface: #f4fafb;
+
+  /* ── Fonts ── */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Syne", "Inter", sans-serif;
+
+  /* ── Background gradients ── */
+  --background-image-hero-gradient: linear-gradient(
+    135deg,
+    #0a2535 0%,
+    #0d3347 50%,
+    #134e6b 100%
+  );
+  --background-image-card-gradient: linear-gradient(
+    135deg,
+    #ebf6fa 0%,
+    #e8f8f5 100%
+  );
+  --background-image-brand-gradient: linear-gradient(
+    135deg,
+    #1a6b8a 0%,
+    #17a589 100%
+  );
 }
 
 @layer base {
-
   html {
     scroll-behavior: smooth;
   }
 
   body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
     @apply text-slate-800 bg-white antialiased;
   }
 
-  h1, h2, h3 {
-    font-family: 'Syne', 'Inter', sans-serif;
+  h1,
+  h2,
+  h3 {
+    font-family: "Syne", "Inter", sans-serif;
   }
 }
 

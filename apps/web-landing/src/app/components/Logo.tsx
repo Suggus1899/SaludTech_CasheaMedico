@@ -11,9 +11,9 @@ interface LogoProps {
 }
 
 const sizes = {
-  sm: { img: "h-7 w-7", icon: "w-7 h-7", text: "text-base" },
-  md: { img: "h-9 w-9", icon: "w-9 h-9", text: "text-lg" },
-  lg: { img: "h-12 w-12", icon: "w-12 h-12", text: "text-2xl" },
+  sm: { img: "h-7 w-auto", icon: "w-7 h-7", text: "text-base" },
+  md: { img: "h-9 w-auto", icon: "w-9 h-9", text: "text-lg" },
+  lg: { img: "h-12 w-auto", icon: "w-12 h-12", text: "text-2xl" },
 };
 
 export default function Logo({ variant = "full", className = "", light = false, size = "md" }: LogoProps) {
@@ -26,7 +26,7 @@ export default function Logo({ variant = "full", className = "", light = false, 
     return (
       <div className={`flex items-center gap-2 ${className}`}>
         <img
-          src="/logostc.svg"
+          src="/logostc.png"
           alt="SaludTech"
           className={`${s.img} w-auto object-contain`}
           onError={() => setImgError(true)}

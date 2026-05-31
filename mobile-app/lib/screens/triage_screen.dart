@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../core/theme.dart';
+import '../core/responsive.dart';
 import '../services/api_service.dart';
 
 class TriageScreen extends StatefulWidget {
@@ -57,7 +58,10 @@ class _TriageScreenState extends State<TriageScreen> {
         ? _symptomsController.text.trim()
         : '${_symptomsController.text.trim()} [Categorías: $selected]';
 
-    final res = await ApiService().submitTriage(fullSymptoms, _severity.toInt());
+    final res = await ApiService().submitTriage(
+      fullSymptoms,
+      _severity.toInt(),
+    );
 
     if (mounted) {
       setState(() => _isSubmitting = false);
@@ -70,7 +74,9 @@ class _TriageScreenState extends State<TriageScreen> {
         _loadTriages();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Solicitud enviada. Un especialista la revisará pronto.'),
+            content: Text(
+              'Solicitud enviada. Un especialista la revisará pronto.',
+            ),
             backgroundColor: AppColors.success,
           ),
         );
@@ -124,28 +130,36 @@ class _TriageScreenState extends State<TriageScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildNewTriageForm(),
-            const SizedBox(height: 32),
-            Text(
-              'Historial de Consultas',
-              style: GoogleFonts.outfit(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+        padding: EdgeInsets.symmetric(
+          horizontal: Responsive.horizontalPadding(context),
+          vertical: 20,
+        ),
+        child: Responsive.constrained(
+          context,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildNewTriageForm(),
+              const SizedBox(height: 32),
+              Text(
+                'Historial de Consultas',
+                style: GoogleFonts.outfit(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            if (_isLoading)
-              const Center(child: CircularProgressIndicator(color: AppColors.primary))
-            else if (_triages.isEmpty)
-              _buildEmptyState()
-            else
-              ..._triages.map((t) => _buildTriageCard(t)),
-          ],
+              const SizedBox(height: 16),
+              if (_isLoading)
+                const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                )
+              else if (_triages.isEmpty)
+                _buildEmptyState()
+              else
+                ..._triages.map((t) => _buildTriageCard(t)),
+            ],
+          ),
         ),
       ),
     );
@@ -205,11 +219,17 @@ class _TriageScreenState extends State<TriageScreen> {
                 selectedColor: AppColors.primary.withValues(alpha: 0.15),
                 checkmarkColor: AppColors.primaryDark,
                 labelStyle: GoogleFonts.outfit(
-                  color: _categories[cat]! ? AppColors.primaryDark : AppColors.textSecondary,
-                  fontWeight: _categories[cat]! ? FontWeight.w600 : FontWeight.normal,
+                  color: _categories[cat]!
+                      ? AppColors.primaryDark
+                      : AppColors.textSecondary,
+                  fontWeight: _categories[cat]!
+                      ? FontWeight.w600
+                      : FontWeight.normal,
                 ),
                 side: BorderSide(
-                  color: _categories[cat]! ? AppColors.primary : const Color(0xFFE2E8F0),
+                  color: _categories[cat]!
+                      ? AppColors.primary
+                      : const Color(0xFFE2E8F0),
                 ),
               );
             }).toList(),
@@ -242,9 +262,14 @@ class _TriageScreenState extends State<TriageScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
-                  color: _getSeverityColor(_severity.toInt()).withValues(alpha: 0.15),
+                  color: _getSeverityColor(
+                    _severity.toInt(),
+                  ).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -281,7 +306,10 @@ class _TriageScreenState extends State<TriageScreen> {
                   ? const SizedBox(
                       width: 24,
                       height: 24,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
                   : Text(
                       'Enviar Síntomas',
@@ -325,16 +353,32 @@ class _TriageScreenState extends State<TriageScreen> {
 
     Color statusColor = Colors.grey;
     String statusLabel = status;
-    if (status == 'PENDING') { statusColor = Colors.orange; statusLabel = 'Pendiente'; }
-    else if (status == 'REVIEWING') { statusColor = Colors.blue; statusLabel = 'En Revisión'; }
-    else if (status == 'RESOLVED') { statusColor = AppColors.success; statusLabel = 'Resuelto'; }
-    else if (status == 'REFERRED') { statusColor = AppColors.primary; statusLabel = 'Derivado'; }
+    if (status == 'PENDING') {
+      statusColor = Colors.orange;
+      statusLabel = 'Pendiente';
+    } else if (status == 'REVIEWING') {
+      statusColor = Colors.blue;
+      statusLabel = 'En Revisión';
+    } else if (status == 'RESOLVED') {
+      statusColor = AppColors.success;
+      statusLabel = 'Resuelto';
+    } else if (status == 'REFERRED') {
+      statusColor = AppColors.primary;
+      statusLabel = 'Derivado';
+    }
 
     Color urgencyColor = AppColors.success;
     String urgencyLabel = 'Baja';
-    if (urgency == 'EMERGENCY') { urgencyColor = AppColors.error; urgencyLabel = '🚨 EMERGENCIA'; }
-    else if (urgency == 'HIGH') { urgencyColor = const Color(0xFFF97316); urgencyLabel = '⚠️ Alta'; }
-    else if (urgency == 'MEDIUM') { urgencyColor = Colors.amber; urgencyLabel = '🔶 Media'; }
+    if (urgency == 'EMERGENCY') {
+      urgencyColor = AppColors.error;
+      urgencyLabel = '🚨 EMERGENCIA';
+    } else if (urgency == 'HIGH') {
+      urgencyColor = const Color(0xFFF97316);
+      urgencyLabel = '⚠️ Alta';
+    } else if (urgency == 'MEDIUM') {
+      urgencyColor = Colors.amber;
+      urgencyLabel = '🔶 Media';
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -357,7 +401,10 @@ class _TriageScreenState extends State<TriageScreen> {
             children: [
               // Urgency badge
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: urgencyColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
@@ -373,7 +420,10 @@ class _TriageScreenState extends State<TriageScreen> {
               ),
               // Status badge
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -392,7 +442,10 @@ class _TriageScreenState extends State<TriageScreen> {
           const SizedBox(height: 10),
           Text(
             triage['symptoms'] ?? '',
-            style: GoogleFonts.outfit(fontSize: 14, color: AppColors.textSecondary),
+            style: GoogleFonts.outfit(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -409,12 +462,19 @@ class _TriageScreenState extends State<TriageScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(LucideIcons.bot, size: 15, color: AppColors.primary),
+                  const Icon(
+                    LucideIcons.bot,
+                    size: 15,
+                    color: AppColors.primary,
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       triage['aiSummary'],
-                      style: GoogleFonts.outfit(fontSize: 12, color: AppColors.primaryDark),
+                      style: GoogleFonts.outfit(
+                        fontSize: 12,
+                        color: AppColors.primaryDark,
+                      ),
                     ),
                   ),
                 ],
@@ -429,17 +489,26 @@ class _TriageScreenState extends State<TriageScreen> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppColors.primary.withValues(alpha: 0.08), AppColors.primary.withValues(alpha: 0.02)],
+                  colors: [
+                    AppColors.primary.withValues(alpha: 0.08),
+                    AppColors.primary.withValues(alpha: 0.02),
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.2),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      const Icon(LucideIcons.stethoscope, size: 14, color: AppColors.primaryDark),
+                      const Icon(
+                        LucideIcons.stethoscope,
+                        size: 14,
+                        color: AppColors.primaryDark,
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         'Especialidad: ${_translateSpecialty(specialty)}',
@@ -458,12 +527,17 @@ class _TriageScreenState extends State<TriageScreen> {
                         child: OutlinedButton.icon(
                           onPressed: () => _loadRecommendedMerchants(triageId),
                           icon: const Icon(LucideIcons.mapPin, size: 14),
-                          label: Text('Ver especialistas', style: GoogleFonts.outfit(fontSize: 12)),
+                          label: Text(
+                            'Ver especialistas',
+                            style: GoogleFonts.outfit(fontSize: 12),
+                          ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.primaryDark,
                             side: const BorderSide(color: AppColors.primary),
                             padding: const EdgeInsets.symmetric(vertical: 8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                         ),
                       ),
@@ -482,12 +556,18 @@ class _TriageScreenState extends State<TriageScreen> {
               decoration: BoxDecoration(
                 color: AppColors.success.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: AppColors.success.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(LucideIcons.userCheck, size: 15, color: AppColors.successDark),
+                  const Icon(
+                    LucideIcons.userCheck,
+                    size: 15,
+                    color: AppColors.successDark,
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Column(
@@ -503,7 +583,10 @@ class _TriageScreenState extends State<TriageScreen> {
                         ),
                         Text(
                           doctorNotes,
-                          style: GoogleFonts.outfit(fontSize: 13, color: AppColors.successDark),
+                          style: GoogleFonts.outfit(
+                            fontSize: 13,
+                            color: AppColors.successDark,
+                          ),
                         ),
                       ],
                     ),
@@ -549,7 +632,8 @@ class _MerchantsSheet extends StatelessWidget {
         children: [
           Center(
             child: Container(
-              width: 40, height: 4,
+              width: 40,
+              height: 4,
               decoration: BoxDecoration(
                 color: const Color(0xFFE2E8F0),
                 borderRadius: BorderRadius.circular(2),
@@ -559,46 +643,70 @@ class _MerchantsSheet extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             'Especialistas Disponibles',
-            style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+            style: GoogleFonts.outfit(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
           ),
           const SizedBox(height: 16),
           if (merchants.isEmpty)
             Center(
-              child: Text('No hay especialistas disponibles en tu área.',
-                style: GoogleFonts.outfit(color: AppColors.textSecondary)),
+              child: Text(
+                'No hay especialistas disponibles en tu área.',
+                style: GoogleFonts.outfit(color: AppColors.textSecondary),
+              ),
             )
           else
-            ...merchants.map((m) => Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
+            ...merchants.map(
+              (m) => Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        LucideIcons.building2,
+                        color: AppColors.primaryDark,
+                        size: 20,
+                      ),
                     ),
-                    child: const Icon(LucideIcons.building2, color: AppColors.primaryDark, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(m['tradeName'] ?? '', style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                        Text(m['city'] ?? '', style: GoogleFonts.outfit(fontSize: 12, color: AppColors.textSecondary)),
-                      ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            m['tradeName'] ?? '',
+                            style: GoogleFonts.outfit(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            m['city'] ?? '',
+                            style: GoogleFonts.outfit(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            )),
+            ),
           const SizedBox(height: 16),
         ],
       ),

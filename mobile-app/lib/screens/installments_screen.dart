@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../core/theme.dart';
+import '../core/responsive.dart';
 import '../services/api_service.dart';
 
 class InstallmentsScreen extends StatefulWidget {
@@ -163,7 +164,10 @@ class _InstallmentsScreenState extends State<InstallmentsScreen>
       color: AppColors.primary,
       onRefresh: _loadInstallments,
       child: ListView.separated(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.symmetric(
+          horizontal: Responsive.horizontalPadding(context),
+          vertical: 20,
+        ),
         itemCount: items.length,
         separatorBuilder: (_, index) => const SizedBox(height: 12),
         itemBuilder: (_, i) {

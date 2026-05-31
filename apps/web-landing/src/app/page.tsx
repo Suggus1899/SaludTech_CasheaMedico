@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import SimuladorCuotas from "./components/SimuladorCuotas";
+import MainNavbar from "./components/MainNavbar";
 import FAQ from "./components/FAQ";
 import Logo from "./components/Logo";
 import {
@@ -23,8 +24,6 @@ import {
   Zap,
   Award,
   ArrowRight,
-  Menu,
-  X,
   Phone,
   Mail,
   MapPin,
@@ -33,90 +32,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-// ─── Navbar ──────────────────────────────────────────────────────────────────
-function Navbar() {
-  const [open, setOpen] = useState(false);
-  const links = [
-    { href: "#como-funciona", label: "Cómo funciona" },
-    { href: "#simulador", label: "Simulador" },
-    { href: "#club", label: "Club" },
-    { href: "#faq", label: "FAQ" },
-    { href: "/para-comercios", label: "Comercios" },
-  ];
-
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <a href="#">
-            <Logo size="md" />
-          </a>
-
-          {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-8">
-            {links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="text-sm font-medium text-slate-600 hover:text-primary transition-colors"
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
-
-          {/* CTA */}
-          <div className="hidden md:flex items-center gap-3">
-            <a href="#comercios" className="text-sm font-semibold text-primary hover:underline">
-              Soy Comercio
-            </a>
-            <a
-              href="#descarga"
-              className="btn-primary text-sm px-5 py-2.5"
-            >
-              <Smartphone className="w-4 h-4" />
-              Descarga la app
-            </a>
-          </div>
-
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-slate-100"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
-
-        {/* Mobile menu */}
-        {open && (
-          <div className="md:hidden py-4 border-t border-slate-100 space-y-1">
-            {links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="block px-3 py-2.5 text-sm font-medium text-slate-700 hover:text-primary hover:bg-primary-50 rounded-lg"
-              >
-                {l.label}
-              </a>
-            ))}
-            <div className="pt-3 flex flex-col gap-2 px-3">
-              <a href="#comercios" className="btn-outline text-sm justify-center">
-                Soy Comercio
-              </a>
-              <a href="#descarga" className="btn-primary text-sm justify-center">
-                <Smartphone className="w-4 h-4" />
-                Descarga la app
-              </a>
-            </div>
-          </div>
-        )}
-      </div>
-    </nav>
-  );
-}
+// Navbar is now a standalone 'use client' component → see components/MainNavbar.tsx
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 function Hero() {
@@ -129,8 +45,8 @@ function Hero() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-accent/5 blur-3xl" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+        <div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Text */}
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/15 border border-primary/30">
@@ -140,10 +56,10 @@ function Hero() {
               </span>
             </div>
 
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight">
               Tu salud,
               <br />
-              <span className="text-gradient-primary bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <span className="text-gradient-primary bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
                 sin esperar
               </span>
               <br />
@@ -168,7 +84,7 @@ function Hero() {
             </div>
 
             {/* Stats */}
-            <div className="flex flex-wrap gap-8 pt-4">
+            <div className="flex flex-wrap gap-6 sm:gap-8 pt-4">
               {[
                 { value: "0%", label: "Interés siempre" },
                 { value: "3 min", label: "Aprobación" },
@@ -183,10 +99,10 @@ function Hero() {
           </div>
 
           {/* Visual card mockup */}
-          <div className="hidden lg:flex justify-center items-center">
+          <div className="hidden md:flex justify-center items-center">
             <div className="relative">
               {/* Main app card */}
-              <div className="w-72 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 shadow-2xl">
+              <div className="w-64 md:w-72 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-5">
                   <div>
                     <p className="text-white/60 text-xs">Línea disponible</p>
@@ -211,7 +127,7 @@ function Hero() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-5 p-3 rounded-xl bg-gradient-to-r from-secondary/20 to-primary/20 border border-secondary/30">
+                <div className="mt-5 p-3 rounded-xl bg-linear-to-r from-secondary/20 to-primary/20 border border-secondary/30">
                   <div className="flex items-center gap-2">
                     <Activity className="w-4 h-4 text-secondary" />
                     <span className="text-white/80 text-xs font-medium">Nivel 2 · 45/50 pts al siguiente</span>
@@ -345,9 +261,9 @@ function AppFeatures() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
           {features.map((f) => (
-            <div key={f.title} className={`rounded-3xl border ${f.border} bg-gradient-to-br ${f.color} p-6 flex flex-col`}>
+            <div key={f.title} className={`rounded-3xl border ${f.border} bg-linear-to-br ${f.color} p-6 flex flex-col`}>
               <div className={`w-11 h-11 rounded-2xl ${f.iconBg} flex items-center justify-center mb-4`}>
                 <f.icon className={`w-6 h-6 ${f.iconColor}`} />
               </div>
@@ -380,6 +296,7 @@ function AppFeatures() {
                     : f.iconColor === "text-secondary"
                     ? "bg-secondary text-white hover:bg-secondary-dark"
                     : "bg-accent text-white hover:opacity-90"
+                
                 }`}
               >
                 {f.cta}
@@ -524,7 +441,7 @@ function ComoFunciona() {
           {steps.map((step, i) => (
             <div key={step.num} className="relative">
               {i < steps.length - 1 && (
-                <div className="hidden lg:block absolute top-12 left-full w-full h-px bg-gradient-to-r from-slate-200 to-transparent z-10 translate-x-2" />
+                <div className="hidden lg:block absolute top-12 left-full w-full h-px bg-linear-to-r from-slate-200 to-transparent z-10 translate-x-2" />
               )}
               <div className={`card-hover bg-white rounded-2xl p-6 border ${step.border} shadow-sm h-full`}>
                 <div className="flex items-start justify-between mb-5">
@@ -621,13 +538,13 @@ function LineasDeCredito() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
           {lines.map((line) => (
             <div
               key={line.name}
               className={`relative rounded-3xl border ${line.border} p-8 card-hover ${
                 line.featured
-                  ? "bg-hero-gradient shadow-2xl shadow-primary/20 scale-105"
+                  ? "bg-hero-gradient shadow-2xl shadow-primary/20 sm:scale-105"
                   : "bg-white shadow-md"
               }`}
             >
@@ -703,7 +620,7 @@ function Especialidades() {
           </p>
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
           {categories.map((cat) => (
             <div
               key={cat.label}
@@ -733,10 +650,10 @@ function Telemedicina() {
   return (
     <section id="triage" className="py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Visual */}
           <div className="relative order-2 lg:order-1">
-            <div className="w-full max-w-md mx-auto">
+            <div className="w-full max-w-sm sm:max-w-md mx-auto">
               {/* Triage card UI */}
               <div className="bg-hero-gradient rounded-3xl p-6 shadow-2xl shadow-dark/40">
                 <div className="flex items-center gap-3 mb-6">
@@ -849,9 +766,9 @@ function ElderCare() {
   ];
 
   return (
-    <section id="elder-care" className="py-24 bg-gradient-to-br from-accent-50 via-white to-primary-50">
+    <section id="elder-care" className="py-24 bg-linear-to-br from-accent-50 via-white to-primary-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className="space-y-8">
             <div>
               <div className="section-tag bg-accent-50 text-accent mb-4">
@@ -890,7 +807,7 @@ function ElderCare() {
           </div>
 
           {/* Elder care visual */}
-          <div className="flex justify-center">
+          <div className="flex justify-center order-first lg:order-last">
             <div className="w-full max-w-sm space-y-4">
               <div className="bg-hero-gradient rounded-3xl p-6 shadow-2xl">
                 <div className="flex items-center gap-3 mb-5">
@@ -978,7 +895,7 @@ function ClubSaludTech() {
         </div>
 
         {/* Level grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-16">
+        <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-16">
           {levels.map((lvl) => (
             <div
               key={lvl.num}
@@ -995,7 +912,7 @@ function ClubSaludTech() {
         </div>
 
         {/* Benefits */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {benefits.map((b) => (
             <div key={b.title} className="bg-surface rounded-2xl p-6 border border-slate-100 card-hover">
               <div className="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center mb-4">
@@ -1023,7 +940,7 @@ function ParaComercios() {
   return (
     <section id="comercios" className="py-24 bg-hero-gradient">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className="space-y-8">
             <div>
               <div className="section-tag bg-white/10 text-white/80 border border-white/20 mb-4">
@@ -1065,7 +982,7 @@ function ParaComercios() {
           </div>
 
           {/* Merchant portal card */}
-          <div className="hidden lg:block">
+          <div className="hidden md:block">
             <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 shadow-2xl">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-primary/30 flex items-center justify-center">
@@ -1123,7 +1040,7 @@ function Descarga() {
   }
 
   return (
-    <section id="descarga" className="py-24 bg-gradient-to-br from-primary-50 via-white to-secondary-50">
+    <section id="descarga" className="py-24 bg-linear-to-br from-primary-50 via-white to-secondary-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
         <div className="flex justify-center mb-6">
           <Logo size="lg" variant="icon" />
@@ -1146,7 +1063,7 @@ function Descarga() {
         </p>
 
         {/* Store buttons */}
-        <div className="flex flex-wrap justify-center gap-4 mb-10">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10">
 
           {/* Android — próximamente, primer en llegar */}
           <div className="relative group">
@@ -1224,7 +1141,7 @@ function Descarga() {
         </div>
 
         {/* Trust row */}
-        <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-500">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-slate-500">
           {[
             { icon: ShieldCheck, text: "Datos protegidos" },
             { icon: CheckCircle2, text: "Sin cuotas ocultas" },
@@ -1327,7 +1244,7 @@ function Footer() {
 export default function LandingPage() {
   return (
     <main>
-      <Navbar />
+      <MainNavbar />
       <Hero />
       <TrustStrip />
       <AppFeatures />

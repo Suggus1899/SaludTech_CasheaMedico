@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../core/theme.dart';
+import '../core/responsive.dart';
 import '../services/api_service.dart';
 import 'elder_care_screen.dart';
 
@@ -210,7 +211,10 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen>
       onRefresh: _loadAll,
       color: AppColors.primary,
       child: ListView.separated(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.symmetric(
+          horizontal: Responsive.horizontalPadding(context),
+          vertical: 20,
+        ),
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: _pharmacySubs.length,
         separatorBuilder: (_, _) => const SizedBox(height: 12),

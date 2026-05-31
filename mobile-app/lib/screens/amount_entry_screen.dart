@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
+import '../core/responsive.dart';
 import '../services/api_service.dart';
 import 'checkout_screen.dart';
 
@@ -21,7 +22,7 @@ class _AmountEntryScreenState extends State<AmountEntryScreen> {
   void _submitAmount() async {
     final amountText = _amountController.text.trim();
     if (amountText.isEmpty) return;
-    
+
     final amount = double.tryParse(amountText);
     if (amount == null || amount <= 0) return;
 
@@ -29,8 +30,9 @@ class _AmountEntryScreenState extends State<AmountEntryScreen> {
 
     // Call backend preview to get real installment schedule
     // Generate a dummy qrToken/nonce since it's a static QR flow
-    final String dummyToken = "${widget.merchantId}:$amount:${DateTime.now().millisecondsSinceEpoch}";
-    
+    final String dummyToken =
+        "${widget.merchantId}:$amount:${DateTime.now().millisecondsSinceEpoch}";
+
     final preview = await _apiService.previewTransaction(
       merchantId: widget.merchantId,
       amount: amount,
@@ -44,7 +46,9 @@ class _AmountEntryScreenState extends State<AmountEntryScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No se pudo simular el financiamiento. Intenta de nuevo.'),
+          content: Text(
+            'No se pudo simular el financiamiento. Intenta de nuevo.',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -55,7 +59,8 @@ class _AmountEntryScreenState extends State<AmountEntryScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => CheckoutScreen(qrData: preview, rawQrToken: dummyToken),
+        builder: (context) =>
+            CheckoutScreen(qrData: preview, rawQrToken: dummyToken),
       ),
     );
   }
@@ -64,51 +69,77 @@ class _AmountEntryScreenState extends State<AmountEntryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ingresar Monto', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.black)),
+        title: Text(
+          'Ingresar Monto',
+          style: GoogleFonts.outfit(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Ingresa el monto de tu factura',
-              style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            TextField(
-              controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                prefixText: '\$ ',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+        padding: EdgeInsets.symmetric(
+          horizontal: Responsive.horizontalPadding(context),
+          vertical: 24,
+        ),
+        child: Responsive.constrained(
+          context,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Ingresa el monto de tu factura',
+                style: GoogleFonts.outfit(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              TextField(
+                controller: _amountController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                style: GoogleFonts.outfit(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  prefixText: '\$ ',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _isProcessing ? null : _submitAmount,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: _isProcessing ? null : _submitAmount,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: _isProcessing
+                    ? const CircularProgressIndicator(color: Colors.black)
+                    : Text(
+                        'Continuar',
+                        style: GoogleFonts.outfit(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
               ),
-              child: _isProcessing
-                  ? const CircularProgressIndicator(color: Colors.black)
-                  : Text(
-                      'Continuar',
-                      style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

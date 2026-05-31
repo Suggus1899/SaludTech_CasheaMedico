@@ -35,7 +35,7 @@ function Hero() {
         <h1 className="font-display text-5xl sm:text-6xl font-bold text-white mb-6 leading-tight">
           Acepta SaludTech y
           <br />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+          <span className="bg-clip-text text-transparent bg-linear-to-r from-primary to-secondary">
             aumenta tus ventas +20%
           </span>
         </h1>
@@ -43,7 +43,7 @@ function Hero() {
           Ofrece financiamiento sin interés a tus pacientes. SaludTech asume el riesgo,
           tú recibes el pago completo al instante.
         </p>
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <a
             href="#proceso"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-primary text-white font-bold text-base hover:bg-primary-dark transition-colors shadow-lg shadow-primary/30"
@@ -61,7 +61,7 @@ function Hero() {
         </div>
 
         {/* Stats strip */}
-        <div className="grid grid-cols-3 gap-6 mt-16 max-w-2xl mx-auto">
+        <div className="grid grid-cols-3 gap-4 sm:gap-6 mt-12 sm:mt-16 max-w-2xl mx-auto">
           {[
             { value: "+20%", label: "Aumento en ventas" },
             { value: "48h", label: "Activación típica" },
@@ -136,7 +136,7 @@ function Beneficios() {
             El método de pago que convierte más pacientes en clientes.
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((item) => (
             <div key={item.title} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
               <div className={`w-12 h-12 rounded-2xl ${item.bg} flex items-center justify-center mb-5`}>
@@ -203,7 +203,7 @@ function ComoFunciona() {
         </div>
 
         <div className="relative">
-          <div className="hidden md:block absolute left-6 top-8 bottom-8 w-px bg-gradient-to-b from-primary via-secondary to-accent" />
+          <div className="hidden md:block absolute left-6 top-8 bottom-8 w-px bg-linear-to-b from-primary via-secondary to-accent" />
           <div className="space-y-6">
             {steps.map((step, i) => (
               <div key={step.num} className="relative flex gap-6 md:pl-16">
@@ -264,7 +264,7 @@ function ProcesoAfiliacion() {
   ];
 
   return (
-    <section id="proceso" className="py-24 bg-gradient-to-br from-dark via-slate-900 to-dark text-white">
+    <section id="proceso" className="py-24 bg-linear-to-br from-dark via-slate-900 to-dark text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-white/10 text-white/70 mb-4">
@@ -278,7 +278,7 @@ function ProcesoAfiliacion() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
           {/* Pasos */}
           <div className="space-y-5">
             {pasos.map((paso) => (

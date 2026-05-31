@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../core/theme.dart';
+import '../core/responsive.dart';
 import '../models/user_response.dart';
 import '../services/api_service.dart';
 import 'qr_scanner_screen.dart';
@@ -102,7 +103,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+        padding: EdgeInsets.fromLTRB(
+          Responsive.horizontalPadding(context),
+          20,
+          Responsive.horizontalPadding(context),
+          32,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -411,6 +417,21 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentCreditPage = 0;
 
   Widget _buildCreditLinesPageView() {
+    final isTablet = Responsive.isTablet(context);
+    if (isTablet) {
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 1.6,
+        ),
+        itemCount: _creditLines.length,
+        itemBuilder: (_, i) => _buildCreditLineCard(_creditLines[i]),
+      );
+    }
     return Column(
       children: [
         SizedBox(

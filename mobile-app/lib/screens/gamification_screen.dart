@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../core/theme.dart';
+import '../core/responsive.dart';
 import '../models/user_response.dart';
 
 class GamificationScreen extends StatelessWidget {
@@ -40,143 +41,151 @@ class GamificationScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Column(
-          children: [
-            // Level Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.primary, AppColors.primaryDark],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+        padding: EdgeInsets.symmetric(
+          horizontal: Responsive.horizontalPadding(context),
+          vertical: 10,
+        ),
+        child: Responsive.constrained(
+          context,
+          Column(
+            children: [
+              // Level Card
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppColors.primary, AppColors.primaryDark],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      LucideIcons.award,
-                      color: Colors.white,
-                      size: 48,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Nivel $currentLevel',
-                    style: GoogleFonts.outfit(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Puntos actuales: $currentPoints pts',
-                    style: GoogleFonts.outfit(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  // Progress Bar
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Progreso a Nivel ${currentLevel + 1}',
-                            style: GoogleFonts.outfit(
-                              color: Colors.white.withValues(alpha: 0.8),
-                              fontSize: 13,
-                            ),
-                          ),
-                          Text(
-                            '$currentPoints / $nextLevelPoints',
-                            style: GoogleFonts.outfit(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
                       ),
-                      const SizedBox(height: 8),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          backgroundColor: Colors.white.withValues(alpha: 0.2),
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                          minHeight: 8,
+                      child: const Icon(
+                        LucideIcons.award,
+                        color: Colors.white,
+                        size: 48,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Nivel $currentLevel',
+                      style: GoogleFonts.outfit(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Puntos actuales: $currentPoints pts',
+                      style: GoogleFonts.outfit(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Progress Bar
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Progreso a Nivel ${currentLevel + 1}',
+                              style: GoogleFonts.outfit(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 13,
+                              ),
+                            ),
+                            Text(
+                              '$currentPoints / $nextLevelPoints',
+                              style: GoogleFonts.outfit(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
-            // Info text
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Cómo ganar puntos',
-                style: GoogleFonts.outfit(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.2,
+                            ),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                            minHeight: 8,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
 
-            _buildInfoCard(
-              icon: LucideIcons.calendarCheck,
-              title: 'Pago Puntual',
-              description:
-                  'Gana 10 pts pagando tus cuotas el día de su vencimiento.',
-              color: AppColors.success,
-            ),
-            const SizedBox(height: 12),
-            _buildInfoCard(
-              icon: LucideIcons.zap,
-              title: 'Pago Adelantado',
-              description:
-                  'Gana 15 pts pagando tus cuotas antes de su fecha de vencimiento.',
-              color: const Color(0xFF8B5CF6),
-            ),
-            const SizedBox(height: 12),
-            _buildInfoCard(
-              icon: LucideIcons.alertTriangle,
-              title: '¡Evita Retrasos!',
-              description:
-                  'Los atrasos congelan tu cuenta y pueden resetear tus puntos.',
-              color: AppColors.error,
-              isWarning: true,
-            ),
-          ],
+              const SizedBox(height: 32),
+
+              // Info text
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Cómo ganar puntos',
+                  style: GoogleFonts.outfit(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              _buildInfoCard(
+                icon: LucideIcons.calendarCheck,
+                title: 'Pago Puntual',
+                description:
+                    'Gana 10 pts pagando tus cuotas el día de su vencimiento.',
+                color: AppColors.success,
+              ),
+              const SizedBox(height: 12),
+              _buildInfoCard(
+                icon: LucideIcons.zap,
+                title: 'Pago Adelantado',
+                description:
+                    'Gana 15 pts pagando tus cuotas antes de su fecha de vencimiento.',
+                color: const Color(0xFF8B5CF6),
+              ),
+              const SizedBox(height: 12),
+              _buildInfoCard(
+                icon: LucideIcons.alertTriangle,
+                title: '¡Evita Retrasos!',
+                description:
+                    'Los atrasos congelan tu cuenta y pueden resetear tus puntos.',
+                color: AppColors.error,
+                isWarning: true,
+              ),
+            ],
+          ),
         ),
       ),
     );

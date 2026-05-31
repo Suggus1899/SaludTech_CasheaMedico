@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../core/theme.dart';
+import '../core/responsive.dart';
 import '../services/api_service.dart';
 
 class ElderCareScreen extends StatefulWidget {
@@ -75,7 +76,10 @@ class _ElderCareScreenState extends State<ElderCareScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Cancelar Suscripción', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+        title: Text(
+          'Cancelar Suscripción',
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+        ),
         content: Text(
           '¿Estás seguro? El cobro del próximo mes no se realizará.',
           style: GoogleFonts.outfit(),
@@ -88,7 +92,10 @@ class _ElderCareScreenState extends State<ElderCareScreen>
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: Text('Cancelar', style: GoogleFonts.outfit(color: Colors.white)),
+            child: Text(
+              'Cancelar',
+              style: GoogleFonts.outfit(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -103,7 +110,10 @@ class _ElderCareScreenState extends State<ElderCareScreen>
       if (success) {
         _loadSubscriptions();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Suscripción cancelada'), backgroundColor: AppColors.success),
+          const SnackBar(
+            content: Text('Suscripción cancelada'),
+            backgroundColor: AppColors.success,
+          ),
         );
       }
     }
@@ -140,7 +150,10 @@ class _ElderCareScreenState extends State<ElderCareScreen>
           labelColor: const Color(0xFF7C3AED),
           unselectedLabelColor: AppColors.textSecondary,
           indicatorColor: const Color(0xFF7C3AED),
-          labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 13),
+          labelStyle: GoogleFonts.outfit(
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
           tabs: const [
             Tab(text: 'Servicios'),
             Tab(text: 'Mis Suscripciones'),
@@ -149,33 +162,36 @@ class _ElderCareScreenState extends State<ElderCareScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildServicesTab(),
-          _buildSubscriptionsTab(),
-        ],
+        children: [_buildServicesTab(), _buildSubscriptionsTab()],
       ),
     );
   }
 
   Widget _buildServicesTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildElderCareHero(),
-          const SizedBox(height: 24),
-          Text(
-            'Servicios Disponibles',
-            style: GoogleFonts.outfit(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+      padding: EdgeInsets.symmetric(
+        horizontal: Responsive.horizontalPadding(context),
+        vertical: 20,
+      ),
+      child: Responsive.constrained(
+        context,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildElderCareHero(),
+            const SizedBox(height: 24),
+            Text(
+              'Servicios Disponibles',
+              style: GoogleFonts.outfit(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          ..._services.map((s) => _buildServiceCard(s)),
-        ],
+            const SizedBox(height: 12),
+            ..._services.map((s) => _buildServiceCard(s)),
+          ],
+        ),
       ),
     );
   }
@@ -277,12 +293,18 @@ class _ElderCareScreenState extends State<ElderCareScreen>
             onPressed: () => _showSubscribeDialog(service),
             style: ElevatedButton.styleFrom(
               backgroundColor: color,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             ),
             child: Text(
               'Suscribir',
-              style: GoogleFonts.outfit(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
+              style: GoogleFonts.outfit(
+                fontSize: 12,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -304,7 +326,10 @@ class _ElderCareScreenState extends State<ElderCareScreen>
           children: [
             Icon(service['icon'] as IconData, color: service['color'] as Color),
             const SizedBox(width: 8),
-            Text(service['label'] as String, style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+            Text(
+              service['label'] as String,
+              style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         content: Column(
@@ -324,12 +349,19 @@ class _ElderCareScreenState extends State<ElderCareScreen>
               ),
               child: Row(
                 children: [
-                  Icon(LucideIcons.info, size: 14, color: service['color'] as Color),
+                  Icon(
+                    LucideIcons.info,
+                    size: 14,
+                    color: service['color'] as Color,
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       'Puedes cancelar en cualquier momento.',
-                      style: GoogleFonts.outfit(fontSize: 12, color: AppColors.textSecondary),
+                      style: GoogleFonts.outfit(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ),
                 ],
@@ -344,8 +376,13 @@ class _ElderCareScreenState extends State<ElderCareScreen>
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: service['color'] as Color),
-            child: Text('Confirmar', style: GoogleFonts.outfit(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: service['color'] as Color,
+            ),
+            child: Text(
+              'Confirmar',
+              style: GoogleFonts.outfit(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -383,7 +420,9 @@ class _ElderCareScreenState extends State<ElderCareScreen>
 
   Widget _buildSubscriptionsTab() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFF7C3AED)));
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFF7C3AED)),
+      );
     }
     if (_subscriptions.isEmpty) {
       return Center(
@@ -392,7 +431,11 @@ class _ElderCareScreenState extends State<ElderCareScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(LucideIcons.shield, size: 56, color: Color(0xFFDDD6FE)),
+              const Icon(
+                LucideIcons.shield,
+                size: 56,
+                color: Color(0xFFDDD6FE),
+              ),
               const SizedBox(height: 16),
               Text(
                 'Sin suscripciones activas',
@@ -437,7 +480,9 @@ class _ElderCareScreenState extends State<ElderCareScreen>
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isActive ? purple.withValues(alpha: 0.2) : const Color(0xFFE2E8F0),
+          color: isActive
+              ? purple.withValues(alpha: 0.2)
+              : const Color(0xFFE2E8F0),
         ),
       ),
       child: Column(
@@ -449,13 +494,21 @@ class _ElderCareScreenState extends State<ElderCareScreen>
               Expanded(
                 child: Text(
                   sub['merchantName'] ?? 'Proveedor',
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                  style: GoogleFonts.outfit(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
-                  color: isActive ? purple.withValues(alpha: 0.1) : Colors.grey.shade100,
+                  color: isActive
+                      ? purple.withValues(alpha: 0.1)
+                      : Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -472,11 +525,18 @@ class _ElderCareScreenState extends State<ElderCareScreen>
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(LucideIcons.activity, size: 14, color: AppColors.textSecondary),
+              const Icon(
+                LucideIcons.activity,
+                size: 14,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 4),
               Text(
                 _translateServiceType(sub['serviceType'] ?? ''),
-                style: GoogleFonts.outfit(fontSize: 13, color: AppColors.textSecondary),
+                style: GoogleFonts.outfit(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
               ),
               const Spacer(),
               Text(
@@ -492,11 +552,18 @@ class _ElderCareScreenState extends State<ElderCareScreen>
             const SizedBox(height: 6),
             Row(
               children: [
-                const Icon(LucideIcons.calendar, size: 14, color: AppColors.textSecondary),
+                const Icon(
+                  LucideIcons.calendar,
+                  size: 14,
+                  color: AppColors.textSecondary,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   'Próximo cobro: ${_formatDate(sub['nextBillingDate'])}',
-                  style: GoogleFonts.outfit(fontSize: 12, color: AppColors.textSecondary),
+                  style: GoogleFonts.outfit(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -506,9 +573,14 @@ class _ElderCareScreenState extends State<ElderCareScreen>
             Align(
               alignment: Alignment.centerRight,
               child: TextButton.icon(
-                onPressed: _isCancelling ? null : () => _cancelSubscription(sub['id']),
+                onPressed: _isCancelling
+                    ? null
+                    : () => _cancelSubscription(sub['id']),
                 icon: const Icon(LucideIcons.x, size: 14),
-                label: Text('Cancelar', style: GoogleFonts.outfit(fontSize: 13)),
+                label: Text(
+                  'Cancelar',
+                  style: GoogleFonts.outfit(fontSize: 13),
+                ),
                 style: TextButton.styleFrom(foregroundColor: AppColors.error),
               ),
             ),
