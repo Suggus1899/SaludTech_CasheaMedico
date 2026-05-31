@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Syne } from "next/font/google";
 import "./globals.css";
-import MockProvider from "../components/MockProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -42,7 +41,7 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Saltar al contenido principal
         </a>
-        <MockProvider>{children}</MockProvider>
+        {children}
       </body>
     </html>
   );

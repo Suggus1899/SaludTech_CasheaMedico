@@ -1,6 +1,4 @@
-import { http, HttpResponse } from "msw";
-
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
+import { NextRequest, NextResponse } from "next/server";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -34,44 +32,40 @@ const mockElderSubs = [
   { id: "ec-003", patientName: "Carmen Vega", age: 75, plan: "Premium", status: "PENDING", monthlyFee: 80.00, nextBilling: null },
 ];
 
-// ─── Handlers ─────────────────────────────────────────────────────────────────
+// ─── Router ───────────────────────────────────────────────────────────────────
 
-export const handlers = [
-  // Auth
-  http.post(`${BASE}/auth/login`, () => {
-    return HttpResponse.json({
-      token: "demo-token",
-      user: { id: "mc-001", email: "comercio@saludtech.com", firstName: "Clínica", lastName: "Santa María", role: "MERCHANT", merchantId: "m-001" },
-    });
-  }),
+function resolve(path: string[], method: string) {
+  const route = path.join("/");
 
-  // QR generate
-  http.post(`${BASE}/merchant/qr/generate`, () => {
-    return HttpResponse.json({ token: "qr-demo-token-abc123", expiresAt: new Date(Date.now() + 300000).toISOString() });
-  }),
+  if (method === "POST" && route === "auth/login") {
+    return { token: "demo-token", user: { id: "mc-001", email: "comercio@saludtech.com", firstName: "Clínica", lastName: "Santa María", role: "MERCHANT", merchantId: "m-001" } };
+  }
+  if (method === "POST" && route === "merchant/qr/generate") {
+    return { token: "qr-demo-token-abc123", expiresAt: new Date(Date.now() + 300000).toISOString() };
+  }
+  if (route.match(/^merchant\/qr\/.+\/status$/)) return { status: "PENDING" };
+  if (route === "merchant/reconciliation/transactions/today") return mockDailyTxs;
+  if (route === "merchant/reconciliation/transactions") return mockHistoryTxs;
+  if (route === "merchant/payouts") return mockPayouts;
+  if (route === "merchant/elder-care/subscriptions") return mockElderSubs;
 
-  // QR status — cycles through PENDING → PAID after a simulated delay
-  http.get(`${BASE}/merchant/qr/:token/status`, () => {
-    return HttpResponse.json({ status: "PENDING" });
-  }),
+  return null;
+}
 
-  // Today transactions
-  http.get(`${BASE}/merchant/reconciliation/transactions/today`, () => {
-    return HttpResponse.json(mockDailyTxs);
-  }),
+export async function GET(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
+  const { path } = await params;
+  const data = resolve(path, "GET");
+  if (!data) return NextResponse.json({ error: "Mock not found" }, { status: 404 });
+  return NextResponse.json(data);
+}
 
-  // All transactions (history)
-  http.get(`${BASE}/merchant/reconciliation/transactions`, () => {
-    return HttpResponse.json(mockHistoryTxs);
-  }),
+export async function POST(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
+  const { path } = await params;
+  const data = resolve(path, "POST");
+  if (!data) return NextResponse.json({ error: "Mock not found" }, { status: 404 });
+  return NextResponse.json(data);
+}
 
-  // Payouts / liquidaciones
-  http.get(`${BASE}/merchant/payouts`, () => {
-    return HttpResponse.json(mockPayouts);
-  }),
-
-  // Elder Care subscriptions
-  http.get(`${BASE}/merchant/elder-care/subscriptions`, () => {
-    return HttpResponse.json(mockElderSubs);
-  }),
-];
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
+  return NextResponse.json({ success: true });
+}

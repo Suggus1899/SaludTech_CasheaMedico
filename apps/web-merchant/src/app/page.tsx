@@ -62,6 +62,11 @@ import { QRCodeSVG } from "qrcode.react";
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 
+function getApiUrl(path: string): string {
+  if (process.env.NEXT_PUBLIC_MOCK_API === "true") return `/api/mock/${path}`;
+  return `${API_BASE}/${path}`;
+}
+
 type MerchantView = "generar-qr" | "liquidaciones" | "historial" | "suscripciones-ec";
 
 interface DailyTx {
@@ -102,7 +107,7 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 async function fetchQrToken(amount: number, description: string): Promise<string> {
-  const res = await fetch(`${API_BASE}/merchant/qr/generate`, {
+  const res = await fetch(getApiUrl("merchant/qr/generate"), {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify({ amount, description }),
@@ -113,7 +118,7 @@ async function fetchQrToken(amount: number, description: string): Promise<string
 }
 
 async function fetchQrStatus(token: string): Promise<string> {
-  const res = await fetch(`${API_BASE}/merchant/qr/${token}/status`, {
+  const res = await fetch(getApiUrl(`merchant/qr/${token}/status`), {
     headers: getAuthHeaders(),
   });
   if (!res.ok) return "UNKNOWN";
@@ -122,7 +127,7 @@ async function fetchQrStatus(token: string): Promise<string> {
 }
 
 async function fetchTodayTransactions(): Promise<DailyTx[]> {
-  const res = await fetch(`${API_BASE}/merchant/reconciliation/transactions/today`, {
+  const res = await fetch(getApiUrl("merchant/reconciliation/transactions/today"), {
     headers: getAuthHeaders(),
   });
   if (!res.ok) return [];
@@ -140,7 +145,7 @@ async function fetchTodayTransactions(): Promise<DailyTx[]> {
 }
 
 async function fetchAllTransactions(): Promise<HistoryTx[]> {
-  const res = await fetch(`${API_BASE}/merchant/reconciliation/transactions`, {
+  const res = await fetch(getApiUrl("merchant/reconciliation/transactions"), {
     headers: getAuthHeaders(),
   });
   if (!res.ok) return [];
@@ -156,7 +161,7 @@ async function fetchAllTransactions(): Promise<HistoryTx[]> {
 }
 
 async function fetchPayouts(): Promise<Payout[]> {
-  const res = await fetch(`${API_BASE}/merchant/payouts`, {
+  const res = await fetch(getApiUrl("merchant/payouts"), {
     headers: getAuthHeaders(),
   });
   if (!res.ok) return [];
@@ -178,7 +183,7 @@ function ElderCareSubscriptionsView() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`${API_BASE}/merchant/elder-care/subscriptions`, {
+        const res = await fetch(getApiUrl("merchant/elder-care/subscriptions"), {
           headers: getAuthHeaders(),
         });
         if (res.ok) setSubs(await res.json());

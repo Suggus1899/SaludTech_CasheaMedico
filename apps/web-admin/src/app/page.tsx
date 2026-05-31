@@ -64,6 +64,11 @@ type View = "overview" | "pacientes" | "comercios" | "financiamientos" | "triaje
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 
+function getApiUrl(path: string): string {
+  if (process.env.NEXT_PUBLIC_MOCK_API === "true") return `/api/mock/${path}`;
+  return `${API_BASE}/${path}`;
+}
+
 function getAuthHeaders(): Record<string, string> {
   const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
   return {
@@ -136,8 +141,8 @@ function useFetchData<T>(url: string, dependencies: any[] = []) {
 
 // ─── Sub-views ─────────────────────────────────────────────────────────────────
 function OverviewView({ searchTerm }: { searchTerm: string }) {
-  const { data: stats, loading: statsLoading } = useFetchData<any>(`${API_BASE}/admin/dashboard/stats`);
-  const { data: txData, loading: txLoading } = useFetchData<any>(`${API_BASE}/admin/transactions?size=5`);
+  const { data: stats, loading: statsLoading } = useFetchData<any>(getApiUrl("admin/dashboard/stats"));
+  const { data: txData, loading: txLoading } = useFetchData<any>(getApiUrl("admin/transactions?size=5"));
 
   if (statsLoading || txLoading) return <div className="p-8 text-center text-muted-foreground">Cargando dashboard...</div>;
 
@@ -287,7 +292,7 @@ function OverviewView({ searchTerm }: { searchTerm: string }) {
 }
 
 function PacientesView({ searchTerm, onAddPatient, refreshTrigger }: { searchTerm: string; onAddPatient: () => void; refreshTrigger: number }) {
-  const { data, loading } = useFetchData<any>(`${API_BASE}/admin/users?size=50`, [refreshTrigger]);
+  const { data, loading } = useFetchData<any>(getApiUrl("admin/users?size=50"), [refreshTrigger]);
   
   if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando pacientes...</div>;
 
@@ -345,7 +350,7 @@ function PacientesView({ searchTerm, onAddPatient, refreshTrigger }: { searchTer
                       {!p.active && (
                         <Button size="sm" variant="outline" onClick={async () => {
                           try {
-                            const res = await fetch(`${API_BASE}/admin/users/${p.id}/status?activate=true`, {
+                            const res = await fetch(getApiUrl(`admin/users/${p.id}/status?activate=true`), {
                               method: 'POST',
                               headers: getAuthHeaders(),
                             });
@@ -356,7 +361,7 @@ function PacientesView({ searchTerm, onAddPatient, refreshTrigger }: { searchTer
                       {p.active && (
                         <Button size="sm" variant="destructive" onClick={async () => {
                           try {
-                            const res = await fetch(`${API_BASE}/admin/users/${p.id}/status?activate=false`, {
+                            const res = await fetch(getApiUrl(`admin/users/${p.id}/status?activate=false`), {
                               method: 'POST',
                               headers: getAuthHeaders(),
                             });
@@ -377,7 +382,7 @@ function PacientesView({ searchTerm, onAddPatient, refreshTrigger }: { searchTer
 }
 
 function ComerciosView({ searchTerm, onAddMerchant, refreshTrigger }: { searchTerm: string; onAddMerchant: () => void; refreshTrigger: number }) {
-  const { data, loading } = useFetchData<any[]>(`${API_BASE}/admin/merchants`, [refreshTrigger]);
+  const { data, loading } = useFetchData<any[]>(getApiUrl("admin/merchants"), [refreshTrigger]);
   
   if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando comercios...</div>;
 
@@ -424,7 +429,7 @@ function ComerciosView({ searchTerm, onAddMerchant, refreshTrigger }: { searchTe
                   {!c.isActive ? (
                     <Button size="sm" onClick={async () => {
                       try {
-                        const res = await fetch(`${API_BASE}/admin/merchants/${c.id}/approve`, {
+                        const res = await fetch(getApiUrl(`admin/merchants/${c.id}/approve`), {
                           method: 'POST',
                           headers: getAuthHeaders(),
                         });
@@ -447,7 +452,7 @@ function ComerciosView({ searchTerm, onAddMerchant, refreshTrigger }: { searchTe
 }
 
 function FinanciamientosView({ searchTerm }: { searchTerm: string }) {
-  const { data, loading } = useFetchData<any>(`${API_BASE}/admin/transactions?size=50`);
+  const { data, loading } = useFetchData<any>(getApiUrl("admin/transactions?size=50"));
 
   if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando financiamientos...</div>;
 
@@ -513,7 +518,7 @@ function FinanciamientosView({ searchTerm }: { searchTerm: string }) {
 
 // ─── TriajesView ───────────────────────────────────────────────────────────────
 function TriajesView({ searchTerm }: { searchTerm: string }) {
-  const { data, loading, refetch } = useFetchData<any[]>(`${API_BASE}/admin/triage/pending`);
+  const { data, loading, refetch } = useFetchData<any[]>(getApiUrl("admin/triage/pending"));
   const [responding, setResponding] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
   const [respondStatus, setRespondStatus] = useState("RESOLVED");
@@ -541,7 +546,7 @@ function TriajesView({ searchTerm }: { searchTerm: string }) {
   const handleRespond = async (id: string) => {
     if (!notes.trim()) return;
     try {
-      const res = await fetch(`${API_BASE}/admin/triage/${id}/respond`, {
+      const res = await fetch(getApiUrl(`admin/triage/${id}/respond`), {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({ doctorNotes: notes, status: respondStatus }),
@@ -625,7 +630,7 @@ function TriajesView({ searchTerm }: { searchTerm: string }) {
 
 // ─── ElderCareView ────────────────────────────────────────────────────────────
 function ElderCareView({ searchTerm }: { searchTerm: string }) {
-  const { data, loading } = useFetchData<any>(`${API_BASE}/admin/elder-care`);
+  const { data, loading } = useFetchData<any>(getApiUrl("admin/elder-care"));
 
   if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando datos Elder Care...</div>;
 
@@ -722,7 +727,7 @@ function ElderCareView({ searchTerm }: { searchTerm: string }) {
 
 // ─── SuscripcionesView ────────────────────────────────────────────────────────
 function SuscripcionesView({ searchTerm }: { searchTerm: string }) {
-  const { data, loading } = useFetchData<any[]>(`${API_BASE}/admin/subscriptions/all`);
+  const { data, loading } = useFetchData<any[]>(getApiUrl("admin/subscriptions/all"));
 
   if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando suscripciones...</div>;
 
@@ -892,7 +897,7 @@ export default function AdminDashboard() {
     if (!notifOpen && overdueList.length === 0) {
       setNotifLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/admin/installments/overdue`, { headers: getAuthHeaders() });
+        const res = await fetch(getApiUrl("admin/installments/overdue"), { headers: getAuthHeaders() });
         if (res.ok) setOverdueList(await res.json());
       } finally {
         setNotifLoading(false);
@@ -905,7 +910,7 @@ export default function AdminDashboard() {
     setPatientError(null);
     setPatientLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/admin/users`, {
+      const res = await fetch(getApiUrl("admin/users"), {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify(patientForm),
@@ -933,7 +938,7 @@ export default function AdminDashboard() {
     setMerchantError(null);
     setMerchantLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/admin/merchants`, {
+      const res = await fetch(getApiUrl("admin/merchants"), {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify(merchantForm),

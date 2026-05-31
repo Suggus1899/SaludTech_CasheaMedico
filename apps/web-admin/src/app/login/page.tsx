@@ -10,6 +10,11 @@ import Logo from "../../components/Logo";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 
+function getApiUrl(path: string): string {
+  if (process.env.NEXT_PUBLIC_MOCK_API === "true") return `/api/mock/${path}`;
+  return `${API_BASE}/${path}`;
+}
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -31,7 +36,7 @@ export default function AdminLoginPage() {
     setError(null);
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const res = await fetch(getApiUrl("auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
