@@ -1,0 +1,16 @@
+{
+  "name": "saludtech-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "clean": "turbo clean",
+    "check-all": "pnpm lint && pnpm test && turbo build"
+  },
+  "devDependencies": {
+    "turbo": "^2.1.2"
+  },
+  "packageManager": "pnpm@9.12.0"
+}

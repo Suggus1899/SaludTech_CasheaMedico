@@ -1,0 +1,81 @@
+spring:
+  application:
+    name: saludtech-backend
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    clean-disabled: true
+    validate-on-migrate: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+saludtech:
+  jwt:
+    secret: ${SALUDTECH_JWT_SECRET:default-dev-secret-change-me-in-production-256bit}
+    access-token-expiration: 900000
+    refresh-token-expiration: 604800000
+  qr:
+    secret: ${SALUDTECH_QR_SECRET:default-qr-secret-change-me-in-production-256bit}
+    ttl-minutes: 15
+  otp:
+    send-real: ${OTP_SEND_REAL:false}
+    whatsapp-bridge-url: ${WHATSAPP_BRIDGE_URL:http://localhost:3500}
+  levels:
+    rules:
+      1:
+        min-down-payment-ratio: 0.60
+        max-installments: 3
+        required-total-paid: 0.00
+        required-installments-paid-count: 0
+      2:
+        min-down-payment-ratio: 0.50
+        max-installments: 3
+        required-total-paid: 120.00
+        required-installments-paid-count: 5
+      3:
+        min-down-payment-ratio: 0.40
+        max-installments: 6
+        required-total-paid: 400.00
+        required-installments-paid-count: 10
+      4:
+        min-down-payment-ratio: 0.40
+        max-installments: 9
+        required-total-paid: 800.00
+        required-installments-paid-count: 20
+      5:
+        min-down-payment-ratio: 0.40
+        max-installments: 12
+        required-total-paid: 2000.00
+        required-installments-paid-count: 40
+      6:
+        min-down-payment-ratio: 0.40
+        max-installments: 12
+        required-total-paid: 4000.00
+        required-installments-paid-count: 80

@@ -1,0 +1,135 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: saludtech-postgres
+    environment:
+      POSTGRES_DB: saludtech_db
+      POSTGRES_USER: saludtech
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-devpassword}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U saludtech -d saludtech_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: saludtech-redis
+    command: redis-server --requirepass ${REDIS_PASSWORD:-devpassword}
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-devpassword}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  whatsapp-bridge:
+    build: ./whatsapp-bridge
+    container_name: saludtech-whatsapp-bridge
+    ports:
+      - "3500:3500"
+    volumes:
+      - ./whatsapp-bridge/session:/app/session
+    environment:
+      PORT: 3500
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3500/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  backend:
+    build: ./backend
+    container_name: saludtech-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/saludtech_db
+      SPRING_DATASOURCE_USERNAME: saludtech
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-devpassword}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD:-devpassword}
+      SALUDTECH_JWT_SECRET: ${SALUDTECH_JWT_SECRET:-default-dev-secret-change-me}
+      SALUDTECH_QR_SECRET: ${SALUDTECH_QR_SECRET:-default-qr-secret-change-me}
+      WHATSAPP_BRIDGE_URL: http://whatsapp-bridge:3500
+      OTP_SEND_REAL: ${OTP_SEND_REAL:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      whatsapp-bridge:
+        condition: service_healthy
+
+  web-admin:
+    build: ./web-admin
+    container_name: saludtech-web-admin
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8080
+    depends_on:
+      - backend
+
+  web-merchant:
+    build: ./web-merchant
+    container_name: saludtech-web-merchant
+    ports:
+      - "3001:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8080
+    depends_on:
+      - backend
+
+  prometheus:
+    image: prom/prometheus:v2.51.1
+    container_name: saludtech-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    depends_on:
+      - backend
+
+  grafana:
+    image: grafana/grafana:10.4.1
+    container_name: saludtech-grafana
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+  nginx:
+    image: nginx:alpine
+    container_name: saludtech-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web-admin
+      - web-merchant
+      - backend
+
+volumes:
+  pgdata:
+  prometheus_data:
+  grafana_data:

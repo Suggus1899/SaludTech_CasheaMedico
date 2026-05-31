@@ -1,0 +1,9 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+saludtech:
+  jwt:
+    secret: test-secret-key-must-be-very-long-to-be-secure-256-bit-minimum-change-me
