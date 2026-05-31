@@ -18,8 +18,6 @@ import {
   DollarSign,
   Users,
   Store,
-  ArrowUpRight,
-  Stethoscope,
   TrendingUp,
   Bell,
   Settings,
@@ -36,7 +34,6 @@ import {
   AlertTriangle,
   Building2,
   Pill,
-  Plus,
   CheckCircle2,
   Clock,
   XCircle,
@@ -46,7 +43,7 @@ import {
   HeartPulse,
   ShieldAlert,
 } from "lucide-react";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useReducer } from "react";
 import { useRouter } from "next/navigation";
 import Logo from "../components/Logo";
 import {
@@ -113,33 +110,46 @@ const VIEW_TITLES: Record<View, string> = {
 };
 
 // ─── Fetch Hooks / Helpers ──────────────────────────────────────────────────
-function useFetchData<T>(url: string, dependencies: any[] = []) {
-  const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+type FetchState<T> = { data: T | null; loading: boolean; error: string | null };
+type FetchAction<T> =
+  | { type: "loading" }
+  | { type: "success"; payload: T }
+  | { type: "error"; payload: string };
+
+function fetchReducer<T>(state: FetchState<T>, action: FetchAction<T>): FetchState<T> {
+  switch (action.type) {
+    case "loading": return { ...state, loading: true, error: null };
+    case "success": return { data: action.payload, loading: false, error: null };
+    case "error": return { ...state, loading: false, error: action.payload };
+  }
+}
+
+function useFetchData<T>(url: string, dependencies: unknown[] = []) {
+  const [state, dispatch] = useReducer(fetchReducer<T>, { data: null, loading: true, error: null });
+  const depsKey = JSON.stringify(dependencies);
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
+    dispatch({ type: "loading" });
     try {
       const res = await fetch(url, { headers: getAuthHeaders() });
       if (!res.ok) throw new Error(`Error: ${res.status}`);
-      const json = await res.json();
-      setData(json);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      const json = await res.json() as T;
+      dispatch({ type: "success", payload: json });
+    } catch (err: unknown) {
+      dispatch({ type: "error", payload: err instanceof Error ? err.message : "Error desconocido" });
     }
-  }, [url]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url, depsKey]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData, ...dependencies]);
+    fetchData().catch(() => undefined);
+  }, [fetchData]);
 
-  return { data, loading, error, refetch: fetchData };
+  return { data: state.data, loading: state.loading, error: state.error, refetch: fetchData };
 }
 
 // ─── Sub-views ─────────────────────────────────────────────────────────────────
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function OverviewView({ searchTerm }: { searchTerm: string }) {
   const { data: stats, loading: statsLoading } = useFetchData<any>(getApiUrl("admin/dashboard/stats"));
   const { data: txData, loading: txLoading } = useFetchData<any>(getApiUrl("admin/transactions?size=5"));
@@ -862,6 +872,7 @@ export default function AdminDashboard() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  void isProfileOpen; void isSettingsOpen; void isHelpOpen;
 
   const adminUser = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("admin_user") ?? "null") : null;
 
