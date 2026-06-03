@@ -1,22 +1,60 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap");
 
 @import "tailwindcss";
+@plugin "daisyui" {
+  themes: false;
+  logs: false;
+}
+
+@plugin "daisyui/theme" {
+  name: "saludtech";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+
+  --color-primary: oklch(47.5% 0.09 220);
+  --color-primary-content: oklch(100% 0 0);
+  --color-secondary: oklch(57% 0.1 178);
+  --color-secondary-content: oklch(100% 0 0);
+  --color-accent: oklch(35% 0.08 220);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(17% 0.04 228);
+  --color-neutral-content: oklch(100% 0 0);
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(97% 0.005 220);
+  --color-base-300: oklch(88% 0.02 220);
+  --color-base-content: oklch(17% 0.04 228);
+  --color-info: oklch(47.5% 0.09 220);
+  --color-info-content: oklch(100% 0 0);
+  --color-success: oklch(52% 0.12 152);
+  --color-success-content: oklch(100% 0 0);
+  --color-warning: oklch(75% 0.15 72);
+  --color-warning-content: oklch(20% 0.05 72);
+  --color-error: oklch(55% 0.2 26);
+  --color-error-content: oklch(100% 0 0);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
 @theme {
-  /* ── Primary (deep navy blue) ── */
-  --color-primary: #1a6b8a;
+  /* ── Primary shades (landing custom tokens) ── */
   --color-primary-dark: #134e6b;
   --color-primary-light: #2a8faf;
   --color-primary-50: #ebf6fa;
   --color-primary-100: #c9e8f2;
 
-  /* ── Secondary (teal) ── */
-  --color-secondary: #17a589;
+  /* ── Secondary shades ── */
   --color-secondary-dark: #0e7b65;
   --color-secondary-light: #1fc8a5;
   --color-secondary-50: #e8f8f5;
 
-  /* ── Accent (mid-tone blue) ── */
-  --color-accent: #0d4f6b;
+  /* ── Accent shades ── */
   --color-accent-dark: #083b52;
   --color-accent-light: #1a6b8a;
   --color-accent-50: #e3f0f5;

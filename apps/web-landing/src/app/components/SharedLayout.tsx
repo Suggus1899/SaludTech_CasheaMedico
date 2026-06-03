@@ -18,9 +18,10 @@ export function Navbar() {
   const links = [
     { href: "/#como-funciona", label: "Cómo funciona" },
     { href: "/lineas-de-credito", label: "Líneas de crédito" },
-    { href: "/#simulador", label: "Simulador" },
-    { href: "/#club", label: "Club" },
-    { href: "/#faq", label: "FAQ" },
+    { href: "/lineas-de-credito#simulador", label: "Simulador" },
+    { href: "/club", label: "Club" },
+    { href: "/telemedicina", label: "Telemedicina" },
+    { href: "/faq", label: "FAQ" },
     { href: "/para-comercios", label: "Comercios" },
   ];
 
@@ -122,10 +123,10 @@ export function Footer() {
     Producto: [
       { label: "Cómo funciona", href: "/#como-funciona" },
       { label: "Líneas de crédito", href: "/lineas-de-credito" },
-      { label: "Simulador de cuotas", href: "/#simulador" },
-      { label: "Club SaludTech", href: "/#club" },
-      { label: "Telemedicina", href: "/#triage" },
-      { label: "Elder Care", href: "/#elder-care" },
+      { label: "Simulador de cuotas", href: "/lineas-de-credito#simulador" },
+      { label: "Club SaludTech", href: "/club" },
+      { label: "Telemedicina", href: "/telemedicina" },
+      { label: "Elder Care", href: "/telemedicina#elder-care" },
     ],
     Comercios: [
       { label: "Afilia tu comercio", href: "/para-comercios" },
@@ -136,7 +137,7 @@ export function Footer() {
     Legal: [
       { label: "Términos y condiciones", href: "#" },
       { label: "Política de privacidad", href: "#" },
-      { label: "Preguntas frecuentes", href: "/#faq" },
+      { label: "Preguntas frecuentes", href: "/faq" },
       { label: "Contacto", href: "mailto:hola@saludtech.app" },
     ],
   };

@@ -11,6 +11,14 @@ import {
   TrendingUp,
   Clock,
   Zap,
+  Heart,
+  Users,
+  Activity,
+  Building2,
+  HeartPulse,
+  UserCheck,
+  Star,
+  CreditCard,
 } from "lucide-react";
 import Link from "next/link";
 import SimuladorCuotas from "../components/SimuladorCuotas";
@@ -42,6 +50,181 @@ function Hero() {
           Calcular mis cuotas
           <ArrowRight className="w-5 h-5" />
         </a>
+      </div>
+    </section>
+  );
+}
+
+// ─── Líneas de crédito ────────────────────────────────────────────────────────
+function LineasDeCredito() {
+  const lines = [
+    {
+      name: "Salud Cotidiana",
+      icon: Pill,
+      color: "text-secondary",
+      bg: "bg-secondary",
+      lightBg: "bg-secondary-50",
+      border: "border-secondary/20",
+      tagBg: "bg-secondary/10 text-secondary",
+      limit: "Hasta $80",
+      desc: "Para el día a día: farmacias, medicamentos, consultas generales y supermercados de salud.",
+      features: [
+        "Farmacias y droguerías",
+        "Medicamentos recurrentes",
+        "Consultas medicina general",
+        "Pago inicial + 1 cuota (14 días)",
+      ],
+      badge: "Lo más usado",
+    },
+    {
+      name: "Especialidad Principal",
+      icon: Stethoscope,
+      color: "text-primary",
+      bg: "bg-primary",
+      lightBg: "bg-primary-50",
+      border: "border-primary/30",
+      tagBg: "bg-primary/10 text-primary",
+      limit: "Hasta $250",
+      desc: "Para procedimientos, especialistas, imagenología, laboratorios y cirugías electivas.",
+      features: [
+        "Clínicas y hospitales privados",
+        "Especialistas (cardiólogo, traumatólogo…)",
+        "Laboratorios e imagenología",
+        "Hasta 9 cuotas (nivel 3+)",
+      ],
+      badge: "Más popular",
+      featured: true,
+    },
+    {
+      name: "Mayor Cuidado",
+      icon: Shield,
+      color: "text-accent",
+      bg: "bg-accent",
+      lightBg: "bg-accent-50",
+      border: "border-accent/20",
+      tagBg: "bg-accent/10 text-accent",
+      limit: "Hasta $150/mes",
+      desc: "Suscripción mensual para el cuidado integral de adultos mayores. Nivel 4+ requerido.",
+      features: [
+        "Enfermera a domicilio",
+        "Cuidador/a profesional",
+        "Fisioterapia en casa",
+        "Especialista en geriatría",
+      ],
+      badge: "Elder Care",
+    },
+  ];
+
+  return (
+    <section id="servicios" className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="section-tag bg-accent-50 text-accent mb-4">
+            <CreditCard className="w-3.5 h-3.5" /> Líneas de crédito
+          </div>
+          <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
+            Una línea para cada necesidad
+          </h2>
+          <p className="text-slate-500 text-lg">
+            Tres líneas especializadas que crecen contigo a medida que subes de nivel.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+          {lines.map((line) => (
+            <div
+              key={line.name}
+              className={`relative rounded-3xl border ${line.border} p-8 card-hover ${
+                line.featured
+                  ? "bg-hero-gradient shadow-2xl shadow-primary/20 sm:scale-105"
+                  : "bg-white shadow-md"
+              }`}
+            >
+              {line.badge && (
+                <div className={`absolute -top-3.5 left-6 px-3 py-1 rounded-full text-xs font-bold ${
+                  line.featured ? "bg-secondary text-white" : `${line.tagBg}`
+                }`}>
+                  {line.badge}
+                </div>
+              )}
+
+              <div className={`w-14 h-14 rounded-2xl ${line.featured ? "bg-white/15" : line.lightBg} flex items-center justify-center mb-5`}>
+                <line.icon className={`w-7 h-7 ${line.featured ? "text-white" : line.color}`} />
+              </div>
+
+              <div className={`text-3xl font-display font-bold mb-1 ${line.featured ? "text-white" : "text-dark"}`}>
+                {line.limit}
+              </div>
+              <h3 className={`font-display font-bold text-lg mb-3 ${line.featured ? "text-white" : "text-dark"}`}>
+                {line.name}
+              </h3>
+              <p className={`text-sm leading-relaxed mb-6 ${line.featured ? "text-white/70" : "text-slate-500"}`}>
+                {line.desc}
+              </p>
+
+              <ul className="space-y-2.5">
+                {line.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5">
+                    <CheckCircle2
+                      className={`w-4 h-4 shrink-0 mt-0.5 ${line.featured ? "text-secondary" : line.color}`}
+                    />
+                    <span className={`text-sm ${line.featured ? "text-white/80" : "text-slate-600"}`}>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Especialidades ───────────────────────────────────────────────────────────
+function Especialidades() {
+  const categories = [
+    { icon: Pill, label: "Farmacia", color: "text-secondary", bg: "bg-secondary-50" },
+    { icon: Heart, label: "Cardiología", color: "text-red-500", bg: "bg-red-50" },
+    { icon: Stethoscope, label: "Medicina General", color: "text-primary", bg: "bg-primary-50" },
+    { icon: Users, label: "Pediatría", color: "text-amber-500", bg: "bg-amber-50" },
+    { icon: Activity, label: "Laboratorios", color: "text-purple-500", bg: "bg-purple-50" },
+    { icon: Building2, label: "Imagenología", color: "text-blue-600", bg: "bg-blue-50" },
+    { icon: HeartPulse, label: "Traumatología", color: "text-orange-500", bg: "bg-orange-50" },
+    { icon: Shield, label: "Elder Care", color: "text-accent", bg: "bg-accent-50" },
+    { icon: UserCheck, label: "Dermatología", color: "text-pink-500", bg: "bg-pink-50" },
+    { icon: Star, label: "Oftalmología", color: "text-indigo-500", bg: "bg-indigo-50" },
+    { icon: TrendingUp, label: "Fisioterapia", color: "text-teal-500", bg: "bg-teal-50" },
+    { icon: Zap, label: "Urgencias / Triage", color: "text-red-600", bg: "bg-red-50" },
+  ];
+
+  return (
+    <section className="py-20 bg-surface">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-xl mx-auto mb-12">
+          <div className="section-tag bg-primary-100 text-primary mb-4">
+            <Building2 className="w-3.5 h-3.5" /> Red de comercios
+          </div>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-dark mb-3">
+            Especialidades médicas que aceptan SaludTech
+          </h2>
+          <p className="text-slate-500">
+            Más de 12 especialidades en nuestra red de comercios aliados.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+          {categories.map((cat) => (
+            <div
+              key={cat.label}
+              className="card-hover bg-white rounded-2xl p-4 flex flex-col items-center gap-3 shadow-sm border border-slate-100 cursor-pointer"
+            >
+              <div className={`w-12 h-12 rounded-xl ${cat.bg} flex items-center justify-center`}>
+                <cat.icon className={`w-6 h-6 ${cat.color}`} />
+              </div>
+              <span className="text-xs font-semibold text-slate-700 text-center leading-tight">{cat.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -279,10 +462,12 @@ function CTAFinal() {
   );
 }
 
-export default function LineasDeCredito() {
+export default function LineasDeCreditoPage() {
   return (
     <SharedLayout>
       <Hero />
+      <LineasDeCredito />
+      <Especialidades />
       <LineasDetalle />
       <SimuladorCuotas />
       <ComoCrece />

@@ -841,10 +841,13 @@ export default function AdminDashboard() {
   const [activeView, setActiveView] = useState<View>("overview");
   const [rawSearch, setRawSearch] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("theme") === "dark";
-  });
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme") === "dark";
+    setIsDarkMode(saved);
+    document.documentElement.setAttribute("data-theme", saved ? "saludtech-dark" : "saludtech");
+  }, []);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -894,7 +897,7 @@ export default function AdminDashboard() {
   const toggleDarkMode = useCallback(() => {
     const next = !isDarkMode;
     setIsDarkMode(next);
-    document.documentElement.classList.toggle("dark", next);
+    document.documentElement.setAttribute("data-theme", next ? "saludtech-dark" : "saludtech");
     localStorage.setItem("theme", next ? "dark" : "light");
   }, [isDarkMode]);
 

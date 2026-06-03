@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "daisyui": "^5.5.20",
     "lucide-react": "^0.474.0",
     "next": "^16.2.6",
     "react": "^19.2.6",
