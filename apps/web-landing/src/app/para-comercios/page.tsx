@@ -1,26 +1,26 @@
 "use client";
 
 import {
-  Building2,
+  Buildings,
   FileText,
-  CheckCircle2,
+  CheckCircle,
   QrCode,
-  TrendingUp,
+  TrendUp,
   CreditCard,
   ShieldCheck,
   Users,
   Clock,
   ArrowRight,
   Phone,
-  Mail,
-  ChevronRight,
+  Envelope,
+  CaretRight,
   Star,
   Pill,
   Stethoscope,
-  Activity,
+  Waveform,
   Heart,
   Shield,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import Link from "next/link";
 import SharedLayout from "../components/SharedLayout";
 
@@ -34,7 +34,7 @@ function Hero() {
       </div>
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/15 border border-primary/30 mb-6">
-          <Building2 className="w-4 h-4 text-primary" />
+          <Buildings className="w-4 h-4 text-primary" />
           <span className="text-primary text-xs font-semibold tracking-widest uppercase">Para Comercios · Clínicas · Farmacias</span>
         </div>
         <h1 className="font-display text-5xl sm:text-6xl font-bold text-white mb-6 leading-tight">
@@ -60,7 +60,7 @@ function Hero() {
             href="tel:+58000SALUDTECH"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl border-2 border-white/30 text-white font-bold text-base hover:bg-white/10 transition-colors"
           >
-            <Phone className="w-5 h-5" />
+            <Phone className="w-5 h-5" weight="regular" />
             Hablar con un asesor
           </a>
         </div>
@@ -87,7 +87,7 @@ function Hero() {
 function Beneficios() {
   const items = [
     {
-      icon: TrendingUp,
+      icon: TrendUp,
       title: "Aumenta tu ticket promedio",
       desc: "Los pacientes que antes diferían la consulta o el medicamento ahora compran sin dudarlo. Tu ticket promedio sube porque no hay fricción de pago.",
       color: "text-secondary",
@@ -197,7 +197,7 @@ function ComoFunciona() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-primary-100 text-primary mb-4">
-            <QrCode className="w-3.5 h-3.5" /> Flujo de cobro
+            <QrCode className="w-3.5 h-3.5" weight="duotone" /> Flujo de cobro
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
             Cómo funciona el cobro con SaludTech
@@ -244,7 +244,7 @@ function ProcesoAfiliacion() {
       num: 2,
       title: "Sube los documentos",
       desc: "Registro mercantil, acta de junta directiva, RIF actualizado, cédula del representante y factura fiscal.",
-      icon: CheckCircle2,
+      icon: CheckCircle,
     },
     {
       num: 3,
@@ -256,7 +256,7 @@ function ProcesoAfiliacion() {
       num: 4,
       title: "Recibe acceso al portal",
       desc: "En 48 horas recibes tus credenciales para el portal de comercio y ya puedes generar QRs.",
-      icon: Building2,
+      icon: Buildings,
     },
   ];
 
@@ -273,7 +273,7 @@ function ProcesoAfiliacion() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-white/10 text-white/70 mb-4">
-            <Star className="w-3.5 h-3.5" /> Afiliación
+            <Star className="w-3.5 h-3.5" weight="duotone" /> Afiliación
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-bold mb-4">
             Afíliate en 4 pasos
@@ -303,7 +303,7 @@ function ProcesoAfiliacion() {
               href="mailto:comercios@saludtech.app"
               className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-primary text-white font-bold text-base hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20 mt-4"
             >
-              <Mail className="w-5 h-5" />
+              <Envelope className="w-5 h-5" />
               Iniciar mi registro
             </a>
           </div>
@@ -315,7 +315,7 @@ function ProcesoAfiliacion() {
             <div className="space-y-4">
               {documentos.map((doc) => (
                 <div key={doc.nombre} className="flex gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-secondary shrink-0 mt-0.5" weight="duotone" />
                   <div>
                     <p className="text-white font-semibold text-sm">{doc.nombre}</p>
                     <p className="text-white/50 text-xs">{doc.desc}</p>
@@ -327,7 +327,7 @@ function ProcesoAfiliacion() {
             <div className="mt-6 pt-6 border-t border-white/10">
               <p className="text-white/60 text-sm">¿Tienes dudas sobre los documentos?</p>
               <a href="mailto:comercios@saludtech.app" className="flex items-center gap-2 text-primary-light text-sm font-semibold mt-2 hover:underline">
-                <Mail className="w-4 h-4" />
+                <Envelope className="w-4 h-4" />
                 comercios@saludtech.app
               </a>
               <a href="tel:+58000SALUDTECH" className="flex items-center gap-2 text-primary-light text-sm font-semibold mt-1 hover:underline">
@@ -398,7 +398,7 @@ function CTAFinal() {
             href="mailto:comercios@saludtech.app"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white text-primary font-bold text-base hover:bg-primary-50 transition-colors"
           >
-            <Mail className="w-5 h-5" />
+            <Envelope className="w-5 h-5" />
             Afiliar mi comercio
           </a>
           <Link
@@ -406,7 +406,7 @@ function CTAFinal() {
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl border-2 border-white/40 text-white font-bold text-base hover:bg-white/10 transition-colors"
           >
             Ver landing principal
-            <ChevronRight className="w-5 h-5" />
+            <CaretRight className="w-5 h-5" />
           </Link>
         </div>
       </div>
@@ -418,9 +418,9 @@ function CTAFinal() {
 function RedAliados() {
   const categorias = [
     { label: "Farmacia", icon: Pill, count: "48" },
-    { label: "Clínica", icon: Building2, count: "32" },
+    { label: "Clínica", icon: Buildings, count: "32" },
     { label: "Especialistas", icon: Stethoscope, count: "67" },
-    { label: "Laboratorio", icon: Activity, count: "24" },
+    { label: "Laboratorio", icon: Waveform, count: "24" },
     { label: "Imagenología", icon: ShieldCheck, count: "18" },
     { label: "Fisioterapia", icon: Heart, count: "21" },
     { label: "Odontología", icon: Star, count: "30" },
@@ -433,7 +433,7 @@ function RedAliados() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
           <div>
             <div className="section-tag bg-secondary-50 text-secondary mb-3">
-              <Building2 className="w-3.5 h-3.5" /> Red de aliados
+              <Buildings className="w-3.5 h-3.5" /> Red de aliados
             </div>
             <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark">
               Estas clínicas y farmacias
@@ -488,7 +488,7 @@ function RedAliados() {
 // ─── Para Comercios Banner ─────────────────────────────────────────────────────
 function ParaComerciosBanner() {
   const benefits = [
-    { icon: TrendingUp, title: "Aumenta tus ventas", desc: "Clientes que antes no podían pagar ahora sí pueden. Accede a más pacientes." },
+    { icon: TrendUp, title: "Aumenta tus ventas", desc: "Clientes que antes no podían pagar ahora sí pueden. Accede a más pacientes." },
     { icon: CreditCard, title: "Liquidación garantizada", desc: "SaludTech te paga el total de la venta. Tú no asumes el riesgo de cuotas." },
     { icon: QrCode, title: "QR en segundos", desc: "Genera un código QR desde tu portal y el paciente paga desde su app al instante." },
     { icon: ShieldCheck, title: "Sin papeleo", desc: "Registro 100% digital. Tu comercio activo en menos de 48 horas." },
@@ -501,7 +501,7 @@ function ParaComerciosBanner() {
           <div className="space-y-8">
             <div>
               <div className="section-tag bg-white/10 text-white/80 border border-white/20 mb-4">
-                <Building2 className="w-3.5 h-3.5" /> Para Comercios
+                <Buildings className="w-3.5 h-3.5" /> Para Comercios
               </div>
               <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
                 Lleva SaludTech
@@ -527,11 +527,11 @@ function ParaComerciosBanner() {
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <a href="mailto:comercios@saludtech.app" className="btn-primary text-base px-7 py-4">
-                <Mail className="w-5 h-5" />
+              <a href="mailto:comercios@saludtech.app" className="btn btn-primary gap-2 px-7 py-4 text-base h-auto">
+                <Envelope className="w-5 h-5" />
                 Registrar mi comercio
               </a>
-              <a href="tel:+58000SALUDTECH" className="btn-secondary text-base px-7 py-4">
+              <a href="tel:+58000SALUDTECH" className="btn btn-ghost text-white border-white/30 hover:bg-white/10 gap-2 px-7 py-4 text-base h-auto">
                 <Phone className="w-5 h-5" />
                 Hablar con un asesor
               </a>
@@ -543,7 +543,7 @@ function ParaComerciosBanner() {
             <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 shadow-2xl">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-primary/30 flex items-center justify-center">
-                  <Building2 className="w-5 h-5 text-primary-light" />
+                  <Buildings className="w-5 h-5 text-primary-light" />
                 </div>
                 <div>
                   <p className="text-white font-semibold text-sm">Portal Comercio</p>
@@ -554,7 +554,7 @@ function ParaComerciosBanner() {
 
               <div className="grid grid-cols-2 gap-3 mb-5">
                 {[
-                  { label: "Ventas este mes", value: "$3,240", icon: TrendingUp, color: "text-secondary" },
+                  { label: "Ventas este mes", value: "$3,240", icon: TrendUp, color: "text-secondary" },
                   { label: "Transacciones", value: "47", icon: CreditCard, color: "text-primary-light" },
                   { label: "Pacientes nuevos", value: "12", icon: Users, color: "text-accent-light" },
                   { label: "Liquidación pend.", value: "$890", icon: Clock, color: "text-amber-400" },

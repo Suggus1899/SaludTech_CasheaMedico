@@ -1,6 +1,6 @@
 "use client";
 
-import { Award, TrendingUp, Clock, Zap, Shield, ArrowRight, Smartphone } from "lucide-react";
+import { Medal, TrendUp, Clock, Lightning, Shield, ArrowRight, DeviceMobile } from "@phosphor-icons/react";
 import Link from "next/link";
 import SharedLayout from "../components/SharedLayout";
 
@@ -15,9 +15,9 @@ function ClubSaludTech() {
   ];
 
   const benefits = [
-    { icon: TrendingUp, title: "Límite de crédito creciente", desc: "Cada nivel que subes aumenta tu disponible en todas tus líneas." },
+    { icon: TrendUp, title: "Límite de crédito creciente", desc: "Cada nivel que subes aumenta tu disponible en todas tus líneas." },
     { icon: Clock, title: "Más cuotas disponibles", desc: "Nivel 3+ desbloquea hasta 6, 9 y 12 cuotas para compras grandes." },
-    { icon: Zap, title: "Puntos por puntualidad", desc: "10 pts pagando a tiempo, 15 pts pagando antes del vencimiento." },
+    { icon: Lightning, title: "Puntos por puntualidad", desc: "10 pts pagando a tiempo, 15 pts pagando antes del vencimiento." },
     { icon: Shield, title: "Mayor Cuidado desbloqueado", desc: "Nivel 4+ activa la línea de Elder Care para tu familia." },
   ];
 
@@ -26,7 +26,7 @@ function ClubSaludTech() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <div className="section-tag bg-amber-50 text-amber-600 mb-4">
-            <Award className="w-3.5 h-3.5" /> Club SaludTech
+            <Medal className="w-3.5 h-3.5" weight="duotone" /> Club SaludTech
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
             Paga bien, sube de nivel,
@@ -81,7 +81,7 @@ function Hero() {
       </div>
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-400/15 border border-amber-400/30 mb-6">
-          <Award className="w-4 h-4 text-amber-400" />
+          <Medal className="w-4 h-4 text-amber-400" weight="duotone" />
           <span className="text-amber-300 text-xs font-semibold tracking-widest uppercase">Club SaludTech</span>
         </div>
         <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
@@ -118,7 +118,7 @@ function CTAFinal() {
             href="/#descarga"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white text-primary font-bold text-base hover:bg-primary-50 transition-colors"
           >
-            <Smartphone className="w-5 h-5" />
+            <DeviceMobile className="w-5 h-5" />
             Descargar la app
           </Link>
           <Link

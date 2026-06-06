@@ -3,9 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FlaskConical, Eye, EyeOff, AlertCircle } from "lucide-react";
-import { Button } from "@saludtech/ui";
-import { Input } from "@saludtech/ui";
-import { Label } from "@saludtech/ui";
 import Logo from "../../components/Logo";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
@@ -76,9 +73,9 @@ export default function AdminLoginPage() {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Correo electrónico</Label>
-              <Input
+            <div className="form-control gap-1">
+              <label htmlFor="email" className="label pb-0"><span className="label-text font-medium">Correo electrónico</span></label>
+              <input
                 id="email"
                 type="email"
                 placeholder="admin@saludtech.com"
@@ -87,13 +84,14 @@ export default function AdminLoginPage() {
                 required
                 autoComplete="email"
                 aria-required="true"
+                className="input input-bordered w-full"
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Contraseña</Label>
+            <div className="form-control gap-1">
+              <label htmlFor="password" className="label pb-0"><span className="label-text font-medium">Contraseña</span></label>
               <div className="relative">
-                <Input
+                <input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
@@ -102,7 +100,7 @@ export default function AdminLoginPage() {
                   required
                   autoComplete="current-password"
                   aria-required="true"
-                  className="pr-10"
+                  className="input input-bordered w-full pr-10"
                 />
                 <button
                   type="button"
@@ -122,9 +120,10 @@ export default function AdminLoginPage() {
               </div>
             )}
 
-            <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+            <button type="submit" className="btn btn-primary w-full" disabled={isLoading}>
+              {isLoading ? <span className="loading loading-spinner loading-sm" /> : null}
               {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
-            </Button>
+            </button>
           </form>
 
           {process.env.NEXT_PUBLIC_MOCK_API === "true" && (

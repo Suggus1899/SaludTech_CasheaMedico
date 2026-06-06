@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap");
 
 @import "tailwindcss";
 @plugin "daisyui" {
@@ -64,8 +64,8 @@
   --color-surface: #f4fafb;
 
   /* ── Fonts ── */
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-display: "Syne", "Inter", sans-serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
 
   /* ── Background gradients ── */
   --background-image-hero-gradient: linear-gradient(
@@ -92,14 +92,14 @@
   }
 
   body {
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: "DM Sans", system-ui, sans-serif;
     @apply text-slate-800 bg-white antialiased;
   }
 
   h1,
   h2,
   h3 {
-    font-family: "Syne", "Inter", sans-serif;
+    font-family: "Playfair Display", Georgia, serif;
   }
 }
 

@@ -5,19 +5,17 @@ import MainNavbar from "./components/MainNavbar";
 import Logo from "./components/Logo";
 import { Footer } from "./components/SharedLayout";
 import {
-  ChevronRight,
-  Smartphone,
+  CaretRight,
+  DeviceMobile,
   QrCode,
   CreditCard,
-  CheckCircle2,
-  Building2,
-  Activity,
-  Zap,
+  CheckCircle,
+  Buildings,
+  Waveform,
+  Lightning,
   Clock,
   ShieldCheck,
-  Mail,
-  MapPin
-} from "lucide-react";
+} from "@phosphor-icons/react";
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 function Hero() {
@@ -58,13 +56,13 @@ function Hero() {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <a href="#descarga" className="btn-primary text-base px-7 py-4">
-                <Smartphone className="w-5 h-5" />
+              <a href="#descarga" className="btn btn-primary gap-2 px-7 py-4 text-base h-auto">
+                <DeviceMobile className="w-5 h-5" />
                 Descargar app gratis
               </a>
-              <a href="#como-funciona" className="btn-secondary text-base px-7 py-4">
+              <a href="#como-funciona" className="btn btn-ghost text-white border-white/30 hover:bg-white/10 gap-2 px-7 py-4 text-base h-auto">
                 Cómo funciona
-                <ChevronRight className="w-5 h-5" />
+                <CaretRight className="w-5 h-5" />
               </a>
             </div>
 
@@ -94,7 +92,7 @@ function Hero() {
                     <p className="text-white font-display font-bold text-2xl">$240.00</p>
                   </div>
                   <div className="w-12 h-12 rounded-2xl bg-primary/30 flex items-center justify-center">
-                    <CreditCard className="w-6 h-6 text-primary-light" />
+                    <CreditCard className="w-6 h-6 text-primary-light" weight="duotone" />
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -114,7 +112,7 @@ function Hero() {
                 </div>
                 <div className="mt-5 p-3 rounded-xl bg-linear-to-r from-secondary/20 to-primary/20 border border-secondary/30">
                   <div className="flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-secondary" />
+                    <Waveform className="w-4 h-4 text-secondary" weight="duotone" />
                     <span className="text-white/80 text-xs font-medium">Nivel 2 · 45/50 pts al siguiente</span>
                   </div>
                 </div>
@@ -124,7 +122,7 @@ function Hero() {
               <div className="absolute -bottom-6 -left-8 bg-white rounded-2xl p-4 shadow-2xl border border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
-                    <QrCode className="w-5 h-5 text-primary" />
+                    <QrCode className="w-5 h-5 text-primary" weight="duotone" />
                   </div>
                   <div>
                     <p className="text-xs text-slate-500">Pago en clínica</p>
@@ -136,7 +134,7 @@ function Hero() {
               {/* Floating approval badge */}
               <div className="absolute -top-4 -right-8 bg-white rounded-2xl px-4 py-3 shadow-2xl border border-slate-100">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-secondary" />
+                  <CheckCircle className="w-5 h-5 text-secondary" weight="duotone" />
                   <span className="text-sm font-bold text-dark">¡Aprobado!</span>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">en 3 minutos</p>
@@ -152,9 +150,9 @@ function Hero() {
 // ─── Trust Strip ─────────────────────────────────────────────────────────────
 function TrustStrip() {
   const items = [
-    { value: "0%", label: "Interés siempre", icon: CheckCircle2, color: "text-secondary" },
-    { value: "3 min", label: "Aprobación instantánea", icon: Zap, color: "text-primary" },
-    { value: "+200", label: "Comercios aliados", icon: Building2, color: "text-accent" },
+    { value: "0%", label: "Interés siempre", icon: CheckCircle, color: "text-secondary" },
+    { value: "3 min", label: "Aprobación instantánea", icon: Lightning, color: "text-primary" },
+    { value: "+200", label: "Comercios aliados", icon: Buildings, color: "text-accent" },
     { value: "14 días", label: "Tiempo entre cuotas", icon: Clock, color: "text-secondary" },
     { value: "100%", label: "Digital, sin papeles", icon: ShieldCheck, color: "text-primary" },
   ];
@@ -181,7 +179,7 @@ function ComoFunciona() {
   const steps = [
     {
       num: "01",
-      icon: Smartphone,
+      icon: DeviceMobile,
       title: "Descarga la app",
       desc: "Regístrate con tu cédula, número de teléfono y datos básicos. Sin papeleo.",
       color: "text-primary",
@@ -190,7 +188,7 @@ function ComoFunciona() {
     },
     {
       num: "02",
-      icon: Zap,
+      icon: Lightning,
       title: "Aprobación en 3 min",
       desc: "Evaluamos tu perfil al instante y te asignamos tus líneas de crédito médico.",
       color: "text-secondary",
@@ -222,7 +220,7 @@ function ComoFunciona() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <div className="section-tag bg-primary-100 text-primary mb-4">
-            <Zap className="w-3.5 h-3.5" /> Simple y rápido
+            <Lightning className="w-3.5 h-3.5" /> Simple y rápido
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
             Cómo funciona SaludTech
@@ -342,7 +340,7 @@ function Descarga() {
         <div className="max-w-md mx-auto mb-10">
           {sent ? (
             <div className="flex flex-col items-center gap-3 py-5 px-6 bg-secondary/10 border border-secondary/30 rounded-2xl">
-              <CheckCircle2 className="w-8 h-8 text-secondary" />
+              <CheckCircle className="w-8 h-8 text-secondary" weight="duotone" />
               <p className="font-display font-bold text-dark text-base">¡Listo! Te avisamos en cuanto esté disponible 🎉</p>
               <p className="text-slate-400 text-xs">Eres parte de los primeros usuarios de SaludTech.</p>
               <button
@@ -375,8 +373,8 @@ function Descarga() {
         <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-slate-500">
           {[
             { icon: ShieldCheck, text: "Datos protegidos" },
-            { icon: CheckCircle2, text: "Sin cuotas ocultas" },
-            { icon: Zap, text: "Aprobación en 3 min" },
+            { icon: CheckCircle, text: "Sin cuotas ocultas" },
+            { icon: Lightning, text: "Aprobación en 3 min" },
           ].map((f) => (
             <div key={f.text} className="flex items-center gap-2">
               <f.icon className="w-4 h-4 text-secondary" />

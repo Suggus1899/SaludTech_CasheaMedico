@@ -1,28 +1,28 @@
 "use client";
 
 import {
-  Smartphone,
-  Zap,
+  DeviceMobile,
+  Lightning,
   UserCheck,
-  Building2,
-  HeartPulse,
-  Activity,
-  CheckCircle2,
+  Buildings,
+  Heartbeat,
+  Waveform,
+  CheckCircle,
   Heart,
   ArrowRight,
   Shield,
-  TrendingUp,
+  Person,
   Stethoscope,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import SharedLayout from "../components/SharedLayout";
 
 // ─── Telemedicina & Triage ────────────────────────────────────────────────────
 function Telemedicina() {
   const steps = [
-    { icon: Smartphone, title: "Describe tus síntomas", desc: "Desde la app, indica qué sientes, el nivel de severidad y desde cuándo." },
-    { icon: Zap, title: "Análisis IA en segundos", desc: "Nuestro sistema clasifica urgencia y te sugiere la especialidad correcta." },
+    { icon: DeviceMobile, title: "Describe tus síntomas", desc: "Desde la app, indica qué sientes, el nivel de severidad y desde cuándo." },
+    { icon: Lightning, title: "Análisis IA en segundos", desc: "Nuestro sistema clasifica urgencia y te sugiere la especialidad correcta." },
     { icon: UserCheck, title: "Responde un médico real", desc: "Un doctor revisa tu caso y confirma o ajusta la recomendación." },
-    { icon: Building2, title: "Te referimos al especialista", desc: "Con financiamiento ya aprobado para que no pierdas tiempo buscando cómo pagar." },
+    { icon: Buildings, title: "Te referimos al especialista", desc: "Con financiamiento ya aprobado para que no pierdas tiempo buscando cómo pagar." },
   ];
 
   return (
@@ -36,7 +36,7 @@ function Telemedicina() {
               <div className="bg-hero-gradient rounded-3xl p-6 shadow-2xl shadow-dark/40">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
-                    <Activity className="w-5 h-5 text-red-400" />
+                    <Waveform className="w-5 h-5 text-red-400" weight="duotone" />
                   </div>
                   <div>
                     <p className="text-white font-semibold text-sm">Triaje Inteligente</p>
@@ -67,7 +67,7 @@ function Telemedicina() {
 
                 <div className="bg-secondary/15 border border-secondary/30 rounded-2xl p-4">
                   <div className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-secondary shrink-0 mt-0.5" weight="duotone" />
                     <div>
                       <p className="text-white text-sm font-semibold">Línea Especialidad disponible</p>
                       <p className="text-white/60 text-xs mt-1">$180 disponibles · Cardiólogo más cercano a 2.1km</p>
@@ -95,7 +95,7 @@ function Telemedicina() {
           <div className="order-1 lg:order-2 space-y-8">
             <div>
               <div className="section-tag bg-red-50 text-red-600 mb-4">
-                <HeartPulse className="w-3.5 h-3.5" /> Exclusivo SaludTech
+                <Heartbeat className="w-3.5 h-3.5" /> Exclusivo SaludTech
               </div>
               <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
                 Telemedicina y
@@ -139,7 +139,7 @@ function ElderCare() {
   const services = [
     { icon: UserCheck, title: "Enfermera a domicilio", desc: "Cuidado y control médico en casa, sin desplazamientos." },
     { icon: Heart, title: "Cuidador/a profesional", desc: "Acompañamiento diario certificado para adultos mayores." },
-    { icon: TrendingUp, title: "Fisioterapia en casa", desc: "Rehabilitación y movilidad sin salir del hogar." },
+    { icon: Person, title: "Fisioterapia en casa", desc: "Rehabilitación y movilidad sin salir del hogar." },
     { icon: Stethoscope, title: "Especialista en geriatría", desc: "Seguimiento médico especializado para la tercera edad." },
   ];
 
@@ -177,7 +177,7 @@ function ElderCare() {
             </div>
 
             <div className="flex items-center gap-3 p-4 rounded-2xl bg-accent/8 border border-accent/20">
-              <CheckCircle2 className="w-5 h-5 text-accent shrink-0" />
+              <CheckCircle className="w-5 h-5 text-accent shrink-0" weight="duotone" />
               <p className="text-sm text-slate-700">
                 <strong>Suscripción flexible:</strong> cancela cuando quieras, sin penalizaciones.
               </p>

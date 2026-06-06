@@ -3,12 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  Smartphone,
-  Menu,
+  DeviceMobile,
+  List,
   X,
-  Mail,
+  Envelope,
   MapPin,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import Logo from "./Logo";
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
@@ -59,7 +59,7 @@ export function Navbar() {
               href="/#descarga"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-dark transition-colors"
             >
-              <Smartphone className="w-4 h-4" />
+              <DeviceMobile className="w-4 h-4" />
               Descarga la app
             </Link>
           </div>
@@ -72,7 +72,7 @@ export function Navbar() {
             aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={open}
           >
-            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {open ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
           </button>
         </div>
 
@@ -106,7 +106,7 @@ export function Navbar() {
                 href="/#descarga"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-dark transition-all"
               >
-                <Smartphone className="w-4 h-4" />
+                <DeviceMobile className="w-4 h-4" />
                 Descarga la app
               </Link>
             </div>
@@ -160,7 +160,7 @@ export function Footer() {
                 href="mailto:hola@saludtech.app"
                 className="flex items-center gap-2 text-white/40 hover:text-white text-xs transition-colors"
               >
-                <Mail className="w-4 h-4" />
+                <Envelope className="w-4 h-4" />
                 hola@saludtech.app
               </a>
             </div>

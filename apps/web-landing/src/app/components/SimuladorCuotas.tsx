@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calculator, CreditCard, CheckCircle2, ChevronDown } from "lucide-react";
+import { Calculator, CreditCard, CheckCircle, CaretDown } from "@phosphor-icons/react";
 
 const NIVELES = [
   { nivel: 1, label: "Nivel 1 · Bronce", inicial: 0.50, cuotas: 3, limite: 80 },
@@ -80,7 +80,7 @@ export default function SimuladorCuotas() {
                       <option key={n.nivel} value={i}>{n.label}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <CaretDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
                 <p className="text-xs text-slate-400 mt-2">
                   Línea disponible: <strong className="text-slate-600">${nivel.limite}</strong> · Hasta {nivel.cuotas} cuotas
@@ -115,7 +115,7 @@ export default function SimuladorCuotas() {
                       <p className="text-white/60 text-xs">Pagas hoy (inicial {(nivel.inicial * 100).toFixed(0)}%)</p>
                       <p className="text-secondary font-bold text-xl">${inicial.toFixed(2)}</p>
                     </div>
-                    <CheckCircle2 className="w-5 h-5 text-secondary" />
+                    <CheckCircle className="w-5 h-5 text-secondary" weight="duotone" />
                   </div>
 
                   <div className="flex items-center justify-between p-4 rounded-2xl bg-primary/20 border border-primary/30">

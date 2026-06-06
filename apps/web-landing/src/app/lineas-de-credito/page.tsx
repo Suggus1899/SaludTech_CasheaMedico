@@ -4,22 +4,26 @@ import {
   Pill,
   Stethoscope,
   Shield,
-  CheckCircle2,
-  Award,
-  ChevronRight,
+  CheckCircle,
+  Medal,
+  CaretRight,
   ArrowRight,
-  TrendingUp,
+  TrendUp,
   Clock,
-  Zap,
+  Lightning,
   Heart,
-  Users,
-  Activity,
-  Building2,
-  HeartPulse,
-  UserCheck,
-  Star,
+  Baby,
+  TestTube,
+  Scan,
+  Bone,
+  HandHeart,
+  PersonSimpleCircle,
+  Eye,
+  Person,
+  FirstAidKit,
   CreditCard,
-} from "lucide-react";
+  Buildings,
+} from "@phosphor-icons/react";
 import Link from "next/link";
 import SimuladorCuotas from "../components/SimuladorCuotas";
 import SharedLayout from "../components/SharedLayout";
@@ -33,7 +37,7 @@ function Hero() {
       </div>
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/15 border border-primary/30 mb-6">
-          <Award className="w-4 h-4 text-primary" />
+          <Medal className="w-4 h-4 text-primary" weight="duotone" />
           <span className="text-primary text-xs font-semibold tracking-widest uppercase">Líneas de Crédito Médico</span>
         </div>
         <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
@@ -120,7 +124,7 @@ function LineasDeCredito() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <div className="section-tag bg-accent-50 text-accent mb-4">
-            <CreditCard className="w-3.5 h-3.5" /> Líneas de crédito
+            <CreditCard className="w-3.5 h-3.5" weight="duotone" /> Líneas de crédito
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
             Una línea para cada necesidad
@@ -165,8 +169,9 @@ function LineasDeCredito() {
               <ul className="space-y-2.5">
                 {line.features.map((f) => (
                   <li key={f} className="flex items-start gap-2.5">
-                    <CheckCircle2
+                    <CheckCircle
                       className={`w-4 h-4 shrink-0 mt-0.5 ${line.featured ? "text-secondary" : line.color}`}
+                      weight="duotone"
                     />
                     <span className={`text-sm ${line.featured ? "text-white/80" : "text-slate-600"}`}>{f}</span>
                   </li>
@@ -186,15 +191,15 @@ function Especialidades() {
     { icon: Pill, label: "Farmacia", color: "text-secondary", bg: "bg-secondary-50" },
     { icon: Heart, label: "Cardiología", color: "text-red-500", bg: "bg-red-50" },
     { icon: Stethoscope, label: "Medicina General", color: "text-primary", bg: "bg-primary-50" },
-    { icon: Users, label: "Pediatría", color: "text-amber-500", bg: "bg-amber-50" },
-    { icon: Activity, label: "Laboratorios", color: "text-purple-500", bg: "bg-purple-50" },
-    { icon: Building2, label: "Imagenología", color: "text-blue-600", bg: "bg-blue-50" },
-    { icon: HeartPulse, label: "Traumatología", color: "text-orange-500", bg: "bg-orange-50" },
-    { icon: Shield, label: "Elder Care", color: "text-accent", bg: "bg-accent-50" },
-    { icon: UserCheck, label: "Dermatología", color: "text-pink-500", bg: "bg-pink-50" },
-    { icon: Star, label: "Oftalmología", color: "text-indigo-500", bg: "bg-indigo-50" },
-    { icon: TrendingUp, label: "Fisioterapia", color: "text-teal-500", bg: "bg-teal-50" },
-    { icon: Zap, label: "Urgencias / Triage", color: "text-red-600", bg: "bg-red-50" },
+    { icon: Baby, label: "Pediatría", color: "text-amber-500", bg: "bg-amber-50" },
+    { icon: TestTube, label: "Laboratorios", color: "text-purple-500", bg: "bg-purple-50" },
+    { icon: Scan, label: "Imagenología", color: "text-blue-600", bg: "bg-blue-50" },
+    { icon: Bone, label: "Traumatología", color: "text-orange-500", bg: "bg-orange-50" },
+    { icon: HandHeart, label: "Elder Care", color: "text-accent", bg: "bg-accent-50" },
+    { icon: PersonSimpleCircle, label: "Dermatología", color: "text-pink-500", bg: "bg-pink-50" },
+    { icon: Eye, label: "Oftalmología", color: "text-indigo-500", bg: "bg-indigo-50" },
+    { icon: Person, label: "Fisioterapia", color: "text-teal-500", bg: "bg-teal-50" },
+    { icon: FirstAidKit, label: "Urgencias / Triage", color: "text-red-600", bg: "bg-red-50" },
   ];
 
   return (
@@ -202,7 +207,7 @@ function Especialidades() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-12">
           <div className="section-tag bg-primary-100 text-primary mb-4">
-            <Building2 className="w-3.5 h-3.5" /> Red de comercios
+            <Buildings className="w-3.5 h-3.5" /> Red de comercios
           </div>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-dark mb-3">
             Especialidades médicas que aceptan SaludTech
@@ -219,7 +224,7 @@ function Especialidades() {
               className="card-hover bg-white rounded-2xl p-4 flex flex-col items-center gap-3 shadow-sm border border-slate-100 cursor-pointer"
             >
               <div className={`w-12 h-12 rounded-xl ${cat.bg} flex items-center justify-center`}>
-                <cat.icon className={`w-6 h-6 ${cat.color}`} />
+                <cat.icon className={`w-6 h-6 ${cat.color}`} weight="duotone" />
               </div>
               <span className="text-xs font-semibold text-slate-700 text-center leading-tight">{cat.label}</span>
             </div>
@@ -327,8 +332,8 @@ function LineasDetalle() {
                 <div className={`p-6 md:p-8 border-t md:border-t-0 md:border-l ${l.featured ? "border-white/10" : "border-slate-100"}`}>
                   <div className="space-y-5">
                     {[
-                      { label: "Límite disponible", value: l.limite, icon: TrendingUp },
-                      { label: "Pago inicial", value: l.inicial, icon: Zap },
+                      { label: "Límite disponible", value: l.limite, icon: TrendUp },
+                      { label: "Pago inicial", value: l.inicial, icon: Lightning },
                       { label: "Cuotas", value: l.cuotas, icon: Clock },
                     ].map((stat) => (
                       <div key={stat.label} className="flex items-center gap-3">
@@ -352,7 +357,7 @@ function LineasDetalle() {
                   <ul className="space-y-3">
                     {l.usoCases.map((uc) => (
                       <li key={uc} className="flex items-start gap-2.5">
-                        <CheckCircle2 className={`w-4 h-4 shrink-0 mt-0.5 ${l.featured ? "text-secondary" : l.color}`} />
+                        <CheckCircle className={`w-4 h-4 shrink-0 mt-0.5 ${l.featured ? "text-secondary" : l.color}`} weight="duotone" />
                         <span className={`text-sm ${l.featured ? "text-white/80" : "text-slate-600"}`}>{uc}</span>
                       </li>
                     ))}
@@ -382,7 +387,7 @@ function ComoCrece() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-12">
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-amber-50 text-amber-600 mb-4">
-            <Award className="w-3.5 h-3.5" /> Club SaludTech
+            <Medal className="w-3.5 h-3.5" weight="duotone" /> Club SaludTech
           </div>
           <h2 className="font-display text-4xl font-bold text-dark mb-4">
             Tu línea crece con tu nivel
@@ -454,7 +459,7 @@ function CTAFinal() {
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl border-2 border-white/40 text-white font-bold text-base hover:bg-white/10 transition-colors"
           >
             Volver al inicio
-            <ChevronRight className="w-5 h-5" />
+            <CaretRight className="w-5 h-5" />
           </Link>
         </div>
       </div>

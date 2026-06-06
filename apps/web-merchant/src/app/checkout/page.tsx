@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, Button, Badge } from "@saludtech/ui";
 import { ArrowLeft, CheckCircle2, XCircle, RefreshCw, Activity, DollarSign, Clock } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
@@ -92,10 +91,10 @@ export default function CheckoutAuthorizationPage() {
           <h1 className="text-lg font-semibold font-(family-name:--font-syne)">Autorizaciones en Tiempo Real</h1>
         </div>
         <div className="flex items-center gap-3">
-          <Badge variant={isPolling ? "default" : "secondary"} className="gap-1.5 px-3 py-1 text-xs">
+          <span className={`badge gap-1.5 px-3 py-1 text-xs ${isPolling ? "badge-primary" : "badge-ghost"}`}>
             {isPolling ? <Activity className="w-3.5 h-3.5 animate-pulse" /> : <Clock className="w-3.5 h-3.5" />}
             {isPolling ? "Escuchando solicitudes..." : "Pausado"}
-          </Badge>
+          </span>
         </div>
       </header>
 
@@ -108,8 +107,8 @@ export default function CheckoutAuthorizationPage() {
         </div>
 
         {pendingAuths.length === 0 ? (
-          <Card className="border-dashed border-2 bg-muted/30">
-            <CardContent className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="card border-dashed border-2 bg-base-200/30">
+            <div className="card-body flex flex-col items-center justify-center py-24 text-center">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <RefreshCw className="w-8 h-8 text-primary animate-spin" />
               </div>
@@ -119,9 +118,8 @@ export default function CheckoutAuthorizationPage() {
               </p>
               
               {/* Development helper to inject a mock auth */}
-              <Button 
-                variant="outline" 
-                className="mt-8 opacity-50 hover:opacity-100 transition-opacity"
+              <button
+                className="btn btn-outline btn-sm mt-8 opacity-50 hover:opacity-100 transition-opacity"
                 onClick={() => setPendingAuths([{
                   id: "MOCK-" + Math.floor(Math.random() * 10000),
                   amount: 150.00,
@@ -130,29 +128,27 @@ export default function CheckoutAuthorizationPage() {
                 }])}
               >
                 Simular Solicitud (Dev)
-              </Button>
-            </CardContent>
-          </Card>
+              </button>
+            </div>
+          </div>
         ) : (
           <div className="space-y-6">
             {pendingAuths.map((auth) => (
-              <Card key={auth.id} className="border-primary/50 shadow-md animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <CardHeader className="pb-3">
+              <div key={auth.id} className="card bg-base-100 border border-primary/50 shadow-md">
+                <div className="card-body pb-3">
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-2xl font-bold mb-1">Nueva Solicitud</CardTitle>
-                      <CardDescription className="text-base flex items-center gap-2">
+                      <h3 className="card-title text-2xl font-bold mb-1">Nueva Solicitud</h3>
+                      <p className="text-base text-base-content/60 flex items-center gap-2">
                         <span>ID: {auth.id}</span>
                         <span>•</span>
                         <span>{auth.time}</span>
-                      </CardDescription>
+                      </p>
                     </div>
-                    <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-0 px-3 py-1 text-sm font-semibold">
+                    <span className="badge badge-info badge-lg font-semibold">
                       Pendiente
-                    </Badge>
+                    </span>
                   </div>
-                </CardHeader>
-                <CardContent>
                   <div className="bg-muted rounded-xl p-5 mb-6 flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground font-medium mb-1">Monto Solicitado</p>
@@ -168,26 +164,23 @@ export default function CheckoutAuthorizationPage() {
                   </div>
 
                   <div className="flex gap-4">
-                    <Button 
-                      variant="outline" 
-                      size="lg" 
-                      className="flex-1 border-destructive text-destructive hover:bg-destructive hover:text-white"
+                    <button
+                      className="btn btn-outline btn-error flex-1"
                       onClick={() => handleReject(auth.id)}
                     >
-                      <XCircle className="w-5 h-5 mr-2" />
+                      <XCircle className="w-5 h-5" />
                       Rechazar
-                    </Button>
-                    <Button 
-                      size="lg" 
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    </button>
+                    <button
+                      className="btn btn-success flex-1 text-white"
                       onClick={() => handleApprove(auth.id)}
                     >
-                      <CheckCircle2 className="w-5 h-5 mr-2" />
+                      <CheckCircle2 className="w-5 h-5" />
                       Autorizar Transacción
-                    </Button>
+                    </button>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         )}

@@ -1,17 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@saludtech/ui";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@saludtech/ui";
-import { Badge } from "@saludtech/ui";
-import { Button } from "@saludtech/ui";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@saludtech/ui";
 import {
   Activity,
   CreditCard,
@@ -46,15 +34,6 @@ import {
 import { useState, useCallback, useRef, useEffect, useReducer } from "react";
 import { useRouter } from "next/navigation";
 import Logo from "../components/Logo";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@saludtech/ui";
-import { Input } from "@saludtech/ui";
-import { Label } from "@saludtech/ui";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type View = "overview" | "pacientes" | "comercios" | "financiamientos" | "triajes" | "elder-care" | "suscripciones";
@@ -203,82 +182,78 @@ function OverviewView({ searchTerm }: { searchTerm: string }) {
             progress: (stats?.defaultRate || 0),
           },
         ].map((kpi) => (
-          <Card
+          <div
             key={kpi.title}
-            className="border-border shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 cursor-pointer group overflow-hidden"
+            className="card bg-base-100 border border-base-300 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 cursor-pointer group overflow-hidden"
           >
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {kpi.title}
-              </CardTitle>
-              <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <kpi.icon className={`h-4 w-4 ${kpi.trend === "down" ? "text-destructive" : "text-primary"}`} />
+            <div className="card-body p-4">
+              <div className="flex flex-row items-center justify-between pb-2">
+                <span className="text-sm font-medium opacity-60">{kpi.title}</span>
+                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <kpi.icon className={`h-4 w-4 ${kpi.trend === "down" ? "text-error" : "text-primary"}`} />
+                </div>
               </div>
-            </CardHeader>
-            <CardContent className="pb-3">
-              <div className={`text-3xl font-bold tracking-tight font-(family-name:--font-syne) ${kpi.trend === "down" ? "text-destructive" : "text-foreground"}`}>
+              <div className={`text-3xl font-bold tracking-tight font-(family-name:--font-syne) ${kpi.trend === "down" ? "text-error" : ""}`}>
                 {kpi.value}
               </div>
-              <p className={`text-xs mt-1 flex items-center gap-1 ${kpi.trend === "up" ? "text-green-600" : kpi.trend === "down" ? "text-destructive" : "text-muted-foreground"}`}>
+              <p className={`text-xs mt-1 flex items-center gap-1 ${kpi.trend === "up" ? "text-success" : kpi.trend === "down" ? "text-error" : "opacity-60"}`}>
                 {kpi.trend === "up" && <TrendingUp className="w-3 h-3" />}
                 {kpi.trend === "down" && <TrendingDown className="w-3 h-3" />}
                 {kpi.sub}
               </p>
-              <div className="mt-3 h-1.5 rounded-full bg-border overflow-hidden">
+              <div className="mt-3 h-1.5 rounded-full bg-base-300 overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all ${kpi.trend === "down" ? "bg-destructive" : "bg-primary"}`}
+                  className={`h-full rounded-full transition-all ${kpi.trend === "down" ? "bg-error" : "bg-primary"}`}
                   style={{ width: `${Math.min(kpi.progress, 100)}%` }}
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
 
       {/* Tabla + Niveles */}
       <div className="grid gap-6 lg:grid-cols-7">
-        <Card className="lg:col-span-4 border-border shadow-sm">
-          <CardHeader>
-            <CardTitle className="font-(family-name:--font-syne)">Transacciones Recientes</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="card bg-base-100 border border-base-300 shadow-sm lg:col-span-4">
+          <div className="card-body">
+            <h3 className="card-title font-(family-name:--font-syne)">Transacciones Recientes</h3>
             {filtered.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <Search className="w-10 h-10 mx-auto mb-3 opacity-40" />
+              <div className="text-center py-12 opacity-40">
+                <Search className="w-10 h-10 mx-auto mb-3" />
                 <p className="font-medium">Sin resultados</p>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-border hover:bg-transparent">
-                    <TableHead>Paciente</TableHead>
-                    <TableHead>Comercio</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead className="text-right">Monto</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtered.map((tx: any) => (
-                    <TableRow key={tx.id} className="border-border/60 hover:bg-accent/40 transition-colors cursor-pointer">
-                      <TableCell className="font-medium">{tx.user?.fullName}</TableCell>
-                      <TableCell className="text-muted-foreground">{tx.merchant?.tradeName}</TableCell>
-                      <TableCell>
-                        <Badge variant={tx.status === "COMPLETED" ? "default" : "secondary"}>{tx.status}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right font-semibold">${tx.amount?.toFixed(2)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <table className="table table-sm w-full">
+                  <thead>
+                    <tr className="border-base-300">
+                      <th>Paciente</th>
+                      <th>Comercio</th>
+                      <th>Estado</th>
+                      <th className="text-right">Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((tx: any) => (
+                      <tr key={tx.id} className="hover:bg-base-200/40 transition-colors cursor-pointer border-base-300/60">
+                        <td className="font-medium">{tx.user?.fullName}</td>
+                        <td className="opacity-60">{tx.merchant?.tradeName}</td>
+                        <td>
+                          <span className={`badge badge-sm ${tx.status === "COMPLETED" ? "badge-primary" : "badge-ghost"}`}>{tx.status}</span>
+                        </td>
+                        <td className="text-right font-semibold">${tx.amount?.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="lg:col-span-3 border-border shadow-sm">
-          <CardHeader>
-            <CardTitle className="font-(family-name:--font-syne)">Niveles de Usuario</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-5">
+        <div className="card bg-base-100 border border-base-300 shadow-sm lg:col-span-3">
+          <div className="card-body space-y-5">
+            <h3 className="card-title font-(family-name:--font-syne)">Niveles de Usuario</h3>
             {niveles.map((lvl: any, i: number) => (
               <div key={i} className="space-y-1.5">
                 <div className="flex items-center justify-between text-sm">
@@ -293,9 +268,9 @@ function OverviewView({ searchTerm }: { searchTerm: string }) {
                 </div>
               </div>
             ))}
-            {niveles.length === 0 && <p className="text-sm text-muted-foreground">No hay usuarios registrados</p>}
-          </CardContent>
-        </Card>
+            {niveles.length === 0 && <p className="text-sm opacity-60">No hay usuarios registrados</p>}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -316,77 +291,77 @@ function PacientesView({ searchTerm, onAddPatient, refreshTrigger }: { searchTer
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground text-sm">{filtered.length} pacientes encontrados</p>
-        <Button className="gap-2" onClick={onAddPatient}>
+        <p className="opacity-60 text-sm">{filtered.length} pacientes encontrados</p>
+        <button className="btn btn-primary btn-sm gap-2" onClick={onAddPatient}>
           <Users className="w-4 h-4" /> Agregar Paciente
-        </Button>
+        </button>
       </div>
-      <Card className="border-border shadow-sm">
-        <CardContent className="p-0">
+      <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="p-0">
           {filtered.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <Users className="w-10 h-10 mx-auto mb-3 opacity-40" />
+            <div className="text-center py-16 opacity-40">
+              <Users className="w-10 h-10 mx-auto mb-3" />
               <p className="font-medium">Sin resultados</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border hover:bg-transparent">
-                  <TableHead>Documento</TableHead>
-                  <TableHead>Paciente</TableHead>
-                  <TableHead>Nivel</TableHead>
-                  <TableHead>Teléfono</TableHead>
-                  <TableHead>Estado Cuenta</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((p: any) => (
-                  <TableRow key={p.id} className="border-border/60 hover:bg-accent/40 transition-colors cursor-pointer">
-                    <TableCell className="text-muted-foreground font-mono text-xs">{p.identityDocument}</TableCell>
-                    <TableCell className="font-medium">{p.fullName}</TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">
-                        Nv. {p.level}
-                      </span>
-                    </TableCell>
-                    <TableCell>{p.phone}</TableCell>
-                    <TableCell>
-                      <Badge variant={p.active ? "default" : "secondary"}>
-                        {p.active ? "Activo" : "Pausado"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right space-x-2">
-                      {!p.active && (
-                        <Button size="sm" variant="outline" onClick={async () => {
-                          try {
-                            const res = await fetch(getApiUrl(`admin/users/${p.id}/status?activate=true`), {
-                              method: 'POST',
-                              headers: getAuthHeaders(),
-                            });
-                            if (res.ok) window.location.reload();
-                          } catch (e) { console.error(e); }
-                        }}>Activar</Button>
-                      )}
-                      {p.active && (
-                        <Button size="sm" variant="destructive" onClick={async () => {
-                          try {
-                            const res = await fetch(getApiUrl(`admin/users/${p.id}/status?activate=false`), {
-                              method: 'POST',
-                              headers: getAuthHeaders(),
-                            });
-                            if (res.ok) window.location.reload();
-                          } catch (e) { console.error(e); }
-                        }}>Pausar</Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto">
+              <table className="table table-sm w-full">
+                <thead>
+                  <tr className="border-base-300">
+                    <th>Documento</th>
+                    <th>Paciente</th>
+                    <th>Nivel</th>
+                    <th>Teléfono</th>
+                    <th>Estado Cuenta</th>
+                    <th className="text-right">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((p: any) => (
+                    <tr key={p.id} className="hover:bg-base-200/40 transition-colors cursor-pointer border-base-300/60">
+                      <td className="opacity-60 font-mono text-xs">{p.identityDocument}</td>
+                      <td className="font-medium">{p.fullName}</td>
+                      <td>
+                        <span className="badge badge-sm badge-primary badge-outline">Nv. {p.level}</span>
+                      </td>
+                      <td>{p.phone}</td>
+                      <td>
+                        <span className={`badge badge-sm ${p.active ? "badge-primary" : "badge-ghost"}`}>
+                          {p.active ? "Activo" : "Pausado"}
+                        </span>
+                      </td>
+                      <td className="text-right space-x-2">
+                        {!p.active && (
+                          <button className="btn btn-xs btn-outline" onClick={async () => {
+                            try {
+                              const res = await fetch(getApiUrl(`admin/users/${p.id}/status?activate=true`), {
+                                method: 'POST',
+                                headers: getAuthHeaders(),
+                              });
+                              if (res.ok) window.location.reload();
+                            } catch (e) { console.error(e); }
+                          }}>Activar</button>
+                        )}
+                        {p.active && (
+                          <button className="btn btn-xs btn-error" onClick={async () => {
+                            try {
+                              const res = await fetch(getApiUrl(`admin/users/${p.id}/status?activate=false`), {
+                                method: 'POST',
+                                headers: getAuthHeaders(),
+                              });
+                              if (res.ok) window.location.reload();
+                            } catch (e) { console.error(e); }
+                          }}>Pausar</button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -406,10 +381,10 @@ function ComerciosView({ searchTerm, onAddMerchant, refreshTrigger }: { searchTe
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground text-sm">{filtered.length} comercios encontrados</p>
-        <Button className="gap-2" onClick={onAddMerchant}>
+        <p className="opacity-60 text-sm">{filtered.length} comercios encontrados</p>
+        <button className="btn btn-primary btn-sm gap-2" onClick={onAddMerchant}>
           <Store className="w-4 h-4" /> Agregar Comercio
-        </Button>
+        </button>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.length === 0 ? (
@@ -419,25 +394,23 @@ function ComerciosView({ searchTerm, onAddMerchant, refreshTrigger }: { searchTe
           </div>
         ) : (
           filtered.map((c: any) => (
-            <Card key={c.id} className="border-border shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all cursor-pointer">
-              <CardHeader className="pb-3">
+            <div key={c.id} className="card bg-base-100 border border-base-300 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all cursor-pointer">
+              <div className="card-body p-4 space-y-2">
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-base">{c.tradeName}</CardTitle>
-                    <p className="text-xs text-muted-foreground mt-0.5">{c.rif}</p>
+                    <h4 className="font-semibold text-base">{c.tradeName}</h4>
+                    <p className="text-xs opacity-60 mt-0.5">{c.rif}</p>
                   </div>
-                  <Badge variant={c.isActive ? "default" : "secondary"}>{c.isActive ? "Activo" : "Pendiente"}</Badge>
+                  <span className={`badge badge-sm ${c.isActive ? "badge-primary" : "badge-ghost"}`}>{c.isActive ? "Activo" : "Pendiente"}</span>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Pill className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">{c.category}</span>
+                  <Pill className="w-3.5 h-3.5 opacity-60" />
+                  <span className="text-sm opacity-60">{c.category}</span>
                 </div>
-                <div className="flex justify-between text-sm pt-2 border-t border-border items-center">
-                  <span className="text-muted-foreground">{c.city}</span>
+                <div className="flex justify-between text-sm pt-2 border-t border-base-300 items-center">
+                  <span className="opacity-60">{c.city}</span>
                   {!c.isActive ? (
-                    <Button size="sm" onClick={async () => {
+                    <button className="btn btn-xs btn-primary" onClick={async () => {
                       try {
                         const res = await fetch(getApiUrl(`admin/merchants/${c.id}/approve`), {
                           method: 'POST',
@@ -447,13 +420,13 @@ function ComerciosView({ searchTerm, onAddMerchant, refreshTrigger }: { searchTe
                       } catch (e) {
                         console.error(e);
                       }
-                    }}>Aprobar</Button>
+                    }}>Aprobar</button>
                   ) : (
                     <span className="font-semibold">{c.phone}</span>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))
         )}
       </div>
@@ -476,52 +449,52 @@ function FinanciamientosView({ searchTerm }: { searchTerm: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground text-sm">{filtered.length} transacciones encontradas</p>
-        <Button className="gap-2">
+        <p className="opacity-60 text-sm">{filtered.length} transacciones encontradas</p>
+        <button className="btn btn-primary btn-sm gap-2">
           <CreditCard className="w-4 h-4" /> Nuevo Financiamiento
-        </Button>
+        </button>
       </div>
-      <Card className="border-border shadow-sm">
-        <CardContent className="p-0">
+      <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="p-0">
           {filtered.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <CreditCard className="w-10 h-10 mx-auto mb-3 opacity-40" />
+            <div className="text-center py-16 opacity-40">
+              <CreditCard className="w-10 h-10 mx-auto mb-3" />
               <p className="font-medium">Sin resultados</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border hover:bg-transparent">
-                  <TableHead>Fecha</TableHead>
-                  <TableHead>Paciente</TableHead>
-                  <TableHead>Comercio</TableHead>
-                  <TableHead>Monto (Total)</TableHead>
-                  <TableHead>Cuotas</TableHead>
-                  <TableHead>Estado</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((f: any) => (
-                  <TableRow key={f.id} className="border-border/60 hover:bg-accent/40 transition-colors cursor-pointer">
-                    <TableCell className="text-muted-foreground font-mono text-xs">
-                      {new Date(f.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="font-medium">{f.user?.fullName}</TableCell>
-                    <TableCell className="text-muted-foreground">{f.merchant?.tradeName}</TableCell>
-                    <TableCell className="font-semibold">${f.amount?.toFixed(2)}</TableCell>
-                    <TableCell>{f.numberOfInstallments}</TableCell>
-                    <TableCell>
-                      <Badge variant={f.status === "ACTIVE" ? "default" : f.status === "FAILED" ? "destructive" : "secondary"}>
-                        {f.status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto">
+              <table className="table table-sm w-full">
+                <thead>
+                  <tr className="border-base-300">
+                    <th>Fecha</th>
+                    <th>Paciente</th>
+                    <th>Comercio</th>
+                    <th>Monto (Total)</th>
+                    <th>Cuotas</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((f: any) => (
+                    <tr key={f.id} className="hover:bg-base-200/40 transition-colors cursor-pointer border-base-300/60">
+                      <td className="opacity-60 font-mono text-xs">{new Date(f.createdAt).toLocaleDateString()}</td>
+                      <td className="font-medium">{f.user?.fullName}</td>
+                      <td className="opacity-60">{f.merchant?.tradeName}</td>
+                      <td className="font-semibold">${f.amount?.toFixed(2)}</td>
+                      <td>{f.numberOfInstallments}</td>
+                      <td>
+                        <span className={`badge badge-sm ${
+                          f.status === "ACTIVE" ? "badge-primary" : f.status === "FAILED" ? "badge-error" : "badge-ghost"
+                        }`}>{f.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -580,8 +553,8 @@ function TriajesView({ searchTerm }: { searchTerm: string }) {
       ) : (
         <div className="space-y-3">
           {filtered.map((t: any) => (
-            <Card key={t.id} className={`border shadow-sm ${t.urgencyLevel === 'EMERGENCY' ? 'border-red-300' : 'border-border'}`}>
-              <CardContent className="p-5">
+            <div key={t.id} className={`card bg-base-100 shadow-sm ${t.urgencyLevel === 'EMERGENCY' ? 'border border-red-300' : 'border border-base-300'}`}>
+              <div className="card-body p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -600,9 +573,9 @@ function TriajesView({ searchTerm }: { searchTerm: string }) {
                       <p className="text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2">{t.aiSummary}</p>
                     )}
                   </div>
-                  <Button size="sm" onClick={() => setResponding(t.id)} className="gap-1 shrink-0">
+                  <button className="btn btn-primary btn-sm gap-1 shrink-0" onClick={() => setResponding(t.id)}>
                     <Send className="w-3.5 h-3.5" /> Responder
-                  </Button>
+                  </button>
                 </div>
 
                 {responding === t.id && (
@@ -624,13 +597,13 @@ function TriajesView({ searchTerm }: { searchTerm: string }) {
                       className="w-full min-h-[80px] text-sm p-3 rounded-lg border border-border bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
                     />
                     <div className="flex gap-2 justify-end">
-                      <Button variant="ghost" size="sm" onClick={() => setResponding(null)}>Cancelar</Button>
-                      <Button size="sm" onClick={() => handleRespond(t.id)} disabled={!notes.trim()}>Confirmar Respuesta</Button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => setResponding(null)}>Cancelar</button>
+                      <button className="btn btn-primary btn-sm" onClick={() => handleRespond(t.id)} disabled={!notes.trim()}>Confirmar Respuesta</button>
                     </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}
@@ -666,56 +639,60 @@ function ElderCareView({ searchTerm }: { searchTerm: string }) {
           { label: "Proveedores Elder Care", value: elderMerchants.length, icon: Building2, color: "text-blue-600" },
           { label: "Tipos de Servicio", value: new Set(activeSubs.map((s:any) => s.serviceType)).size, icon: Activity, color: "text-pink-600" },
         ].map(kpi => (
-          <Card key={kpi.label} className="border-border shadow-sm">
-            <CardContent className="p-5 flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-muted"><kpi.icon className={`w-6 h-6 ${kpi.color}`} /></div>
+          <div key={kpi.label} className="card bg-base-100 border border-base-300 shadow-sm">
+            <div className="card-body flex-row items-center gap-4 p-5">
+              <div className="p-3 rounded-xl bg-base-200"><kpi.icon className={`w-6 h-6 ${kpi.color}`} /></div>
               <div>
                 <div className="text-2xl font-bold">{kpi.value}</div>
-                <div className="text-xs text-muted-foreground">{kpi.label}</div>
+                <div className="text-xs opacity-60">{kpi.label}</div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
 
       {/* Subscriptions table */}
-      <Card className="border-border shadow-sm">
-        <CardHeader><CardTitle className="font-(family-name:--font-syne)">Suscripciones Elder Care Activas</CardTitle></CardHeader>
-        <CardContent className="p-0">
+      <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="card-body pb-0">
+          <h3 className="card-title font-(family-name:--font-syne)">Suscripciones Elder Care Activas</h3>
+        </div>
+        <div className="p-0">
           {filtered.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground"><Shield className="w-10 h-10 mx-auto mb-3 opacity-30" /><p>Sin suscripciones activas</p></div>
+            <div className="text-center py-12 opacity-40"><Shield className="w-10 h-10 mx-auto mb-3" /><p>Sin suscripciones activas</p></div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border hover:bg-transparent">
-                  <TableHead>Proveedor</TableHead>
-                  <TableHead>Servicio</TableHead>
-                  <TableHead>Monto/Mes</TableHead>
-                  <TableHead>Próximo Cobro</TableHead>
-                  <TableHead>Estado</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((s: any) => (
-                  <TableRow key={s.id} className="border-border/60 hover:bg-accent/40">
-                    <TableCell className="font-medium">{s.merchantName}</TableCell>
-                    <TableCell><Badge variant="secondary">{SERVICE_LABELS[s.serviceType] ?? s.serviceType}</Badge></TableCell>
-                    <TableCell className="font-semibold">${s.monthlyAmount?.toFixed(2)}</TableCell>
-                    <TableCell className="text-muted-foreground text-xs">{s.nextBillingDate ? new Date(s.nextBillingDate).toLocaleDateString('es-VE') : '—'}</TableCell>
-                    <TableCell><Badge variant="default">Activa</Badge></TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto">
+              <table className="table table-sm w-full">
+                <thead>
+                  <tr className="border-base-300">
+                    <th>Proveedor</th>
+                    <th>Servicio</th>
+                    <th>Monto/Mes</th>
+                    <th>Próximo Cobro</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((s: any) => (
+                    <tr key={s.id} className="hover:bg-base-200/40 border-base-300/60">
+                      <td className="font-medium">{s.merchantName}</td>
+                      <td><span className="badge badge-sm badge-ghost">{SERVICE_LABELS[s.serviceType] ?? s.serviceType}</span></td>
+                      <td className="font-semibold">${s.monthlyAmount?.toFixed(2)}</td>
+                      <td className="opacity-60 text-xs">{s.nextBillingDate ? new Date(s.nextBillingDate).toLocaleDateString('es-VE') : '—'}</td>
+                      <td><span className="badge badge-sm badge-primary">Activa</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Elder Care Merchants */}
       {elderMerchants.length > 0 && (
-        <Card className="border-border shadow-sm">
-          <CardHeader><CardTitle className="font-(family-name:--font-syne)">Proveedores de Cuidado Mayor</CardTitle></CardHeader>
-          <CardContent>
+        <div className="card bg-base-100 border border-base-300 shadow-sm">
+          <div className="card-body">
+            <h3 className="card-title font-(family-name:--font-syne)">Proveedores de Cuidado Mayor</h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {elderMerchants.map((m: any) => (
                 <div key={m.id} className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30">
@@ -724,12 +701,12 @@ function ElderCareView({ searchTerm }: { searchTerm: string }) {
                     <p className="text-sm font-semibold">{m.tradeName}</p>
                     <p className="text-xs text-muted-foreground">{m.subcategory ?? m.category}</p>
                   </div>
-                  <Badge variant={m.isActive ? 'default' : 'secondary'} className="ml-auto">{m.isActive ? 'Activo' : 'Inactivo'}</Badge>
+                  <span className={`badge badge-sm ml-auto ${m.isActive ? 'badge-primary' : 'badge-ghost'}`}>{m.isActive ? 'Activo' : 'Inactivo'}</span>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -752,43 +729,43 @@ function SuscripcionesView({ searchTerm }: { searchTerm: string }) {
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">{filtered.length} suscripciones de farmacia activas</p>
       </div>
-      <Card className="border-border shadow-sm">
-        <CardContent className="p-0">
+      <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="p-0">
           {filtered.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <Pill className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <div className="text-center py-16 opacity-40">
+              <Pill className="w-10 h-10 mx-auto mb-3" />
               <p>Sin suscripciones activas</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border hover:bg-transparent">
-                  <TableHead>Producto</TableHead>
-                  <TableHead>Farmacia</TableHead>
-                  <TableHead>Monto/Mes</TableHead>
-                  <TableHead>Próximo Cobro</TableHead>
-                  <TableHead>Estado</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((s: any) => (
-                  <TableRow key={s.id} className="border-border/60 hover:bg-accent/40">
-                    <TableCell className="font-medium">{s.productName}</TableCell>
-                    <TableCell className="text-muted-foreground">{s.merchantName}</TableCell>
-                    <TableCell className="font-semibold">${s.amount?.toFixed(2)}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {s.nextBillingDate ? new Date(s.nextBillingDate).toLocaleDateString('es-VE') : '—'}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={s.status === 'ACTIVE' ? 'default' : 'secondary'}>{s.status}</Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto">
+              <table className="table table-sm w-full">
+                <thead>
+                  <tr className="border-base-300">
+                    <th>Producto</th>
+                    <th>Farmacia</th>
+                    <th>Monto/Mes</th>
+                    <th>Próximo Cobro</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((s: any) => (
+                    <tr key={s.id} className="hover:bg-base-200/40 border-base-300/60">
+                      <td className="font-medium">{s.productName}</td>
+                      <td className="opacity-60">{s.merchantName}</td>
+                      <td className="font-semibold">${s.amount?.toFixed(2)}</td>
+                      <td className="text-xs opacity-60">{s.nextBillingDate ? new Date(s.nextBillingDate).toLocaleDateString('es-VE') : '—'}</td>
+                      <td>
+                        <span className={`badge badge-sm ${s.status === 'ACTIVE' ? 'badge-primary' : 'badge-ghost'}`}>{s.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1079,36 +1056,26 @@ export default function AdminDashboard() {
               )}
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button aria-label="Menú de usuario" className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-                    {(adminUser?.firstName?.[0] ?? "A").toUpperCase()}
-                  </div>
-                  <ChevronDown className="w-3 h-3 text-muted-foreground" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="font-normal">
+            <div className="dropdown dropdown-end">
+              <button tabIndex={0} aria-label="Menú de usuario" className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-content font-bold text-sm">
+                  {(adminUser?.firstName?.[0] ?? "A").toUpperCase()}
+                </div>
+                <ChevronDown className="w-3 h-3 opacity-60" />
+              </button>
+              <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box shadow-lg border border-base-300 w-56 z-50 p-1 mt-1">
+                <li className="menu-title px-3 py-1">
                   <p className="text-sm font-semibold">{adminUser?.firstName ?? "Administrador"}</p>
-                  <p className="text-xs text-muted-foreground">{adminUser?.email ?? "admin@saludtech.com"}</p>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setIsProfileOpen(true)}>
-                  <User className="mr-2 h-4 w-4" /> Mi Perfil
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsSettingsOpen(true)}>
-                  <Settings className="mr-2 h-4 w-4" /> Configuración
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsHelpOpen(true)}>
-                  <HelpCircle className="mr-2 h-4 w-4" /> Ayuda
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" /> Cerrar Sesión
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <p className="text-xs opacity-60">{adminUser?.email ?? "admin@saludtech.com"}</p>
+                </li>
+                <li><hr className="my-1 border-base-300" /></li>
+                <li><button onClick={() => setIsProfileOpen(true)}><User className="w-4 h-4" /> Mi Perfil</button></li>
+                <li><button onClick={() => setIsSettingsOpen(true)}><Settings className="w-4 h-4" /> Configuración</button></li>
+                <li><button onClick={() => setIsHelpOpen(true)}><HelpCircle className="w-4 h-4" /> Ayuda</button></li>
+                <li><hr className="my-1 border-base-300" /></li>
+                <li><button onClick={handleLogout} className="text-error"><LogOut className="w-4 h-4" /> Cerrar Sesión</button></li>
+              </ul>
+            </div>
           </div>
         </header>
 
@@ -1126,139 +1093,140 @@ export default function AdminDashboard() {
       </div>
 
       {/* ── Modal: Agregar Paciente ─────────────────────────────────────────── */}
-      <Dialog open={isAddPatientOpen} onOpenChange={(o) => { setIsAddPatientOpen(o); if (!o) { setPatientError(null); setPatientSuccess(false); } }}>
-        <DialogContent className="sm:max-w-md p-6">
-          <DialogHeader>
-            <DialogTitle className="font-(family-name:--font-syne)">Agregar Paciente</DialogTitle>
-            <DialogDescription>Crea una cuenta de paciente y asigna una línea de crédito inicial.</DialogDescription>
-          </DialogHeader>
-          {patientSuccess ? (
-            <div className="flex flex-col items-center py-8 gap-3 text-green-600">
-              <CheckCircle2 className="w-12 h-12" />
-              <p className="font-semibold">Paciente creado exitosamente</p>
-            </div>
-          ) : (
-            <form onSubmit={handleAddPatient} className="space-y-4 mt-2">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Nombre</Label>
-                  <Input id="firstName" required value={patientForm.firstName} onChange={(e) => setPatientForm({ ...patientForm, firstName: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Apellido</Label>
-                  <Input id="lastName" required value={patientForm.lastName} onChange={(e) => setPatientForm({ ...patientForm, lastName: e.target.value })} />
-                </div>
+      {isAddPatientOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-md p-6">
+            <h3 className="font-bold text-lg font-(family-name:--font-syne)">Agregar Paciente</h3>
+            <p className="text-sm opacity-60 mb-4">Crea una cuenta de paciente y asigna una línea de crédito inicial.</p>
+            {patientSuccess ? (
+              <div className="flex flex-col items-center py-8 gap-3 text-success">
+                <CheckCircle2 className="w-12 h-12" />
+                <p className="font-semibold">Paciente creado exitosamente</p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="identityDocument">Cédula</Label>
-                <Input id="identityDocument" required value={patientForm.identityDocument} onChange={(e) => setPatientForm({ ...patientForm, identityDocument: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Correo Electrónico</Label>
-                <Input id="email" type="email" required value={patientForm.email} onChange={(e) => setPatientForm({ ...patientForm, email: e.target.value })} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Teléfono</Label>
-                  <Input id="phone" type="tel" required value={patientForm.phone} onChange={(e) => setPatientForm({ ...patientForm, phone: e.target.value })} />
+            ) : (
+              <form onSubmit={handleAddPatient} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="form-control gap-1">
+                    <label htmlFor="firstName" className="label pb-0"><span className="label-text font-medium">Nombre</span></label>
+                    <input id="firstName" className="input input-bordered w-full" required value={patientForm.firstName} onChange={(e) => setPatientForm({ ...patientForm, firstName: e.target.value })} />
+                  </div>
+                  <div className="form-control gap-1">
+                    <label htmlFor="lastName" className="label pb-0"><span className="label-text font-medium">Apellido</span></label>
+                    <input id="lastName" className="input input-bordered w-full" required value={patientForm.lastName} onChange={(e) => setPatientForm({ ...patientForm, lastName: e.target.value })} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Contraseña</Label>
-                  <Input id="password" type="password" required value={patientForm.password} onChange={(e) => setPatientForm({ ...patientForm, password: e.target.value })} />
+                <div className="form-control gap-1">
+                  <label htmlFor="identityDocument" className="label pb-0"><span className="label-text font-medium">Cédula</span></label>
+                  <input id="identityDocument" className="input input-bordered w-full" required value={patientForm.identityDocument} onChange={(e) => setPatientForm({ ...patientForm, identityDocument: e.target.value })} />
                 </div>
-              </div>
-              {patientError && (
-                <div className="p-3 text-sm bg-destructive/10 text-destructive rounded-lg flex items-start gap-2">
-                  <XCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <p>{patientError}</p>
+                <div className="form-control gap-1">
+                  <label htmlFor="patEmail" className="label pb-0"><span className="label-text font-medium">Correo Electrónico</span></label>
+                  <input id="patEmail" type="email" className="input input-bordered w-full" required value={patientForm.email} onChange={(e) => setPatientForm({ ...patientForm, email: e.target.value })} />
                 </div>
-              )}
-              <div className="flex justify-end gap-3 pt-4 border-t border-border mt-6">
-                <Button type="button" variant="outline" onClick={() => setIsAddPatientOpen(false)}>Cancelar</Button>
-                <Button type="submit" disabled={patientLoading}>
-                  {patientLoading && <Clock className="w-4 h-4 mr-2 animate-spin" />}
-                  Crear Paciente
-                </Button>
-              </div>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="form-control gap-1">
+                    <label htmlFor="phone" className="label pb-0"><span className="label-text font-medium">Teléfono</span></label>
+                    <input id="phone" type="tel" className="input input-bordered w-full" required value={patientForm.phone} onChange={(e) => setPatientForm({ ...patientForm, phone: e.target.value })} />
+                  </div>
+                  <div className="form-control gap-1">
+                    <label htmlFor="patPassword" className="label pb-0"><span className="label-text font-medium">Contraseña</span></label>
+                    <input id="patPassword" type="password" className="input input-bordered w-full" required value={patientForm.password} onChange={(e) => setPatientForm({ ...patientForm, password: e.target.value })} />
+                  </div>
+                </div>
+                {patientError && (
+                  <div role="alert" className="alert alert-error text-sm">
+                    <XCircle className="w-4 h-4 shrink-0" />
+                    <p>{patientError}</p>
+                  </div>
+                )}
+                <div className="flex justify-end gap-3 pt-4 border-t border-base-300">
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setIsAddPatientOpen(false)}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary btn-sm" disabled={patientLoading}>
+                    {patientLoading && <span className="loading loading-spinner loading-xs" />}
+                    Crear Paciente
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+          <div className="modal-backdrop" onClick={() => { setIsAddPatientOpen(false); setPatientError(null); setPatientSuccess(false); }} />
+        </div>
+      )}
 
       {/* ── Modal: Agregar Comercio ─────────────────────────────────────────── */}
-      <Dialog open={isAddMerchantOpen} onOpenChange={(o) => { setIsAddMerchantOpen(o); if (!o) { setMerchantError(null); setMerchantSuccess(false); } }}>
-        <DialogContent className="sm:max-w-md p-6 max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="font-(family-name:--font-syne)">Afiliar Comercio</DialogTitle>
-            <DialogDescription>Registra una nueva clínica, farmacia o proveedor.</DialogDescription>
-          </DialogHeader>
-          {merchantSuccess ? (
-            <div className="flex flex-col items-center py-8 gap-3 text-green-600">
-              <CheckCircle2 className="w-12 h-12" />
-              <p className="font-semibold">Comercio afiliado exitosamente</p>
-            </div>
-          ) : (
-            <form onSubmit={handleAddMerchant} className="space-y-4 mt-2">
-              <div className="space-y-2">
-                <Label htmlFor="legalName">Razón Social</Label>
-                <Input id="legalName" required value={merchantForm.legalName} onChange={(e) => setMerchantForm({ ...merchantForm, legalName: e.target.value })} />
+      {isAddMerchantOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-md p-6 max-h-[90vh] overflow-y-auto">
+            <h3 className="font-bold text-lg font-(family-name:--font-syne)">Afiliar Comercio</h3>
+            <p className="text-sm opacity-60 mb-4">Registra una nueva clínica, farmacia o proveedor.</p>
+            {merchantSuccess ? (
+              <div className="flex flex-col items-center py-8 gap-3 text-success">
+                <CheckCircle2 className="w-12 h-12" />
+                <p className="font-semibold">Comercio afiliado exitosamente</p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="tradeName">Nombre Comercial</Label>
-                <Input id="tradeName" required value={merchantForm.tradeName} onChange={(e) => setMerchantForm({ ...merchantForm, tradeName: e.target.value })} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="rif">RIF</Label>
-                  <Input id="rif" required value={merchantForm.rif} onChange={(e) => setMerchantForm({ ...merchantForm, rif: e.target.value })} />
+            ) : (
+              <form onSubmit={handleAddMerchant} className="space-y-4">
+                <div className="form-control gap-1">
+                  <label htmlFor="legalName" className="label pb-0"><span className="label-text font-medium">Razón Social</span></label>
+                  <input id="legalName" className="input input-bordered w-full" required value={merchantForm.legalName} onChange={(e) => setMerchantForm({ ...merchantForm, legalName: e.target.value })} />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="category">Categoría</Label>
-                  <select id="category" required value={merchantForm.category} onChange={(e) => setMerchantForm({ ...merchantForm, category: e.target.value })} className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
-                    <option value="CLINIC">Clínica</option>
-                    <option value="PHARMACY">Farmacia</option>
-                    <option value="DENTAL">Odontología</option>
-                    <option value="OPTICAL">Óptica</option>
-                    <option value="LABORATORY">Laboratorio</option>
-                  </select>
+                <div className="form-control gap-1">
+                  <label htmlFor="tradeName" className="label pb-0"><span className="label-text font-medium">Nombre Comercial</span></label>
+                  <input id="tradeName" className="input input-bordered w-full" required value={merchantForm.tradeName} onChange={(e) => setMerchantForm({ ...merchantForm, tradeName: e.target.value })} />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="emailMerch">Email de Contacto</Label>
-                <Input id="emailMerch" type="email" required value={merchantForm.email} onChange={(e) => setMerchantForm({ ...merchantForm, email: e.target.value })} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="phoneMerch">Teléfono</Label>
-                  <Input id="phoneMerch" type="tel" required value={merchantForm.phone} onChange={(e) => setMerchantForm({ ...merchantForm, phone: e.target.value })} />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="form-control gap-1">
+                    <label htmlFor="rif" className="label pb-0"><span className="label-text font-medium">RIF</span></label>
+                    <input id="rif" className="input input-bordered w-full" required value={merchantForm.rif} onChange={(e) => setMerchantForm({ ...merchantForm, rif: e.target.value })} />
+                  </div>
+                  <div className="form-control gap-1">
+                    <label htmlFor="category" className="label pb-0"><span className="label-text font-medium">Categoría</span></label>
+                    <select id="category" required value={merchantForm.category} onChange={(e) => setMerchantForm({ ...merchantForm, category: e.target.value })} className="select select-bordered w-full">
+                      <option value="CLINIC">Clínica</option>
+                      <option value="PHARMACY">Farmacia</option>
+                      <option value="DENTAL">Odontología</option>
+                      <option value="OPTICAL">Óptica</option>
+                      <option value="LABORATORY">Laboratorio</option>
+                    </select>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="city">Ciudad</Label>
-                  <Input id="city" required value={merchantForm.city} onChange={(e) => setMerchantForm({ ...merchantForm, city: e.target.value })} />
+                <div className="form-control gap-1">
+                  <label htmlFor="emailMerch" className="label pb-0"><span className="label-text font-medium">Email de Contacto</span></label>
+                  <input id="emailMerch" type="email" className="input input-bordered w-full" required value={merchantForm.email} onChange={(e) => setMerchantForm({ ...merchantForm, email: e.target.value })} />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contactName">Nombre de Contacto</Label>
-                <Input id="contactName" required value={merchantForm.contactName} onChange={(e) => setMerchantForm({ ...merchantForm, contactName: e.target.value })} />
-              </div>
-              
-              {merchantError && (
-                <div className="p-3 text-sm bg-destructive/10 text-destructive rounded-lg flex items-start gap-2">
-                  <XCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <p>{merchantError}</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="form-control gap-1">
+                    <label htmlFor="phoneMerch" className="label pb-0"><span className="label-text font-medium">Teléfono</span></label>
+                    <input id="phoneMerch" type="tel" className="input input-bordered w-full" required value={merchantForm.phone} onChange={(e) => setMerchantForm({ ...merchantForm, phone: e.target.value })} />
+                  </div>
+                  <div className="form-control gap-1">
+                    <label htmlFor="city" className="label pb-0"><span className="label-text font-medium">Ciudad</span></label>
+                    <input id="city" className="input input-bordered w-full" required value={merchantForm.city} onChange={(e) => setMerchantForm({ ...merchantForm, city: e.target.value })} />
+                  </div>
                 </div>
-              )}
-              <div className="flex justify-end gap-3 pt-4 border-t border-border mt-6">
-                <Button type="button" variant="outline" onClick={() => setIsAddMerchantOpen(false)}>Cancelar</Button>
-                <Button type="submit" disabled={merchantLoading}>
-                  {merchantLoading && <Clock className="w-4 h-4 mr-2 animate-spin" />}
-                  Afiliar Comercio
-                </Button>
-              </div>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
+                <div className="form-control gap-1">
+                  <label htmlFor="contactName" className="label pb-0"><span className="label-text font-medium">Nombre de Contacto</span></label>
+                  <input id="contactName" className="input input-bordered w-full" required value={merchantForm.contactName} onChange={(e) => setMerchantForm({ ...merchantForm, contactName: e.target.value })} />
+                </div>
+                {merchantError && (
+                  <div role="alert" className="alert alert-error text-sm">
+                    <XCircle className="w-4 h-4 shrink-0" />
+                    <p>{merchantError}</p>
+                  </div>
+                )}
+                <div className="flex justify-end gap-3 pt-4 border-t border-base-300">
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setIsAddMerchantOpen(false)}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary btn-sm" disabled={merchantLoading}>
+                    {merchantLoading && <span className="loading loading-spinner loading-xs" />}
+                    Afiliar Comercio
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+          <div className="modal-backdrop" onClick={() => { setIsAddMerchantOpen(false); setMerchantError(null); setMerchantSuccess(false); }} />
+        </div>
+      )}
     </div>
   );
 }

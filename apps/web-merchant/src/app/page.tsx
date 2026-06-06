@@ -4,32 +4,6 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Logo from "../components/Logo";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@saludtech/ui";
-import { Badge } from "@saludtech/ui";
-import { Button } from "@saludtech/ui";
-import { Input } from "@saludtech/ui";
-import { Label } from "@saludtech/ui";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@saludtech/ui";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@saludtech/ui";
-import {
   Store,
   Wallet,
   CheckCircle2,
@@ -223,26 +197,26 @@ function ElderCareSubscriptionsView() {
           { label: "Nuevas Suscripciones", value: "+12", icon: UserPlus, color: "text-blue-600" },
           { label: "Servicios Diferentes", value: "8", icon: Activity, color: "text-pink-600" },
         ].map((kpi) => (
-          <Card key={kpi.label} className="border-border shadow-sm">
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="p-2.5 rounded-lg bg-muted">
+          <div key={kpi.label} className="card bg-base-100 border border-base-300 shadow-sm">
+            <div className="card-body flex-row items-center gap-4 p-5">
+              <div className="p-2.5 rounded-lg bg-base-200">
                 <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
               </div>
               <div>
                 <p className="text-2xl font-bold font-(family-name:--font-syne)">{kpi.value}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{kpi.label}</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
 
-      <Card className="border-border shadow-sm">
-        <CardHeader>
-          <CardTitle className="font-(family-name:--font-syne)">Suscripciones Elder Care</CardTitle>
-          <CardDescription>Pacientes suscritos a tus servicios de cuidado mayor</CardDescription>
-        </CardHeader>
-        <CardContent className="p-0">
+      <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="card-body pb-0">
+          <h3 className="card-title font-(family-name:--font-syne)">Suscripciones Elder Care</h3>
+          <p className="text-sm text-base-content/60">Pacientes suscritos a tus servicios de cuidado mayor</p>
+        </div>
+        <div className="p-0">
           {subs.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground">
               <Shield className="w-10 h-10 mx-auto mb-3 opacity-30" />
@@ -273,9 +247,9 @@ function ElderCareSubscriptionsView() {
                         ${(s.monthlyAmount ?? 0).toFixed(2)}
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <Badge variant={s.status === "ACTIVE" ? "default" : "secondary"}>
+                        <span className={`badge ${s.status === "ACTIVE" ? "badge-primary" : "badge-ghost"}`}>
                           {s.status === "ACTIVE" ? "Activa" : "Cancelada"}
-                        </Badge>
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground text-xs">
                         {s.nextBillingDate
@@ -288,8 +262,8 @@ function ElderCareSubscriptionsView() {
               </table>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -561,33 +535,25 @@ export default function MerchantDashboard() {
             <button onClick={toggleDarkMode} aria-label={isDarkMode ? "Modo claro" : "Modo oscuro"} className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button aria-label="Menú de usuario" className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-                    {(merchantUser?.firstName?.[0] ?? "C").toUpperCase()}
-                  </div>
-                  <ChevronDown className="w-3 h-3 text-muted-foreground" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuLabel className="font-normal">
+            <div className="dropdown dropdown-end">
+              <button tabIndex={0} aria-label="Menú de usuario" className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-content font-bold text-sm">
+                  {(merchantUser?.firstName?.[0] ?? "C").toUpperCase()}
+                </div>
+                <ChevronDown className="w-3 h-3 text-muted-foreground" />
+              </button>
+              <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box shadow-lg border border-base-300 w-52 z-50 p-1 mt-1">
+                <li className="menu-title px-3 py-1">
                   <p className="text-sm font-semibold">{merchantUser?.firstName ?? "Comercio"}</p>
-                  <p className="text-xs text-muted-foreground">{merchantUser?.email ?? ""}</p>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setIsProfileOpen(true)}>
-                  <User className="mr-2 h-4 w-4" /> Mi Perfil
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsConfigOpen(true)}>
-                  <Settings className="mr-2 h-4 w-4" /> Configuración
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" /> Cerrar Sesión
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <p className="text-xs opacity-60">{merchantUser?.email ?? ""}</p>
+                </li>
+                <li><hr className="my-1 border-base-300" /></li>
+                <li><button onClick={() => setIsProfileOpen(true)}><User className="w-4 h-4" /> Mi Perfil</button></li>
+                <li><button onClick={() => setIsConfigOpen(true)}><Settings className="w-4 h-4" /> Configuración</button></li>
+                <li><hr className="my-1 border-base-300" /></li>
+                <li><button onClick={handleLogout} className="text-error"><LogOut className="w-4 h-4" /> Cerrar Sesión</button></li>
+              </ul>
+            </div>
           </div>
         </header>
 
@@ -604,8 +570,8 @@ export default function MerchantDashboard() {
                   { label: "Transacciones", value: `${dailyTxs.length}`, icon: TrendingUp, color: "text-green-600" },
                   { label: "Pendientes", value: `${dailyTxs.filter(t => t.status === "Pendiente").length}`, icon: Clock, color: "text-muted-foreground" },
                 ].map((kpi) => (
-                  <Card key={kpi.label} className="border-border shadow-sm">
-                    <CardContent className="flex items-center gap-4 p-5">
+                  <div key={kpi.label} className="card bg-base-100 border border-base-300 shadow-sm">
+                    <div className="card-body flex-row items-center gap-4 p-5">
                       <div className="p-2.5 rounded-lg bg-primary/10">
                         <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
                       </div>
@@ -613,30 +579,28 @@ export default function MerchantDashboard() {
                         <p className="text-2xl font-bold font-(family-name:--font-syne)">{kpi.value}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">{kpi.label}</p>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))}
               </div>
 
               <div className="grid gap-6 lg:grid-cols-2 max-w-5xl">
                 {/* Formulario QR */}
-                <Card className="border-border shadow-sm">
-                  <CardHeader>
-                    <CardTitle className="font-(family-name:--font-syne)">Nuevo Cobro</CardTitle>
-                    <CardDescription>Genera un QR para que el paciente pague desde su app en cuotas sin interés.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
+                <div className="card bg-base-100 border border-base-300 shadow-sm">
+                  <div className="card-body">
+                    <h3 className="card-title font-(family-name:--font-syne)">Nuevo Cobro</h3>
+                    <p className="text-sm text-base-content/60 mb-2">Genera un QR para que el paciente pague desde su app en cuotas sin interés.</p>
                     <form onSubmit={handleGenerateQR} className="space-y-5">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="amount">Monto Total (USD)</Label>
+                      <div className="form-control gap-1">
+                        <label htmlFor="amount" className="label pb-0"><span className="label-text font-medium">Monto Total (USD)</span></label>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold pointer-events-none">$</span>
-                          <Input ref={amountInputRef} id="amount" type="number" step="0.01" min="1" placeholder="0.00" required aria-required="true" className="pl-8 text-lg font-semibold" value={amount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)} />
+                          <input ref={amountInputRef} id="amount" type="number" step="0.01" min="1" placeholder="0.00" required aria-required="true" className="input input-bordered w-full pl-8 text-lg font-semibold" value={amount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)} />
                         </div>
                       </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="desc">Descripción <span className="text-muted-foreground font-normal">(opcional)</span></Label>
-                        <Input id="desc" placeholder={defaultDesc || "Ej. Consulta Especialista + Rayos X"} value={description} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)} />
+                      <div className="form-control gap-1">
+                        <label htmlFor="desc" className="label pb-0"><span className="label-text font-medium">Descripción <span className="opacity-60 font-normal">(opcional)</span></span></label>
+                        <input id="desc" className="input input-bordered w-full" placeholder={defaultDesc || "Ej. Consulta Especialista + Rayos X"} value={description} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)} />
                       </div>
                       {amount && parseFloat(amount) > 0 && (
                         <div className="p-4 rounded-lg bg-accent/60 border border-border space-y-1.5 text-sm">
@@ -655,26 +619,26 @@ export default function MerchantDashboard() {
                           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" /><span>{error}</span>
                         </div>
                       )}
-                      <Button type="submit" size="lg" className="w-full gap-2" disabled={isLoading}>
-                        {isLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <QrCode className="w-5 h-5" />}
+                      <button type="submit" className="btn btn-primary w-full gap-2" disabled={isLoading}>
+                        {isLoading ? <span className="loading loading-spinner loading-sm" /> : <QrCode className="w-5 h-5" />}
                         {isLoading ? "Generando..." : "Generar Código QR"}
-                      </Button>
+                      </button>
                     </form>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
                 {/* Cobros del día */}
-                <Card className="border-border shadow-sm">
-                  <CardHeader className="flex flex-row items-center justify-between">
+                <div className="card bg-base-100 border border-base-300 shadow-sm">
+                  <div className="card-body">
+                    <div className="flex flex-row items-center justify-between mb-2">
                     <div>
-                      <CardTitle className="font-(family-name:--font-syne)">Cobros de Hoy</CardTitle>
-                      <CardDescription>Transacciones del día</CardDescription>
+                      <h3 className="card-title font-(family-name:--font-syne)">Cobros de Hoy</h3>
+                      <p className="text-sm text-base-content/60">Transacciones del día</p>
                     </div>
                     <button onClick={handleRefreshCobros} aria-label="Actualizar cobros" className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
                       <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
                     </button>
-                  </CardHeader>
-                  <CardContent>
+                    </div>
                     <div className="space-y-3">
                       {dailyTxs.map((tx, i) => (
                         <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-border bg-card hover:bg-accent/40 transition-colors">
@@ -690,7 +654,7 @@ export default function MerchantDashboard() {
                           <div className="text-right">
                             <p className="font-semibold text-sm">{tx.amount}</p>
                             <p className="text-[10px] text-destructive">MDR: -{tx.mdrFee}</p>
-                            <Badge variant={tx.status === "Liquidado" ? "default" : "secondary"} className="text-[10px] mt-0.5">{tx.status}</Badge>
+                            <span className={`badge badge-xs mt-0.5 ${tx.status === "Liquidado" ? "badge-primary" : "badge-ghost"}`}>{tx.status}</span>
                           </div>
                         </div>
                       ))}
@@ -698,8 +662,8 @@ export default function MerchantDashboard() {
                         Ver historial completo <ArrowRight className="w-4 h-4" />
                       </button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
             </>
           )}
@@ -710,8 +674,8 @@ export default function MerchantDashboard() {
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">{payouts.length} liquidaciones encontradas</p>
               </div>
-              <Card className="border-border shadow-sm">
-                <CardContent className="p-0">
+              <div className="card bg-base-100 border border-base-300 shadow-sm">
+                <div className="p-0">
                   {payoutsLoading ? (
                     <div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
                       <RefreshCw className="w-5 h-5 animate-spin" /> Cargando liquidaciones...
@@ -748,9 +712,9 @@ export default function MerchantDashboard() {
                               <td className="px-4 py-3 text-right text-destructive">-${p.mdrDeducted.toFixed(2)}</td>
                               <td className="px-4 py-3 text-right font-semibold text-primary">${p.netAmount.toFixed(2)}</td>
                               <td className="px-4 py-3 text-center">
-                                <Badge variant={p.status === "PAID" ? "default" : "secondary"}>
+                                <span className={`badge ${p.status === "PAID" ? "badge-primary" : "badge-ghost"}`}>
                                   {p.status === "PAID" ? "Liquidado" : "Pendiente"}
-                                </Badge>
+                                </span>
                               </td>
                               <td className="px-4 py-3 text-center">
                                 <button onClick={() => setSelectedPayout(p)} className="text-xs text-primary hover:underline font-medium">
@@ -763,8 +727,8 @@ export default function MerchantDashboard() {
                       </table>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           )}
 
@@ -800,8 +764,8 @@ export default function MerchantDashboard() {
                 </button>
               </div>
 
-              <Card className="border-border shadow-sm">
-                <CardContent className="p-0">
+              <div className="card bg-base-100 border border-base-300 shadow-sm">
+                <div className="p-0">
                   {historyLoading ? (
                     <div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
                       <RefreshCw className="w-5 h-5 animate-spin" /> Cargando historial...
@@ -854,13 +818,13 @@ export default function MerchantDashboard() {
                                 <td className="px-4 py-3 text-right font-semibold">${tx.totalAmount.toFixed(2)}</td>
                                 <td className="px-4 py-3 text-right text-destructive text-xs">-${tx.mdrFee.toFixed(2)}</td>
                                 <td className="px-4 py-3 text-center">
-                                  <Badge variant={
-                                    tx.status === "ACTIVE" || tx.status === "COMPLETED" ? "default" :
-                                    tx.status === "OVERDUE" ? "destructive" : "secondary"
-                                  }>
+                                  <span className={`badge ${
+                                    tx.status === "ACTIVE" || tx.status === "COMPLETED" ? "badge-primary" :
+                                    tx.status === "OVERDUE" ? "badge-error" : "badge-ghost"
+                                  }`}>
                                     {tx.status === "ACTIVE" || tx.status === "COMPLETED" ? "Liquidado" :
                                      tx.status === "OVERDUE" ? "En mora" : "Pendiente"}
-                                  </Badge>
+                                  </span>
                                 </td>
                                 <td className="px-4 py-3 text-muted-foreground text-xs">
                                   {new Date(tx.createdAt).toLocaleDateString("es-VE")}
@@ -871,8 +835,8 @@ export default function MerchantDashboard() {
                       </table>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           )}
 
@@ -883,119 +847,130 @@ export default function MerchantDashboard() {
       </div>
 
       {/* ── Modal QR ──────────────────────────────────────────────────────── */}
-      <Dialog open={isQrOpen} onOpenChange={(open) => { if (!open) handleNewCharge(); }}>
-        <DialogContent className="sm:max-w-sm flex flex-col items-center text-center p-8">
-          <DialogHeader className="w-full">
-            <DialogTitle className="text-xl font-(family-name:--font-syne)">Código QR Generado</DialogTitle>
-            <DialogDescription>El paciente escaneará este código desde su app SaludTech.</DialogDescription>
-          </DialogHeader>
+      {isQrOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-sm flex flex-col items-center text-center p-8">
+            <h3 className="text-xl font-bold font-(family-name:--font-syne) mb-1">Código QR Generado</h3>
+            <p className="text-sm opacity-60 mb-4">El paciente escaneará este código desde su app SaludTech.</p>
 
-          <div className="bg-white p-5 rounded-2xl shadow-sm border border-border my-6">
-            <QRCodeSVG value={qrPayload || "preview"} size={200} level="Q" includeMargin={false} />
-          </div>
-
-          <div className="space-y-1 mb-4">
-            <p className="font-bold text-3xl text-primary font-(family-name:--font-syne)">${amount}</p>
-            <p className="text-sm text-muted-foreground">{description || defaultDesc || "Cobro Médico"}</p>
-          </div>
-
-          {qrConfirmed ? (
-            <div className="w-full flex items-center justify-center gap-2 p-3 rounded-lg bg-green-50 border border-green-200 text-sm text-green-700 mb-4">
-              <CheckCircle2 className="w-4 h-4 text-green-600" />
-              ¡Pago confirmado! El paciente aprobó el financiamiento.
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-base-300 my-4">
+              <QRCodeSVG value={qrPayload || "preview"} size={200} level="Q" includeMargin={false} />
             </div>
-          ) : (
-            <div className="w-full flex items-center justify-center gap-2 p-3 rounded-lg bg-accent/60 text-sm text-muted-foreground mb-4">
-              <RefreshCw className="w-4 h-4 animate-spin text-primary" />
-              Esperando confirmación del paciente...
-            </div>
-          )}
 
-          <Button variant="outline" className="w-full" onClick={handleNewCharge}>
-            Hacer otro cobro
-          </Button>
-        </DialogContent>
-      </Dialog>
+            <div className="space-y-1 mb-4">
+              <p className="font-bold text-3xl text-primary font-(family-name:--font-syne)">${amount}</p>
+              <p className="text-sm opacity-60">{description || defaultDesc || "Cobro Médico"}</p>
+            </div>
+
+            {qrConfirmed ? (
+              <div className="alert alert-success text-sm mb-4">
+                <CheckCircle2 className="w-4 h-4" />
+                ¡Pago confirmado! El paciente aprobó el financiamiento.
+              </div>
+            ) : (
+              <div className="alert mb-4">
+                <RefreshCw className="w-4 h-4 animate-spin text-primary" />
+                <span className="text-sm">Esperando confirmación del paciente...</span>
+              </div>
+            )}
+
+            <button className="btn btn-outline w-full" onClick={handleNewCharge}>
+              Hacer otro cobro
+            </button>
+          </div>
+          <div className="modal-backdrop" onClick={handleNewCharge} />
+        </div>
+      )}
 
       {/* ── Modal Detalle Liquidación ──────────────────────────────────────── */}
-      <Dialog open={!!selectedPayout} onOpenChange={(o) => { if (!o) setSelectedPayout(null); }}>
-        <DialogContent className="sm:max-w-md p-6">
-          <DialogHeader>
-            <DialogTitle className="font-(family-name:--font-syne)">Detalle de Liquidación</DialogTitle>
-            <DialogDescription>Período: {selectedPayout?.periodStart} — {selectedPayout?.periodEnd}</DialogDescription>
-          </DialogHeader>
-          {selectedPayout && (
-            <div className="space-y-3 mt-4">
+      {!!selectedPayout && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-md p-6">
+            <h3 className="font-bold text-lg font-(family-name:--font-syne)">Detalle de Liquidación</h3>
+            <p className="text-sm opacity-60 mb-4">Período: {selectedPayout?.periodStart} — {selectedPayout?.periodEnd}</p>
+            {selectedPayout && (
+              <div className="space-y-3">
+                {[
+                  { label: "Monto Bruto", value: `$${selectedPayout!.grossAmount.toFixed(2)}` },
+                  { label: "Comisión MDR (3.5%)", value: `-$${selectedPayout!.mdrDeducted.toFixed(2)}`, red: true },
+                  { label: "Monto Neto", value: `$${selectedPayout!.netAmount.toFixed(2)}`, bold: true },
+                  { label: "Estado", value: selectedPayout!.status === "PAID" ? "Liquidado" : "Pendiente" },
+                  { label: "Fecha de pago", value: selectedPayout!.paidAt ? new Date(selectedPayout!.paidAt).toLocaleDateString("es-VE") : "—" },
+                ].map((row) => (
+                  <div key={row.label} className="flex justify-between text-sm border-b border-base-300 pb-2 last:border-0">
+                    <span className="opacity-60">{row.label}</span>
+                    <span className={row.bold ? "font-bold text-primary" : row.red ? "text-error" : "font-medium"}>{row.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="modal-action">
+              <button className="btn btn-sm" onClick={() => setSelectedPayout(null)}>Cerrar</button>
+            </div>
+          </div>
+          <div className="modal-backdrop" onClick={() => setSelectedPayout(null)} />
+        </div>
+      )}
+
+      {/* ── Modal Mi Perfil ────────────────────────────────────────────────── */}
+      {isProfileOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-sm p-6">
+            <h3 className="font-bold text-lg font-(family-name:--font-syne)">Mi Perfil</h3>
+            <p className="text-sm opacity-60 mb-4">Datos del comercio autenticado.</p>
+            <div className="space-y-3">
               {[
-                { label: "Monto Bruto", value: `$${selectedPayout.grossAmount.toFixed(2)}` },
-                { label: "Comisión MDR (3.5%)", value: `-$${selectedPayout.mdrDeducted.toFixed(2)}`, red: true },
-                { label: "Monto Neto", value: `$${selectedPayout.netAmount.toFixed(2)}`, bold: true },
-                { label: "Estado", value: selectedPayout.status === "PAID" ? "Liquidado" : "Pendiente" },
-                { label: "Fecha de pago", value: selectedPayout.paidAt ? new Date(selectedPayout.paidAt).toLocaleDateString("es-VE") : "—" },
+                { label: "Nombre", value: merchantUser?.firstName ?? "—" },
+                { label: "Correo", value: merchantUser?.email ?? "—" },
+                { label: "ID Comercio", value: merchantUser?.id?.slice(0, 16) ?? "—" },
+                { label: "Nivel", value: `Nivel ${merchantUser?.level ?? 1}` },
               ].map((row) => (
-                <div key={row.label} className="flex justify-between text-sm border-b border-border pb-2 last:border-0">
-                  <span className="text-muted-foreground">{row.label}</span>
-                  <span className={row.bold ? "font-bold text-primary" : row.red ? "text-destructive" : "font-medium"}>{row.value}</span>
+                <div key={row.label} className="flex justify-between text-sm border-b border-base-300 pb-2 last:border-0">
+                  <span className="opacity-60">{row.label}</span>
+                  <span className="font-medium">{row.value}</span>
                 </div>
               ))}
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* ── Modal Mi Perfil ────────────────────────────────────────────────── */}
-      <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
-        <DialogContent className="sm:max-w-sm p-6">
-          <DialogHeader>
-            <DialogTitle className="font-(family-name:--font-syne)">Mi Perfil</DialogTitle>
-            <DialogDescription>Datos del comercio autenticado.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 mt-4">
-            {[
-              { label: "Nombre", value: merchantUser?.firstName ?? "—" },
-              { label: "Correo", value: merchantUser?.email ?? "—" },
-              { label: "ID Comercio", value: merchantUser?.id?.slice(0, 16) ?? "—" },
-              { label: "Nivel", value: `Nivel ${merchantUser?.level ?? 1}` },
-            ].map((row) => (
-              <div key={row.label} className="flex justify-between text-sm border-b border-border pb-2 last:border-0">
-                <span className="text-muted-foreground">{row.label}</span>
-                <span className="font-medium">{row.value}</span>
-              </div>
-            ))}
+            <div className="modal-action">
+              <button className="btn btn-sm" onClick={() => setIsProfileOpen(false)}>Cerrar</button>
+            </div>
           </div>
-        </DialogContent>
-      </Dialog>
+          <div className="modal-backdrop" onClick={() => setIsProfileOpen(false)} />
+        </div>
+      )}
 
       {/* ── Modal Configuración ────────────────────────────────────────────── */}
-      <Dialog open={isConfigOpen} onOpenChange={setIsConfigOpen}>
-        <DialogContent className="sm:max-w-sm p-6">
-          <DialogHeader>
-            <DialogTitle className="font-(family-name:--font-syne)">Configuración</DialogTitle>
-            <DialogDescription>Personaliza el comportamiento del portal.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 mt-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="default-desc">Descripción por defecto del QR</Label>
-              <Input
-                id="default-desc"
-                placeholder="Ej. Consulta Médica General"
-                value={defaultDesc}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDefaultDesc(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">Se usa cuando no ingresas una descripción al generar el QR.</p>
+      {isConfigOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-sm p-6">
+            <h3 className="font-bold text-lg font-(family-name:--font-syne)">Configuración</h3>
+            <p className="text-sm opacity-60 mb-4">Personaliza el comportamiento del portal.</p>
+            <div className="space-y-4">
+              <div className="form-control gap-1">
+                <label htmlFor="default-desc" className="label pb-0"><span className="label-text font-medium">Descripción por defecto del QR</span></label>
+                <input
+                  id="default-desc"
+                  className="input input-bordered w-full"
+                  placeholder="Ej. Consulta Médica General"
+                  value={defaultDesc}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDefaultDesc(e.target.value)}
+                />
+                <p className="text-xs opacity-60 mt-1">Se usa cuando no ingresas una descripción al generar el QR.</p>
+              </div>
+              <button
+                className="btn btn-primary w-full"
+                onClick={() => {
+                  localStorage.setItem("default_qr_desc", defaultDesc);
+                  setIsConfigOpen(false);
+                }}
+              >
+                Guardar cambios
+              </button>
             </div>
-            <Button
-              className="w-full"
-              onClick={() => {
-                localStorage.setItem("default_qr_desc", defaultDesc);
-                setIsConfigOpen(false);
-              }}
-            >
-              Guardar cambios
-            </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+          <div className="modal-backdrop" onClick={() => setIsConfigOpen(false)} />
+        </div>
+      )}
     </div>
   );
 }

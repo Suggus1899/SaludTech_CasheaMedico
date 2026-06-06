@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Smartphone, Menu, X } from "lucide-react";
+import { DeviceMobile, List, X } from "@phosphor-icons/react";
 import Logo from "./Logo";
 
 const links = [
@@ -50,8 +50,8 @@ export default function MainNavbar() {
             >
               Soy Comercio
             </a>
-            <a href="/#descarga" className="btn-primary text-sm px-5 py-2.5">
-              <Smartphone className="w-4 h-4" />
+            <a href="/#descarga" className="btn btn-primary btn-sm gap-2">
+              <DeviceMobile className="w-4 h-4" />
               Descarga la app
             </a>
           </div>
@@ -64,7 +64,7 @@ export default function MainNavbar() {
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={open}
           >
-            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {open ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
           </button>
         </div>
 
@@ -90,15 +90,15 @@ export default function MainNavbar() {
             <div className="pt-3 flex flex-col gap-2 px-3">
               <a
                 href="/para-comercios"
-                className="btn-outline text-sm justify-center"
+                className="btn btn-outline btn-primary btn-sm w-full justify-center"
               >
                 Soy Comercio
               </a>
               <a
                 href="/#descarga"
-                className="btn-primary text-sm justify-center"
+                className="btn btn-primary btn-sm w-full justify-center gap-2"
               >
-                <Smartphone className="w-4 h-4" />
+                <DeviceMobile className="w-4 h-4" />
                 Descarga la app
               </a>
             </div>

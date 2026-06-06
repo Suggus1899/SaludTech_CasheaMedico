@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, HelpCircle, User, Building2, Shield, CreditCard } from "lucide-react";
+import { CaretDown, Question, User, Buildings, Shield, CreditCard } from "@phosphor-icons/react";
 
 const FAQS = [
   {
@@ -162,7 +162,7 @@ const FAQS = [
   },
   {
     category: "Comercios",
-    icon: Building2,
+    icon: Buildings,
     color: "text-primary",
     activeBg: "bg-primary",
     items: [
@@ -223,7 +223,7 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
               {q}
             </span>
           </div>
-          <ChevronDown
+          <CaretDown
             className={`w-4 h-4 shrink-0 mt-0.5 text-slate-400 transition-transform duration-200 ${open ? "rotate-180 text-primary" : ""}`}
           />
         </div>
@@ -250,7 +250,7 @@ export default function FAQ() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-slate-100 text-slate-600 mb-4">
-            <HelpCircle className="w-3.5 h-3.5" /> Preguntas frecuentes
+            <Question className="w-3.5 h-3.5" weight="duotone" /> Preguntas frecuentes
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-3">
             Resolvemos tus dudas
