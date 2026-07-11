@@ -53,6 +53,9 @@ function resolve(path: string[], method: string) {
 }
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
+  if (process.env.NEXT_PUBLIC_MOCK_API !== "true") {
+    return NextResponse.json({ error: "Mock API disabled" }, { status: 404 });
+  }
   const { path } = await params;
   const data = resolve(path, "GET");
   if (!data) return NextResponse.json({ error: "Mock not found" }, { status: 404 });
@@ -60,6 +63,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
+  if (process.env.NEXT_PUBLIC_MOCK_API !== "true") {
+    return NextResponse.json({ error: "Mock API disabled" }, { status: 404 });
+  }
   const { path } = await params;
   const data = resolve(path, "POST");
   if (!data) return NextResponse.json({ error: "Mock not found" }, { status: 404 });
@@ -67,5 +73,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
+  if (process.env.NEXT_PUBLIC_MOCK_API !== "true") {
+    return NextResponse.json({ error: "Mock API disabled" }, { status: 404 });
+  }
   return NextResponse.json({ success: true });
 }

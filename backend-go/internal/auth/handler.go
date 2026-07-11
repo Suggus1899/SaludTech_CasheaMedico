@@ -1,0 +1,176 @@
+package auth
+
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"strings"
+
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/saludtech/backend-go/internal/config"
+	"github.com/saludtech/backend-go/internal/database"
+	"golang.org/x/crypto/bcrypt"
+)
+
+type AuthHandler struct {
+	DB  database.Querier
+	Cfg *config.Config
+}
+
+type LoginRequest struct {
+	Phone    string `json:"phone"`
+	Password string `json:"password"`
+}
+
+type RegisterRequest struct {
+	FirstName        string `json:"firstName"`
+	LastName         string `json:"lastName"`
+	Email            string `json:"email"`
+	Phone            string `json:"phone"`
+	IdentityDocument string `json:"identityDocument"`
+	Password         string `json:"password"`
+}
+
+type UserResponse struct {
+	ID               string `json:"id"`
+	FirstName        string `json:"firstName"`
+	LastName         string `json:"lastName"`
+	Email            string `json:"email"`
+	Phone            string `json:"phone"`
+	IdentityDocument string `json:"identityDocument"`
+	Level            int16  `json:"level"`
+	Points           int32  `json:"points"`
+	KYCStatus        string `json:"kycStatus"`
+	Active           bool   `json:"active"`
+}
+
+func toUserResponse(user database.User) UserResponse {
+	firstName := user.FullName
+	lastName := ""
+	if idx := strings.Index(user.FullName, " "); idx > 0 {
+		firstName = user.FullName[:idx]
+		lastName = user.FullName[idx+1:]
+	}
+	email := ""
+	if user.Email.Valid {
+		email = user.Email.String
+	}
+	nationalID := ""
+	if user.NationalID.Valid {
+		nationalID = user.NationalID.String
+	}
+	return UserResponse{
+		ID:               user.ID.String(),
+		FirstName:        firstName,
+		LastName:         lastName,
+		Email:            email,
+		Phone:            user.Phone,
+		IdentityDocument: nationalID,
+		Level:            user.Level,
+		Points:           user.Points,
+		KYCStatus:        "APPROVED",
+		Active:           user.IsActive,
+	}
+}
+
+func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+	var req LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	user, err := h.DB.GetUserByPhone(context.Background(), req.Phone)
+	if err != nil {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password))
+	if err != nil {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
+	}
+
+	token, err := GenerateToken(user.ID.String(), string(user.Role), h.Cfg)
+	if err != nil {
+		http.Error(w, "Error generating token", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"access_token": token,
+		"token":        token,
+		"user":         toUserResponse(user),
+	})
+}
+
+func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
+	var req RegisterRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	if req.Phone == "" || req.Password == "" || req.Email == "" {
+		http.Error(w, "Phone, email and password are required", http.StatusBadRequest)
+		return
+	}
+
+	if len(req.Password) < 8 {
+		http.Error(w, "Password must be at least 8 characters", http.StatusBadRequest)
+		return
+	}
+
+	// Check if phone already exists
+	existing, err := h.DB.GetUserByPhone(context.Background(), req.Phone)
+	if err == nil && existing.ID.Valid {
+		http.Error(w, "Phone already registered", http.StatusConflict)
+		return
+	}
+
+	// Check if email already exists
+	emailText := pgtype.Text{String: req.Email, Valid: true}
+	existingEmail, err := h.DB.GetUserByEmail(context.Background(), emailText)
+	if err == nil && existingEmail.ID.Valid {
+		http.Error(w, "Email already registered", http.StatusConflict)
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		http.Error(w, "Error hashing password", http.StatusInternalServerError)
+		return
+	}
+
+	fullName := strings.TrimSpace(req.FirstName + " " + req.LastName)
+	nationalID := pgtype.Text{String: req.IdentityDocument, Valid: req.IdentityDocument != ""}
+
+	user, err := h.DB.CreateUser(context.Background(), database.CreateUserParams{
+		Phone:        req.Phone,
+		Email:        emailText,
+		PasswordHash: string(hashedPassword),
+		FullName:     fullName,
+		NationalID:   nationalID,
+		Role:         "PATIENT",
+	})
+	if err != nil {
+		http.Error(w, "Error creating user", http.StatusInternalServerError)
+		return
+	}
+
+	token, err := GenerateToken(user.ID.String(), string(user.Role), h.Cfg)
+	if err != nil {
+		http.Error(w, "Error generating token", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"access_token": token,
+		"token":        token,
+		"user":         toUserResponse(user),
+	})
+}

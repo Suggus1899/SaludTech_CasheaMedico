@@ -1,111 +1,400 @@
-# SaludTech — BNPL HealthTech Platform
+<div align="center">
 
-> Plataforma BNPL (Buy Now, Pay Later) de cero interés orientada exclusivamente al sector salud en Venezuela.
+# 🏥 SaludTech
 
-Los pacientes financian servicios y productos médicos pagando una fracción inicial y el resto en cuotas cada 14 días.
+### BNPL HealthTech Platform — Salud financiada a tu alcance
 
-## Stack
+Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al sector salud en Venezuela. Los pacientes financian servicios y productos médicos pagando una fracción inicial y el resto en cuotas cada 14 días.
 
-| Capa | Tecnología |
-|------|------------|
-| Mobile (Pacientes) | Flutter (Dart) — iOS + Android |
-| Web Admin Backoffice | Next.js 14 + TypeScript + TailwindCSS + shadcn/ui |
-| Web Merchant Dashboard | Next.js 14 + TypeScript + TailwindCSS + shadcn/ui |
-| Backend API | Java 17 + Spring Boot 3.4.5 |
-| ORM | Spring Data JPA + Hibernate |
-| Base de datos | PostgreSQL 16 |
-| Caché / Sesiones | Redis 7 |
-| Auth | JWT (access + refresh tokens) + Spring Security |
-| KYC / OCR | AWS Rekognition (cédula venezolana) |
-| QR | qr_code_dart (Flutter) + qrcode.react (Web) |
-| Cron Jobs | Spring @Scheduled (daily installment scanner) |
-| Notificaciones | Firebase Cloud Messaging |
-| Contenerización | Docker + Docker Compose |
+</div>
 
-## Estructura del Monorepo
+<br>
+
+<div align="center">
+
+## 🛠️ Tech Stack
+
+</div>
+
+<table align="center">
+<tr>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/nextdotjs/000000" width="48" height="48" alt="Next.js" />
+<br><sub><b>Next.js 16</b></sub>
+<br><sub>App Router</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/react/61DAFB" width="48" height="48" alt="React" />
+<br><sub><b>React 19</b></sub>
+<br><sub>Server Components</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/typescript/3178C6" width="48" height="48" alt="TypeScript" />
+<br><sub><b>TypeScript 5</b></sub>
+<br><sub>Type-safe</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" width="48" height="48" alt="Tailwind CSS" />
+<br><sub><b>Tailwind v4</b></sub>
+<br><sub>Utility-first</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/daisyui/7C3AED" width="48" height="48" alt="DaisyUI" />
+<br><sub><b>DaisyUI v5</b></sub>
+<br><sub>Component lib</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/go/00ADD8" width="48" height="48" alt="Go" />
+<br><sub><b>Go 1.26</b></sub>
+<br><sub>Backend API</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/chi/000000" width="48" height="48" alt="go-chi" />
+<br><sub><b>go-chi v5</b></sub>
+<br><sub>HTTP router</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/postgresql/4169E1" width="48" height="48" alt="PostgreSQL" />
+<br><sub><b>PostgreSQL 16</b></sub>
+<br><sub>Primary DB</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/redis/DC382D" width="48" height="48" alt="Redis" />
+<br><sub><b>Redis 7</b></sub>
+<br><sub>Cache / sessions</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/jsonwebtokens/000000" width="48" height="48" alt="JWT" />
+<br><sub><b>JWT</b></sub>
+<br><sub>HS256 · 24h</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/pnpm/F69220" width="48" height="48" alt="pnpm" />
+<br><sub><b>pnpm 9</b></sub>
+<br><sub>Workspaces</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/turborepo/EF4444" width="48" height="48" alt="Turborepo" />
+<br><sub><b>Turborepo</b></sub>
+<br><sub>Build system</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/sqlc/000000" width="48" height="48" alt="sqlc" />
+<br><sub><b>sqlc</b></sub>
+<br><sub>Type-safe SQL</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/docker/2496ED" width="48" height="48" alt="Docker" />
+<br><sub><b>Docker</b></sub>
+<br><sub>Containerization</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/nginx/009639" width="48" height="48" alt="nginx" />
+<br><sub><b>nginx</b></sub>
+<br><sub>Reverse proxy</sub>
+</td>
+</tr>
+</table>
+
+<br>
+
+## 📐 Arquitectura
+
+```
+                    ┌─────────────────────────────────────────────────┐
+                    │                   nginx (port 80)                │
+                    │              saludtech.local / api / admin       │
+                    └──────┬──────────────────┬────────────────────────┘
+                           │                  │
+            ┌──────────────▼──────────┐  ┌────▼──────────────────────┐
+            │  Backend Go (port 8081) │  │  Next.js Apps             │
+            │  go-chi · sqlc · pgx    │  │  ├── web-patient (PWA)    │
+            │  JWT · Redis · Cron     │  │  ├── web-admin            │
+            └──────────┬──────────────┘  │  ├── web-merchant         │
+                       │                  │  └── web-landing          │
+            ┌──────────▼──────────┐       └───────────────────────────┘
+            │  PostgreSQL 16      │
+            │  Redis 7            │
+            └─────────────────────┘
+```
+
+## 📱 Aplicaciones
+
+| App | Descripción | Puerto | Rol |
+|-----|-------------|--------|-----|
+| **web-patient** | PWA instalable para pacientes — login, dashboard, cuotas, pagar (QR), suscripciones, triaje, cuidado mayor, perfil/gamificación | 3000 | PATIENT |
+| **web-admin** | Backoffice administrativo — gestión de usuarios, merchants, transacciones, payouts | 3000 | ADMIN |
+| **web-merchant** | Dashboard del comercio — QR dinámico, transacciones, payouts, suscripciones | 3001 | MERCHANT |
+| **web-landing** | Landing page pública — marketing y captación de usuarios | 3000 | PUBLIC |
+
+## 📦 Estructura del Monorepo
 
 ```
 saludtech/
-├── backend/          ← Spring Boot API
-├── web-admin/        ← Next.js Admin Backoffice
-├── web-merchant/     ← Next.js Merchant Dashboard
-├── mobile/           ← Flutter Patient App
-├── docker-compose.yml
-└── README.md
+├── backend-go/              ← Go API (go-chi + sqlc + pgx + redis)
+│   ├── cmd/api/             ← Entry point + router
+│   ├── internal/
+│   │   ├── auth/            ← JWT login + register
+│   │   ├── config/          ← envconfig + godotenv
+│   │   ├── credit/          ← BNPL transaction creation
+│   │   ├── database/        ← sqlc generated code
+│   │   ├── merchant/        ← Merchant payouts
+│   │   ├── payment/         ← Installment payment processing
+│   │   ├── user/            ← User profile
+│   │   └── worker/          ← Cron installment scanner
+│   └── sql/                 ← sqlc queries + migrations (V1-V7)
+│
+├── apps/
+│   ├── web-patient/         ← Next.js 16 PWA (paciente)
+│   │   └── src/
+│   │       ├── app/         ← App Router pages
+│   │       ├── components/  ← ServiceWorkerRegister + shared
+│   │       ├── hooks/       ← useFetchData
+│   │       ├── lib/         ← api client, utils, QR parser
+│   │       └── types/       ← TypeScript domain types
+│   ├── web-admin/           ← Next.js (admin backoffice)
+│   ├── web-merchant/        ← Next.js (merchant dashboard)
+│   └── web-landing/         ← Next.js (landing page)
+│
+├── packages/
+│   ├── ui/                  ← @saludtech/ui shared components
+│   └── config/              ← Shared config (reserved)
+│
+├── .github/workflows/       ← CI (Web Apps + Go Backend)
+├── nginx.conf               ← Reverse proxy config
+├── pnpm-workspace.yaml      ← Workspace definition
+└── turbo.json               ← Turborepo pipeline
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerrequisitos
-- Java 17+
-- Node.js 18+
-- Flutter SDK 3.3+
-- Docker + Docker Compose
 
-### 1. Levantar infraestructura
+| Herramienta | Versión | Instalación |
+|-------------|---------|-------------|
+| Go | 1.26+ | [go.dev/dl](https://go.dev/dl/) |
+| Node.js | 20+ | [nodejs.org](https://nodejs.org/) |
+| pnpm | 9.12+ | `npm install -g pnpm` |
+| PostgreSQL | 16+ | [postgresql.org](https://www.postgresql.org/download/) |
+| Redis | 7+ | [redis.io](https://redis.io/docs/getting-started/) |
+
+### 1. Base de datos
+
 ```bash
-cp .env.example .env
-# Editar .env con tus valores
-docker compose up -d postgres redis
+# Crear base de datos
+createdb saludtech
+
+# Aplicar migraciones en orden
+psql -d saludtech -f backend-go/sql/V1__initial_schema.sql
+psql -d saludtech -f backend-go/sql/V2__seed_data.sql
+psql -d saludtech -f backend-go/sql/V3__remove_kyc.sql
+psql -d saludtech -f backend-go/sql/V4__add_phone_verified.sql
+psql -d saludtech -f backend-go/sql/V5__add_gamification_and_freeze.sql
+psql -d saludtech -f backend-go/sql/V6__sync_enums_and_new_tables.sql
+psql -d saludtech -f backend-go/sql/V7__cleanup_dead_types.sql
 ```
 
-### 2. Backend
-```bash
-cd backend
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+### 2. Variables de entorno
+
+Crear `.env` en la raíz del proyecto:
+
+```env
+# Backend Go
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/saludtech
+SALUDTECH_JWT_SECRET=tu-secreto-super-seguro-cambiar-en-produccion
+REDIS_URL=redis://localhost:6379/0
+PORT=8081
+
+# Web Patient
+NEXT_PUBLIC_MOCK_API=true
+# Para conectar al backend real:
+# NEXT_PUBLIC_MOCK_API=false
+# NEXT_PUBLIC_API_BASE_URL=http://localhost:8081/api/v1
 ```
 
-### 3. Web Admin
+### 3. Backend (Go)
+
 ```bash
-cd web-admin
-npm install
-npm run dev
+cd backend-go
+go run ./cmd/api
+# ✅ Servidor en http://localhost:8081
 ```
 
-### 4. Web Merchant
+### 4. Frontend (todas las apps)
+
 ```bash
-cd web-merchant
-npm install
-npm run dev
+# Instalar dependencias del monorepo
+pnpm install
+
+# Levantar todas las apps en paralelo
+pnpm dev
+
+# O levantar individualmente:
+cd apps/web-patient  && pnpm dev   # → http://localhost:3000
+cd apps/web-admin    && pnpm dev   # → http://localhost:3001
+cd apps/web-merchant && pnpm dev   # → http://localhost:3002
+cd apps/web-landing  && pnpm dev   # → http://localhost:3003
 ```
 
-### 5. Mobile
+### 5. Build de producción
+
 ```bash
-cd mobile
-flutter pub get
-flutter run
+# Todas las apps
+pnpm build
+
+# Solo web-patient
+cd apps/web-patient && pnpm build
 ```
 
-## API Endpoints
+## 🔌 API Endpoints (backend-go)
 
-| Grupo | Prefijo | Rol |
-|-------|---------|-----|
-| Paciente | `/api/v1/patient/**` | PATIENT |
-| Merchant | `/api/v1/merchant/**` | MERCHANT |
-| Admin | `/api/v1/admin/**` | ADMIN |
+| Método | Endpoint | Descripción | Auth |
+|--------|----------|-------------|------|
+| `GET` | `/health` | Health check | — |
+| `POST` | `/api/v1/auth/login` | Login (phone + password) | — |
+| `POST` | `/api/v1/auth/register` | Registro de nuevo paciente | — |
+| `POST` | `/api/v1/credit/transaction` | Crear transacción BNPL | JWT |
+| `POST` | `/api/v1/payments` | Procesar pago de cuota | JWT |
+| `GET` | `/api/v1/merchant/payouts` | Payouts del merchant | JWT |
+| `GET` | `/api/v1/users/profile` | Perfil del usuario | JWT |
 
-## Niveles de Usuario (1-6)
+### Auth Flow
 
-| Nivel | Pago Inicial Mín. | Máx. Cuotas | Requisito |
-|-------|-------------------|-------------|----------|
-| 1 | 60% | 3 | Nuevo usuario |
-| 2 | 50% | 3 | $120 pagados o 5 cuotas |
-| 3 | 40% | 6 | $400 pagados o 10 cuotas |
-| 4 | 40% | 9 | $800 pagados o 20 cuotas |
-| 5 | 40% | 12 | $2000 pagados o 40 cuotas |
-| 6 | 40% | 12 | $4000 pagados o 80 cuotas |
+```
+Registro:  POST /api/v1/auth/register
+           Body: { firstName, lastName, email, phone, identityDocument, password }
+           Response: { access_token, token, user }
 
-## Línea Salud Diaria
-- 1/3 de la Línea Principal
-- Máximo 1 cuota
-- Para farmacias e insumos crónicos
+Login:     POST /api/v1/auth/login
+           Body: { phone, password }
+           Response: { access_token, token, user }
 
-## Mora
-- Cargo de reactivación: $4 por cuota en mora
-- 2 días de gracia después del vencimiento
+Token:     JWT HS256 · 24h expiry
+Claims:    { user_id, role }
+Secret:    SALUDTECH_JWT_SECRET env var
+```
+
+## 🎮 Gamificación — Niveles de Usuario (1-6)
+
+| Nivel | Pago Inicial Mín. | Máx. Cuotas | Requisito | Beneficios |
+|-------|-------------------|-------------|-----------|------------|
+| 1 | 60% | 3 | Nuevo usuario | Línea básica |
+| 2 | 50% | 3 | $120 pagados o 5 cuotas | — |
+| 3 | 40% | 6 | $400 pagados o 10 cuotas | — |
+| 4 | 40% | 9 | $800 pagados o 20 cuotas | Cuidado Mayor desbloqueado |
+| 5 | 40% | 12 | $2000 pagados o 40 cuotas | — |
+| 6 | 40% | 12 | $4000 pagados o 80 cuotas | Línea máxima |
+
+## 💳 Líneas de Crédito
+
+| Tipo | Descripción | Requisito |
+|------|-------------|-----------|
+| `ESPECIALIDAD_PRINCIPAL` | Línea principal para especialidades médicas | Nivel 1+ |
+| `SALUD_COTIDIANA` | Farmacia e insumos crónicos (1/3 de la principal) | Nivel 1+ |
+| `MAYOR_CUIDADO` | Cuidado de adultos mayores (enfermería, caregiver) | Nivel 4+ |
+
+## ⚠️ Mora
+
+- Cargo de reactivación: **$4** por cuota en mora
+- **2 días** de gracia después del vencimiento
 - Pausa automática de línea de crédito
-- Degradación de nivel después de 14+ días
-- Reset a nivel 1 después de 28+ días
+- Degradación de nivel después de **14+ días**
+- Reset a nivel 1 después de **28+ días**
+- Background worker (`robfig/cron/v3`) escanea diariamente
 
-## Licencia
+## 📲 Web Patient — Features
+
+| Feature | Descripción |
+|---------|-------------|
+| **Auth** | Login + registro con sesión JWT (cookie + localStorage) |
+| **Dashboard** | Líneas de crédito, próximos pagos, acciones rápidas |
+| **Cuotas** | Lista de pendientes/en mora + detalle + pago con confirmación |
+| **Pagar (QR)** | Scanner @zxing/browser + entrada manual + checkout con selector de cuotas (3/6/9/12) |
+| **Suscripciones** | Farmacia mensual — activar/cancelar |
+| **Cuidado Mayor** | Servicios para adultos mayores — validación de nivel 4+ |
+| **Triaje** | Formulario de síntomas + historial + merchants recomendados |
+| **Perfil** | Gamificación (nivel, puntos) + logout |
+| **PWA** | Manifest + Service Worker + offline + install prompt + update toast |
+
+### Modo Mock
+
+Web Patient puede funcionar **sin backend** usando datos de prueba:
+
+```bash
+NEXT_PUBLIC_MOCK_API=true pnpm dev
+```
+
+Esto activa un router mock en `/api/mock/[...path]` que retorna datos para todos los endpoints del paciente.
+
+## 🗄️ Modelo de Datos
+
+```
+users ──┬── credit_lines
+        ├── transactions ──┬── installments
+        │                  └── payments
+        ├── subscriptions
+        ├── elder_care_subscriptions
+        ├── user_gamification_history
+        └── user_level_history
+
+merchants ──┬── merchant_users
+            └── merchant_payouts
+```
+
+## 🔧 Variables de Entorno
+
+### Backend Go
+
+| Variable | Requerida | Default | Descripción |
+|----------|-----------|---------|-------------|
+| `DATABASE_URL` | ✅ | — | Connection string PostgreSQL |
+| `SALUDTECH_JWT_SECRET` | ✅ | — | Secret para firmar JWT |
+| `REDIS_URL` | ❌ | `redis://:devpassword@localhost:6379/0` | URL de Redis |
+| `PORT` | ❌ | `8081` | Puerto del servidor |
+
+### Web Patient
+
+| Variable | Requerida | Default | Descripción |
+|----------|-----------|---------|-------------|
+| `NEXT_PUBLIC_MOCK_API` | ❌ | `false` | Activa el router mock |
+| `NEXT_PUBLIC_API_BASE_URL` | ❌ | — | URL base del backend Go |
+| `JWT_SECRET` | ✅ prod | `fallback-dev-only-change-me` | Secret para verificar JWT en middleware |
+
+## 🧪 Testing & CI
+
+```bash
+# Lint todas las apps
+pnpm lint
+
+# Build todas las apps
+pnpm build
+
+# Test (apps que tienen tests)
+pnpm test
+
+# Todo en uno
+pnpm check-all
+```
+
+### CI Pipeline (GitHub Actions)
+
+| Job | Descripción |
+|-----|-------------|
+| **Web Apps (Next.js)** | Install → Build → Lint → Test (pnpm + Turborepo) |
+| **Backend (Go)** | `go build ./...` → `go vet ./...` |
+
+## 📜 Licencia
+
 Propietario — Todos los derechos reservados.
+
+---
+
+<div align="center">
+
+<sub>Hecho con ❤️ para el sector salud de Venezuela</sub>
+
+</div>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { FlaskConical, Eye, EyeOff, AlertCircle } from "lucide-react";
 import Logo from "../../components/Logo";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost/api/v1";
 
 function getApiUrl(path: string): string {
   if (process.env.NEXT_PUBLIC_MOCK_API === "true") return `/api/mock/${path}`;

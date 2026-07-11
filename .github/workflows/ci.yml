@@ -8,7 +8,7 @@ on:
 
 jobs:
   node-apps-ci:
-    name: Node Apps (Web & Bridge)
+    name: Web Apps (Next.js)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,38 +42,19 @@ jobs:
         run: pnpm turbo test --continue
 
   backend-ci:
-    name: Backend (Spring Boot)
+    name: Backend (Go)
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./backend
+        working-directory: ./backend-go
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven
-      - name: Build and Test with Maven
-        run: mvn -B package --file pom.xml
-
-  mobile-ci:
-    name: Mobile App (Flutter)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./mobile-app
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
+          go-version: '1.26'
           cache: true
-      - name: Install dependencies
-        run: flutter pub get
-      - name: Analyze project source
-        run: flutter analyze
-      - name: Run tests
-        run: flutter test
+      - name: Build
+        run: go build ./...
+      - name: Vet
+        run: go vet ./...
