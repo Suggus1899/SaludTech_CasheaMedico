@@ -1,7 +1,7 @@
 "use client";
 
-import MainNavbar from "../components/MainNavbar";
-import { Footer } from "../components/SharedLayout";
+import MainNavbar from "./components/MainNavbar";
+import { Footer } from "./components/SharedLayout";
 import Hero from "../components/home/Hero";
 import TrustStrip from "../components/home/TrustStrip";
 import ComoFunciona from "../components/home/ComoFunciona";

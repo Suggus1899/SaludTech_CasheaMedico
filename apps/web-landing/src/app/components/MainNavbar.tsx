@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { DeviceMobile, List, X } from "@phosphor-icons/react";
-import Logo from "./Logo";
+import { Logo } from "@saludtech/ui";
 
 const links = [
   { href: "/#como-funciona", label: "Cómo funciona" },

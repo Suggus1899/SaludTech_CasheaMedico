@@ -1,3 +1,6 @@
+-- name: TryScannerLock :one
+SELECT pg_try_advisory_xact_lock($1, $2) AS acquired;
+
 -- name: GetOverdueInstallments :many
 SELECT * FROM installments
 WHERE status = 'PENDING' AND due_date < CURRENT_DATE - INTERVAL '2 days';

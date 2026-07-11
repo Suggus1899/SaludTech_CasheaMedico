@@ -25,6 +25,7 @@ type Querier interface {
 	GetUserByPhone(ctx context.Context, phone string) (User, error)
 	PauseUserCreditLines(ctx context.Context, userID pgtype.UUID) error
 	ProcessInstallmentPayment(ctx context.Context, id pgtype.UUID) (Installment, error)
+	TryScannerLock(ctx context.Context, key1 int32, key2 int32) (bool, error)
 	UpdateCreditLineUsage(ctx context.Context, arg UpdateCreditLineUsageParams) (CreditLine, error)
 	UpdateUserGamification(ctx context.Context, arg UpdateUserGamificationParams) (User, error)
 }

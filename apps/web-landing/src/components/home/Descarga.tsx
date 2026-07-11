@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Logo from "../Logo";
+import { Logo } from "@saludtech/ui";
 import { CheckCircle, ShieldCheck, Lightning } from "@phosphor-icons/react";
 
 export default function Descarga() {

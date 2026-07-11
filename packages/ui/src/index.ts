@@ -5,6 +5,7 @@ export * from './dialog';
 export * from './dropdown-menu';
 export * from './input';
 export * from './label';
+export * from './logo';
 export * from './table';
 export * from './select';
 export * from './separator';

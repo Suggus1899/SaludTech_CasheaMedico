@@ -58,12 +58,7 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 <td align="center" width="120">
 <img src="https://cdn.simpleicons.org/postgresql/4169E1" width="48" height="48" alt="PostgreSQL" />
 <br><sub><b>PostgreSQL 16</b></sub>
-<br><sub>Primary DB</sub>
-</td>
-<td align="center" width="120">
-<img src="https://cdn.simpleicons.org/redis/DC382D" width="48" height="48" alt="Redis" />
-<br><sub><b>Redis 7</b></sub>
-<br><sub>Cache / sessions</sub>
+<br><sub>Primary DB · Advisory Locks</sub>
 </td>
 <td align="center" width="120">
 <img src="https://cdn.simpleicons.org/jsonwebtokens/000000" width="48" height="48" alt="JWT" />
@@ -113,12 +108,11 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
             ┌──────────────▼──────────┐  ┌────▼──────────────────────┐
             │  Backend Go (port 8081) │  │  Next.js Apps             │
             │  go-chi · sqlc · pgx    │  │  ├── web-patient (PWA)    │
-            │  JWT · Redis · Cron     │  │  ├── web-admin            │
+            │  JWT · Cron            │  │  ├── web-admin            │
             └──────────┬──────────────┘  │  ├── web-merchant         │
                        │                  │  └── web-landing          │
             ┌──────────▼──────────┐       └───────────────────────────┘
             │  PostgreSQL 16      │
-            │  Redis 7            │
             └─────────────────────┘
 ```
 
@@ -135,7 +129,7 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 
 ```
 saludtech/
-├── backend-go/              ← Go API (go-chi + sqlc + pgx + redis)
+├── backend-go/              ← Go API (go-chi + sqlc + pgx)
 │   ├── cmd/api/             ← Entry point + router
 │   ├── internal/
 │   │   ├── auth/            ← JWT login + register
@@ -180,7 +174,6 @@ saludtech/
 | Node.js | 20+ | [nodejs.org](https://nodejs.org/) |
 | pnpm | 9.12+ | `npm install -g pnpm` |
 | PostgreSQL | 16+ | [postgresql.org](https://www.postgresql.org/download/) |
-| Redis | 7+ | [redis.io](https://redis.io/docs/getting-started/) |
 
 ### 1. Base de datos
 
@@ -206,7 +199,6 @@ Crear `.env` en la raíz del proyecto:
 # Backend Go
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/saludtech
 SALUDTECH_JWT_SECRET=tu-secreto-super-seguro-cambiar-en-produccion
-REDIS_URL=redis://localhost:6379/0
 PORT=8081
 
 # Web Patient
@@ -353,7 +345,6 @@ merchants ──┬── merchant_users
 |----------|-----------|---------|-------------|
 | `DATABASE_URL` | ✅ | — | Connection string PostgreSQL |
 | `SALUDTECH_JWT_SECRET` | ✅ | — | Secret para firmar JWT |
-| `REDIS_URL` | ❌ | `redis://:devpassword@localhost:6379/0` | URL de Redis |
 | `PORT` | ❌ | `8081` | Puerto del servidor |
 
 ### Web Patient

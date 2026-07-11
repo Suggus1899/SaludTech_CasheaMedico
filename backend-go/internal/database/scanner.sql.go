@@ -11,6 +11,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const tryScannerLock = `-- name: TryScannerLock :one
+SELECT pg_try_advisory_xact_lock($1, $2) AS acquired
+`
+
+func (q *Queries) TryScannerLock(ctx context.Context, key1 int32, key2 int32) (bool, error) {
+	row := q.db.QueryRow(ctx, tryScannerLock, key1, key2)
+	var acquired bool
+	err := row.Scan(&acquired)
+	return acquired, err
+}
+
 const applyReactivationFee = `-- name: ApplyReactivationFee :one
 UPDATE installments
 SET 

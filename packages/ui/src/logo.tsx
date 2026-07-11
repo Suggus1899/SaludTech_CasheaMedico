@@ -16,7 +16,7 @@ const sizes = {
   lg: { img: "h-12 w-auto", icon: "w-12 h-12", text: "text-2xl" },
 };
 
-export default function Logo({ variant = "full", className = "", light = false, size = "md" }: LogoProps) {
+export function Logo({ variant = "full", className = "", light = false, size = "md" }: LogoProps) {
   const [imgError, setImgError] = useState(false);
   const s = sizes[size];
   const textColor = light ? "text-white" : "text-[#0A2535]";
@@ -32,7 +32,7 @@ export default function Logo({ variant = "full", className = "", light = false, 
           onError={() => setImgError(true)}
         />
         {variant === "full" && (
-          <span className={`font-display font-bold ${s.text} ${textColor}`}>
+          <span className={`font-bold ${s.text} ${textColor}`}>
             Salud<span className={accentColor}>Tech</span>
           </span>
         )}
@@ -49,13 +49,20 @@ export default function Logo({ variant = "full", className = "", light = false, 
       >
         {/* Caduceus cross */}
         <svg viewBox="0 0 24 24" fill="none" className="w-4/6 h-4/6">
-          <rect x="10" y="3" width="4" height="18" rx="1.5" fill="white" opacity="0.9"/>
-          <rect x="3" y="10" width="18" height="4" rx="1.5" fill="white" opacity="0.9"/>
-          <path d="M8 7 Q12 4 16 7 Q12 10 8 13 Q12 16 16 17" stroke="white" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.5"/>
+          <rect x="10" y="3" width="4" height="18" rx="1.5" fill="white" opacity="0.9" />
+          <rect x="3" y="10" width="18" height="4" rx="1.5" fill="white" opacity="0.9" />
+          <path
+            d="M8 7 Q12 4 16 7 Q12 10 8 13 Q12 16 16 17"
+            stroke="white"
+            strokeWidth="1"
+            strokeLinecap="round"
+            fill="none"
+            opacity="0.5"
+          />
         </svg>
       </div>
       {variant === "full" && (
-        <span className={`font-display font-bold ${s.text} ${textColor}`}>
+        <span className={`font-bold ${s.text} ${textColor}`}>
           Salud<span className={accentColor}>Tech</span>
         </span>
       )}

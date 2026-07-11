@@ -11,7 +11,6 @@ type Config struct {
 	Port        int    `envconfig:"PORT" default:"8081"`
 	DatabaseURL string `envconfig:"DATABASE_URL" required:"true"`
 	JWTSecret   string `envconfig:"SALUDTECH_JWT_SECRET" required:"true"`
-	RedisURL    string `envconfig:"REDIS_URL" default:"redis://:devpassword@localhost:6379/0"`
 }
 
 func Load() *Config {

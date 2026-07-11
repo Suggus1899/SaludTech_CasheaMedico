@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FlaskConical, Eye, EyeOff, AlertCircle } from "lucide-react";
-import Logo from "../../components/Logo";
+import { Logo } from "@saludtech/ui";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost/api/v1";
 

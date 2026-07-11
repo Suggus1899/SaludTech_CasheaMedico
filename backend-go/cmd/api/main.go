@@ -13,7 +13,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/redis/go-redis/v9"
 
 	"github.com/saludtech/backend-go/internal/auth"
 	"github.com/saludtech/backend-go/internal/config"
@@ -39,30 +38,18 @@ func main() {
 	if err := pool.Ping(context.Background()); err != nil {
 		log.Fatalf("Database ping failed: %v", err)
 	}
-	// 3. Conectar a Redis
-	opt, err := redis.ParseURL(cfg.RedisURL)
-	if err != nil {
-		log.Fatalf("Invalid Redis URL: %v", err)
-	}
-	rdb := redis.NewClient(opt)
-	defer rdb.Close()
-	if err := rdb.Ping(context.Background()).Err(); err != nil {
-		log.Fatalf("Redis ping failed: %v", err)
-	}
-	log.Println("✅ Connected to Redis natively")
-
-	// 4. Inicializar Repositorios (sqlc) y Handlers
+	// 3. Inicializar Repositorios (sqlc) y Handlers
 	queries := database.New(pool)
-	
+
 	authHandler := &auth.AuthHandler{DB: queries, Cfg: cfg}
 	creditService := &credit.CreditService{Pool: pool}
 	creditHandler := &credit.CreditHandler{Service: creditService}
 
-	// 5. Iniciar Background Workers (Cron)
-	scanner := &worker.InstallmentScanner{DB: queries, Redis: rdb}
+	// 4. Iniciar Background Workers (Cron)
+	scanner := &worker.InstallmentScanner{Pool: pool}
 	scanner.Start()
 
-	// 6. Configurar Router (go-chi)
+	// 5. Configurar Router (go-chi)
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -94,7 +81,7 @@ func main() {
 	userHandler := &user.UserHandler{DB: queries}
 	r.Get("/api/v1/users/profile", userHandler.GetProfile)
 
-	// 4. Levantar el Servidor
+	// 6. Levantar el Servidor
 	addr := fmt.Sprintf(":%d", cfg.Port)
 	srv := &http.Server{
 		Addr:    addr,

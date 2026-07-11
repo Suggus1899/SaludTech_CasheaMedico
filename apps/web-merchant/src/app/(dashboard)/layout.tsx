@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Sidebar } from "../../../components/shared/Sidebar";
-import { Topbar } from "../../../components/shared/Topbar";
-import Logo from "../../../components/Logo";
+import { Sidebar } from "../../components/shared/Sidebar";
+import { Topbar } from "../../components/shared/Topbar";
+import { Logo } from "@saludtech/ui";
 import { X } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogOut, Settings } from "lucide-react";
-import Logo from "../Logo";
+import { Logo } from "@saludtech/ui";
 import { NAV_ITEMS } from "../../lib/constants";
 
 export function Sidebar({

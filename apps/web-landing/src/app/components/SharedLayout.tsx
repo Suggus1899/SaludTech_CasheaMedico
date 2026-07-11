@@ -9,7 +9,7 @@ import {
   Envelope,
   MapPin,
 } from "@phosphor-icons/react";
-import Logo from "./Logo";
+import { Logo } from "@saludtech/ui";
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
 export function Navbar() {

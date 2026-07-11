@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Clock, QrCode, Wallet, Shield, Stethoscope, LogOut } from "lucide-react";
-import Logo from "../Logo";
+import { Logo } from "@saludtech/ui";
 import { useCallback, useEffect, useState } from "react";
 
 export function Sidebar() {
