@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  DeviceMobile,
+  UserPlus,
   List,
   X,
   Envelope,
@@ -56,11 +56,11 @@ export function Navbar() {
               Soy Comercio
             </Link>
             <Link
-              href="/#descarga"
+              href="/login"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-dark transition-colors"
             >
-              <DeviceMobile className="w-4 h-4" />
-              Descarga la app
+              <UserPlus className="w-4 h-4" />
+              Regístrate
             </Link>
           </div>
 
@@ -103,11 +103,11 @@ export function Navbar() {
                 Soy Comercio
               </Link>
               <Link
-                href="/#descarga"
+                href="/login"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-dark transition-all"
               >
-                <DeviceMobile className="w-4 h-4" />
-                Descarga la app
+                <UserPlus className="w-4 h-4" />
+                Regístrate
               </Link>
             </div>
           </div>

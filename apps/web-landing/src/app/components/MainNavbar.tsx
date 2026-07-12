@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DeviceMobile, List, X } from "@phosphor-icons/react";
+import { UserPlus, List, X } from "@phosphor-icons/react";
 import { Logo } from "@saludtech/ui";
 
 const links = [
@@ -50,9 +50,9 @@ export default function MainNavbar() {
             >
               Soy Comercio
             </a>
-            <a href="/#descarga" className="btn btn-primary btn-sm gap-2">
-              <DeviceMobile className="w-4 h-4" />
-              Descarga la app
+            <a href="/login" className="btn btn-primary btn-sm gap-2">
+              <UserPlus className="w-4 h-4" />
+              Regístrate
             </a>
           </div>
 
@@ -95,11 +95,11 @@ export default function MainNavbar() {
                 Soy Comercio
               </a>
               <a
-                href="/#descarga"
+                href="/login"
                 className="btn btn-primary btn-sm w-full justify-center gap-2"
               >
-                <DeviceMobile className="w-4 h-4" />
-                Descarga la app
+                <UserPlus className="w-4 h-4" />
+                Regístrate
               </a>
             </div>
           </div>

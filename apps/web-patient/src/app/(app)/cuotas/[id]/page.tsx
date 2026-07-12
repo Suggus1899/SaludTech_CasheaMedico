@@ -143,6 +143,7 @@ export default function PayInstallmentPage({
 
       {/* Summary */}
       <div
+        data-tour="amount-summary"
         className={`p-5 rounded-2xl border bg-base-100 ${
           isOverdue ? "border-error/30" : "border-border"
         }`}
@@ -186,13 +187,13 @@ export default function PayInstallmentPage({
       </div>
 
       {/* Payment method — Card form */}
-      <section>
+      <section data-tour="card-form">
         <h2 className="text-base font-bold text-foreground mb-3 font-display">
           Datos de la Tarjeta
         </h2>
 
         {/* Test card quick-select */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div data-tour="test-cards" className="flex flex-wrap gap-2 mb-4">
           {testCards.map((c) => (
             <button
               key={c.number}

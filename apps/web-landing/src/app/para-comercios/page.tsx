@@ -103,7 +103,7 @@ function Beneficios() {
     {
       icon: Users,
       title: "Acceso a más pacientes",
-      desc: "Los usuarios de SaludTech buscan activamente comercios aliados en la app. Tu clínica o farmacia aparece geolocalizada para usuarios cercanos.",
+      desc: "Los usuarios de SaludTech buscan activamente comercios aliados en la página. Tu clínica o farmacia aparece geolocalizada para usuarios cercanos.",
       color: "text-accent",
       bg: "bg-accent-50",
     },
@@ -173,7 +173,7 @@ function ComoFunciona() {
     {
       num: "03",
       title: "El paciente escanea y confirma",
-      desc: "El paciente escanea el QR con la app de SaludTech, ve el desglose (inicial + cuotas) y confirma el pago con su PIN.",
+      desc: "El paciente escanea el QR con la página de SaludTech, ve el desglose (inicial + cuotas) y confirma el pago con su PIN.",
     },
     {
       num: "04",
@@ -490,7 +490,7 @@ function ParaComerciosBanner() {
   const benefits = [
     { icon: TrendUp, title: "Aumenta tus ventas", desc: "Clientes que antes no podían pagar ahora sí pueden. Accede a más pacientes." },
     { icon: CreditCard, title: "Liquidación garantizada", desc: "SaludTech te paga el total de la venta. Tú no asumes el riesgo de cuotas." },
-    { icon: QrCode, title: "QR en segundos", desc: "Genera un código QR desde tu portal y el paciente paga desde su app al instante." },
+    { icon: QrCode, title: "QR en segundos", desc: "Genera un código QR desde tu portal y el paciente paga desde su página al instante." },
     { icon: ShieldCheck, title: "Sin papeleo", desc: "Registro 100% digital. Tu comercio activo en menos de 48 horas." },
   ];
 

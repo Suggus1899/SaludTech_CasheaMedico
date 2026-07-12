@@ -188,7 +188,7 @@ export default function MerchantDetailPage({
       </button>
 
       {/* Tabs */}
-      <div className="tabs tabs-boxed">
+      <div data-tour="merchant-tabs" className="tabs tabs-boxed">
         <button
           onClick={() => setTab("services")}
           className={`tab ${tab === "services" ? "tab-active" : ""}`}
@@ -216,9 +216,10 @@ export default function MerchantDetailPage({
               No hay servicios disponibles
             </p>
           ) : (
-            services.map((svc) => (
+            services.map((svc, idx) => (
               <div
                 key={svc.id}
+                data-tour={idx === 0 ? "catalog-item" : undefined}
                 className="p-4 rounded-2xl border border-border bg-base-100"
               >
                 <div className="flex items-start justify-between gap-3">
@@ -335,7 +336,7 @@ export default function MerchantDetailPage({
 
       {/* Cart bar */}
       {cart.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-base-100 border-t border-border p-4 shadow-lg">
+        <div data-tour="checkout-cart" className="fixed bottom-0 left-0 right-0 z-50 bg-base-100 border-t border-border p-4 shadow-lg">
           <div className="max-w-md mx-auto space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-foreground">

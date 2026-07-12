@@ -444,14 +444,14 @@ function CTAFinal() {
           Activa tu línea en 3 minutos
         </h2>
         <p className="text-white/80 text-lg mb-8">
-          Descarga la app, regístrate y accede a tu línea de crédito médico sin interés.
+          Regístrate en la página y accede a tu línea de crédito médico sin interés.
         </p>
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <Link
-            href="/#descarga"
+            href="/login"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white text-primary font-bold text-base hover:bg-primary-50 transition-colors"
           >
-            Descargar app
+            Crear cuenta gratis
             <ArrowRight className="w-5 h-5" />
           </Link>
           <Link

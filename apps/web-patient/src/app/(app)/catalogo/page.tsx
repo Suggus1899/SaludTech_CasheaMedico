@@ -91,7 +91,7 @@ export default function CatalogoPage() {
       </div>
 
       {/* Search */}
-      <div className="relative">
+      <div data-tour="catalog-search" className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           type="text"
@@ -143,7 +143,7 @@ export default function CatalogoPage() {
           No se encontraron resultados
         </p>
       ) : (
-        <div className="space-y-3">
+        <div data-tour="catalog-results" className="space-y-3">
           <p className="text-xs text-muted-foreground">
             {results.length} resultado(s)
           </p>

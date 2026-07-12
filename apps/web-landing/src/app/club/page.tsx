@@ -1,6 +1,6 @@
 "use client";
 
-import { Medal, TrendUp, Clock, Lightning, Shield, ArrowRight, DeviceMobile } from "@phosphor-icons/react";
+import { Medal, TrendUp, Clock, Lightning, Shield, ArrowRight, UserPlus } from "@phosphor-icons/react";
 import Link from "next/link";
 import SharedLayout from "../components/SharedLayout";
 
@@ -111,15 +111,15 @@ function CTAFinal() {
           Empieza en Nivel 1 hoy
         </h2>
         <p className="text-white/80 text-lg mb-8">
-          Descarga la app, regístrate y comienza a construir tu historial de salud financiero.
+          Regístrate en la página y comienza a construir tu historial de salud financiero.
         </p>
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <Link
-            href="/#descarga"
+            href="/login"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white text-primary font-bold text-base hover:bg-primary-50 transition-colors"
           >
-            <DeviceMobile className="w-5 h-5" />
-            Descargar la app
+            <UserPlus className="w-5 h-5" />
+            Crear cuenta gratis
           </Link>
           <Link
             href="/lineas-de-credito"

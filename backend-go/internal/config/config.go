@@ -18,6 +18,9 @@ type Config struct {
 
 	// fakePayment API key (test payment gateway)
 	FakePayKey string `envconfig:"FAKEPAY_API_KEY"`
+
+	// Comma-separated list of allowed CORS origins
+	CORSAllowedOrigins string `envconfig:"CORS_ALLOWED_ORIGINS" default:"http://localhost:3000,http://localhost:3001,http://localhost:3002"`
 }
 
 func Load() *Config {

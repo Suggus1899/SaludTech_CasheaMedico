@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Award, LogOut, Mail, Phone, CreditCard, Shield } from "lucide-react";
+import { Award, LogOut, Mail, Phone, CreditCard, Shield, GraduationCap, RotateCcw } from "lucide-react";
 import { clearSession, getStoredUser } from "../../../lib/api";
 import { profileGradient } from "../../../lib/creditLineStyles";
+import { useTour, tours } from "../../../lib/tours";
 import type { UserResponse } from "../../../types/patient";
 
 const levelThresholds: Record<number, number> = {
@@ -18,6 +19,7 @@ const levelThresholds: Record<number, number> = {
 export default function PerfilPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserResponse | null>(null);
+  const { startTour, hasSeenTour, resetTours } = useTour();
 
   useEffect(() => {
     setUser(getStoredUser<UserResponse>());
@@ -100,6 +102,57 @@ export default function PerfilPage() {
           label="KYC"
           value={user?.kycStatus ?? "—"}
         />
+      </div>
+
+      {/* Tutorials */}
+      <div className="p-5 rounded-2xl border border-border bg-base-100 space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-bold text-foreground font-display flex items-center gap-2">
+            <GraduationCap className="w-5 h-5 text-primary" />
+            Tutoriales
+          </h3>
+          <button
+            onClick={resetTours}
+            className="btn btn-ghost btn-xs gap-1 text-muted-foreground"
+            aria-label="Reiniciar tutoriales"
+          >
+            <RotateCcw className="w-3 h-3" />
+            Reiniciar
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Aprende a usar cada sección con un tour guiado paso a paso.
+        </p>
+        <div className="space-y-2">
+          {tours.map((tour) => {
+            const seen = hasSeenTour(tour.id);
+            return (
+              <button
+                key={tour.id}
+                onClick={() => {
+                  if (tour.startRoute) {
+                    router.push(tour.startRoute);
+                  }
+                  // Small delay to allow navigation before starting tour
+                  setTimeout(() => startTour(tour.id), 500);
+                }}
+                className="w-full flex items-center justify-between p-3 rounded-xl border border-border hover:border-primary hover:bg-primary/5 transition-all text-left"
+              >
+                <div className="flex items-center gap-2.5">
+                  <GraduationCap className="w-4 h-4 text-primary shrink-0" />
+                  <span className="text-sm font-medium text-foreground">
+                    {tour.name}
+                  </span>
+                </div>
+                {seen && (
+                  <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
+                    Visto
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Logout */}

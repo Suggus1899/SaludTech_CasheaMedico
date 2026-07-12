@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  DeviceMobile,
+  ClipboardText,
   Lightning,
   UserCheck,
   Buildings,
@@ -19,7 +19,7 @@ import SharedLayout from "../components/SharedLayout";
 // ─── Telemedicina & Triage ────────────────────────────────────────────────────
 function Telemedicina() {
   const steps = [
-    { icon: DeviceMobile, title: "Describe tus síntomas", desc: "Desde la app, indica qué sientes, el nivel de severidad y desde cuándo." },
+    { icon: ClipboardText, title: "Describe tus síntomas", desc: "Desde la página, indica qué sientes, el nivel de severidad y desde cuándo." },
     { icon: Lightning, title: "Análisis IA en segundos", desc: "Nuestro sistema clasifica urgencia y te sugiere la especialidad correcta." },
     { icon: UserCheck, title: "Responde un médico real", desc: "Un doctor revisa tu caso y confirma o ajusta la recomendación." },
     { icon: Buildings, title: "Te referimos al especialista", desc: "Con financiamiento ya aprobado para que no pierdas tiempo buscando cómo pagar." },

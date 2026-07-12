@@ -14,6 +14,7 @@ import {
   WifiOff,
   Store,
   Search,
+  GraduationCap,
 } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
 import { getApiUrl, getStoredUser } from "../../../lib/api";
@@ -22,10 +23,12 @@ import {
   getCreditLineStyle,
   quickActionStyles,
 } from "../../../lib/creditLineStyles";
+import { useTour } from "../../../lib/tours";
 import type { CreditLine, Installment, UserResponse } from "../../../types/patient";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<UserResponse | null>(null);
+  const { startTour, hasSeenTour } = useTour();
 
   useEffect(() => {
     setUser(getStoredUser<UserResponse>());
@@ -42,7 +45,25 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-7">
+      {/* Tutorial prompt — shown once for new users */}
+      {!hasSeenTour("dashboard") && (
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 border border-primary/20">
+          <GraduationCap className="w-5 h-5 text-primary shrink-0" />
+          <div className="flex-1">
+            <p className="text-xs font-semibold text-foreground">¿Primera vez aquí?</p>
+            <p className="text-[11px] text-muted-foreground">Toma un tour guiado de 30 segundos.</p>
+          </div>
+          <button
+            onClick={() => startTour("dashboard")}
+            className="btn btn-primary btn-xs"
+          >
+            Ver tour
+          </button>
+        </div>
+      )}
+
       {/* Credit lines */}
+      <div data-tour="credit-lines">
       {linesLoading ? (
         <div className="flex justify-center py-12">
           <span className="loading loading-spinner text-primary" />
@@ -66,9 +87,10 @@ export default function DashboardPage() {
           No hay líneas de crédito disponibles
         </p>
       )}
+      </div>
 
       {/* Quick actions */}
-      <section>
+      <section data-tour="quick-actions">
         <h2 className="text-base font-bold text-foreground mb-3.5">
           Acciones Rápidas
         </h2>
@@ -121,7 +143,7 @@ export default function DashboardPage() {
       </section>
 
       {/* Upcoming payments */}
-      <section>
+      <section data-tour="upcoming-payments">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-bold text-foreground">
             Próximos Pagos

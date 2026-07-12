@@ -87,12 +87,12 @@ export default function CuotasPage() {
           </p>
         </div>
       ) : (
-        <ul className="space-y-3">
-          {current.map((inst) => {
+        <ul data-tour="installment-list" className="space-y-3">
+          {current.map((inst, idx) => {
             const isOverdue = tab === "overdue";
             const merchant = inst.transaction?.merchant?.tradeName ?? "Comercio";
             return (
-              <li key={inst.id}>
+              <li key={inst.id} data-tour={idx === 0 ? "installment-card" : undefined}>
                 <Link
                   href={`/cuotas/${inst.id}`}
                   className={`block p-4 rounded-2xl border bg-base-100 hover:shadow-md transition-shadow ${

@@ -1,6 +1,6 @@
 "use client";
 
-import { DeviceMobile, CaretRight, CreditCard, Waveform, QrCode, CheckCircle } from "@phosphor-icons/react";
+import { Globe, CaretRight, CreditCard, Waveform, QrCode, CheckCircle } from "@phosphor-icons/react";
 
 export default function Hero() {
   return (
@@ -40,9 +40,9 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <a href="#descarga" className="btn btn-primary gap-2 px-7 py-4 text-base h-auto">
-                <DeviceMobile className="w-5 h-5" />
-                Descargar app gratis
+              <a href="/login" className="btn btn-primary gap-2 px-7 py-4 text-base h-auto">
+                <Globe className="w-5 h-5" />
+                Regístrate gratis
               </a>
               <a href="#como-funciona" className="btn btn-ghost text-white border-white/30 hover:bg-white/10 gap-2 px-7 py-4 text-base h-auto">
                 Cómo funciona
@@ -68,7 +68,7 @@ export default function Hero() {
           {/* Visual card mockup */}
           <div className="hidden md:flex justify-center items-center">
             <div className="relative">
-              {/* Main app card */}
+              {/* Main platform card */}
               <div className="w-64 md:w-72 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-5">
                   <div>

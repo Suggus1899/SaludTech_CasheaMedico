@@ -1,14 +1,14 @@
 "use client";
 
-import { DeviceMobile, Lightning, QrCode, CreditCard } from "@phosphor-icons/react";
+import { UserPlus, Lightning, QrCode, CreditCard } from "@phosphor-icons/react";
 
 export default function ComoFunciona() {
   const steps = [
     {
       num: "01",
-      icon: DeviceMobile,
-      title: "Descarga la app",
-      desc: "Regístrate con tu cédula, número de teléfono y datos básicos. Sin papeleo.",
+      icon: UserPlus,
+      title: "Regístrate en la página",
+      desc: "Crea tu cuenta con cédula, número de teléfono y datos básicos. Sin papeleo.",
       color: "text-primary",
       bg: "bg-primary-50",
       border: "border-primary/20",
@@ -26,7 +26,7 @@ export default function ComoFunciona() {
       num: "03",
       icon: QrCode,
       title: "Escanea en el comercio",
-      desc: "El comercio genera un QR. Tú lo escaneas y pagas la inicial directamente desde la app.",
+      desc: "El comercio genera un QR. Tú lo escaneas y pagas la inicial directamente desde la página.",
       color: "text-accent",
       bg: "bg-accent-50",
       border: "border-accent/20",

@@ -78,7 +78,7 @@ export default function ComerciosPage() {
       </div>
 
       {/* Search */}
-      <div className="relative">
+      <div data-tour="merchant-search" className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           type="text"
@@ -117,7 +117,7 @@ export default function ComerciosPage() {
           No se encontraron comercios
         </p>
       ) : (
-        <div className="space-y-6">
+        <div data-tour="merchant-list" className="space-y-6">
           {Object.entries(grouped).map(([category, items]) => {
             const cfg = categoryConfig[category] || { label: category, icon: Heart, color: "#6b7280" };
             const Icon = cfg.icon;

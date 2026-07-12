@@ -20,7 +20,7 @@ const FAQS = [
       },
       {
         q: "¿Cuánto tiempo tarda la aprobación?",
-        a: "La pre-aprobación es en menos de 3 minutos desde la app. Solo necesitas tu cédula, número de teléfono y datos básicos. No hay papeles, ni visitas a oficina, ni esperas.",
+        a: "La pre-aprobación es en menos de 3 minutos desde la página. Solo necesitas tu cédula, número de teléfono y datos básicos. No hay papeles, ni visitas a oficina, ni esperas.",
       },
       {
         q: "¿Hay intereses o cargos ocultos?",
@@ -28,15 +28,15 @@ const FAQS = [
       },
       {
         q: "¿Cómo funciona el pago en el comercio?",
-        a: "El comercio genera un código QR desde su portal. Tú lo escaneas con la app de SaludTech, ves el desglose (inicial + cuotas), confirmas con tu PIN biométrico, y listo. Toda la operación toma menos de 30 segundos.",
+        a: "El comercio genera un código QR desde su portal. Tú lo escaneas con la página de SaludTech, ves el desglose (inicial + cuotas), confirmas con tu PIN biométrico, y listo. Toda la operación toma menos de 30 segundos.",
       },
       {
         q: "¿Qué pasa si no pago una cuota a tiempo?",
-        a: "Tu línea se pausa temporalmente hasta que regularices el pago. Se aplica un cargo de reactivación de $4. También puedes perder puntos Club SaludTech acumulados. Activar los recordatorios en la app evita esto.",
+        a: "Tu línea se pausa temporalmente hasta que regularices el pago. Se aplica un cargo de reactivación de $4. También puedes perder puntos Club SaludTech acumulados. Activar los recordatorios en la página evita esto.",
       },
       {
         q: "¿Puedo usar SaludTech para pagar online?",
-        a: "Sí. Además de los comercios físicos con QR, puedes pagar servicios de telemedicina y farmacias online directamente desde la app, sin necesidad de escanear ningún código.",
+        a: "Sí. Además de los comercios físicos con QR, puedes pagar servicios de telemedicina y farmacias online directamente desde la página, sin necesidad de escanear ningún código.",
       },
       {
         q: "¿En qué moneda funciona SaludTech?",
@@ -44,7 +44,7 @@ const FAQS = [
       },
       {
         q: "¿Cómo pago mis cuotas?",
-        a: "Desde la app puedes pagar con pago móvil interbancario, transferencia bancaria o divisas en efectivo en los puntos habilitados. Recibirás recordatorios automáticos 3 días antes de cada vencimiento.",
+        a: "Desde la página puedes pagar con pago móvil interbancario, transferencia bancaria o divisas en efectivo en los puntos habilitados. Recibirás recordatorios automáticos 3 días antes de cada vencimiento.",
       },
     ],
   },
@@ -112,7 +112,7 @@ const FAQS = [
       },
       {
         q: "¿Cómo refiero a un amigo?",
-        a: "Desde la sección 'Referidos' en la app obtienes tu código o enlace único. Cuando tu amigo se registra y realiza su primera compra, ambos reciben los puntos de referido automáticamente.",
+        a: "Desde la sección 'Referidos' en la página obtienes tu código o enlace único. Cuando tu amigo se registra y realiza su primera compra, ambos reciben los puntos de referido automáticamente.",
       },
       {
         q: "¿Los puntos tienen fecha de vencimiento?",
@@ -144,11 +144,11 @@ const FAQS = [
       },
       {
         q: "¿Puedo elegir los días y horarios del servicio?",
-        a: "Sí. Al activar la suscripción seleccionas los días, horarios y tipo de servicio desde la app. Puedes modificar la agenda con al menos 24 horas de anticipación sin costo adicional.",
+        a: "Sí. Al activar la suscripción seleccionas los días, horarios y tipo de servicio desde la página. Puedes modificar la agenda con al menos 24 horas de anticipación sin costo adicional.",
       },
       {
         q: "¿Puedo cancelar la suscripción Elder Care?",
-        a: "Sí, sin penalización y en cualquier momento desde la app. Los servicios agendados dentro del período ya pagado se completan normalmente. El débito del siguiente mes no se realiza.",
+        a: "Sí, sin penalización y en cualquier momento desde la página. Los servicios agendados dentro del período ya pagado se completan normalmente. El débito del siguiente mes no se realiza.",
       },
       {
         q: "¿Están certificados los cuidadores?",
