@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -14,7 +15,7 @@ import (
 
 // EnsureMigrations creates the schema_migrations table if it does not exist,
 // then applies every V*.sql file in sql/schema/ that has not been recorded yet.
-// Files are applied in lexical order (V1, V2, ... V10, ...).
+// Files are applied in numeric version order (V1, V2, ... V10, V11, ...).
 func EnsureMigrations(ctx context.Context, pool *pgxpool.Pool, schemaDir string) error {
 	// 1. Create tracking table
 	_, err := pool.Exec(ctx, `
@@ -44,7 +45,12 @@ func EnsureMigrations(ctx context.Context, pool *pgxpool.Pool, schemaDir string)
 		}
 		files = append(files, name)
 	}
-	sort.Strings(files)
+	// Sort by numeric version (V1, V2, ... V10, V11, ...) instead of lexical
+	sort.Slice(files, func(i, j int) bool {
+		vi := extractVersionNum(files[i])
+		vj := extractVersionNum(files[j])
+		return vi < vj
+	})
 
 	// 3. Apply pending migrations in a single transaction per file
 	for _, file := range files {
@@ -87,4 +93,16 @@ func EnsureMigrations(ctx context.Context, pool *pgxpool.Pool, schemaDir string)
 	}
 
 	return nil
+}
+
+// extractVersionNum parses the numeric part of a migration filename.
+// e.g. "V10__add_triage.sql" -> 10, "V1__initial_schema.sql" -> 1.
+func extractVersionNum(filename string) int {
+	// Strip "V" prefix and everything after the first "_"
+	parts := strings.SplitN(strings.TrimPrefix(filename, "V"), "_", 2)
+	n, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return 0
+	}
+	return n
 }
