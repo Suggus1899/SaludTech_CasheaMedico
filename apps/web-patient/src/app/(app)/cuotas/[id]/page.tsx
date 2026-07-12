@@ -128,7 +128,7 @@ export default function PayInstallmentPage({
   const merchant = installment.transaction?.merchant?.tradeName ?? "Comercio";
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-lg mx-auto space-y-6">
       <button
         onClick={() => router.back()}
         aria-label="Volver"

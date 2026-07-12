@@ -203,7 +203,7 @@ export default function CuidadoMayorPage() {
           )}
 
           {/* Service cards */}
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {services.map((s) => {
               const Icon = s.icon;
               const style = elderCareServiceStyles[s.type];
@@ -262,7 +262,7 @@ export default function CuidadoMayorPage() {
               </p>
             </div>
           ) : (
-            <ul className="space-y-3">
+            <ul className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               {subscriptions.map((sub) => {
                 const isActive = sub.status === "ACTIVE";
                 return (

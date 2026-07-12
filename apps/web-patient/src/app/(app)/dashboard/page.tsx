@@ -77,7 +77,7 @@ export default function DashboardPage() {
           </button>
         </div>
       ) : creditLines && creditLines.length > 0 ? (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {creditLines.map((line) => (
             <CreditLineCard key={line.id} line={line} level={user?.level} />
           ))}
@@ -94,7 +94,7 @@ export default function DashboardPage() {
         <h2 className="text-base font-bold text-foreground mb-3.5">
           Acciones Rápidas
         </h2>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 lg:grid-cols-7 gap-3">
           <QuickAction
             href="/triaje"
             icon={<Stethoscope className="w-5 h-5" />}
@@ -119,8 +119,6 @@ export default function DashboardPage() {
             label="Cuidado Mayor"
             color={quickActionStyles.cuidadoMayor.color}
           />
-        </div>
-        <div className="grid grid-cols-4 gap-3 mt-3">
           <QuickAction
             href="/comercios"
             icon={<Store className="w-5 h-5" />}
@@ -155,7 +153,7 @@ export default function DashboardPage() {
             Ver todas
           </Link>
         </div>
-        <div className="space-y-2.5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {pendingInstallments.length === 0 ? (
             <p className="text-center text-muted-foreground py-6 text-sm">
               No hay pagos pendientes 🎉

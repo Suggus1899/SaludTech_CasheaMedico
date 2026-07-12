@@ -87,54 +87,97 @@ export default function CuotasPage() {
           </p>
         </div>
       ) : (
-        <ul data-tour="installment-list" className="space-y-3">
-          {current.map((inst, idx) => {
-            const isOverdue = tab === "overdue";
-            const merchant = inst.transaction?.merchant?.tradeName ?? "Comercio";
-            return (
-              <li key={inst.id} data-tour={idx === 0 ? "installment-card" : undefined}>
-                <Link
-                  href={`/cuotas/${inst.id}`}
-                  className={`block p-4 rounded-2xl border bg-base-100 hover:shadow-md transition-shadow ${
-                    isOverdue ? "border-error/30" : "border-border"
-                  }`}
-                >
-                  <div className="flex items-center gap-3.5">
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                        isOverdue ? "bg-error/10 text-error" : "bg-primary/10 text-primary"
-                      }`}
-                    >
-                      {isOverdue ? (
-                        <AlertTriangle className="w-5 h-5" />
-                      ) : (
-                        <Clock className="w-5 h-5" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-foreground font-display">
-                        Cuota #
-                        {inst.installmentNumber ?? "—"} · {merchant}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Vence: {formatDate(inst.dueDate)}
-                      </p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p
-                        className={`text-base font-bold font-display ${
-                          isOverdue ? "text-error" : "text-foreground"
+        <>
+          {/* Desktop table */}
+          <div data-tour="installment-list" className="hidden lg:block overflow-x-auto rounded-2xl border border-border">
+            <table className="table table-zebra">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Comercio</th>
+                  <th>Monto</th>
+                  <th>Vence</th>
+                  <th>Estado</th>
+                  <th className="text-right">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {current.map((inst, idx) => {
+                  const isOverdue = tab === "overdue";
+                  const merchant = inst.transaction?.merchant?.tradeName ?? "Comercio";
+                  return (
+                    <tr key={inst.id} data-tour={idx === 0 ? "installment-card" : undefined}>
+                      <td className="font-semibold">#{inst.installmentNumber ?? "—"}</td>
+                      <td>{merchant}</td>
+                      <td className="font-semibold">{formatWithVES(inst.amount, inst.amountVES)}</td>
+                      <td className="text-sm">{formatDate(inst.dueDate)}</td>
+                      <td>
+                        <span className={`badge badge-sm ${isOverdue ? "badge-error" : "badge-warning"}`}>
+                          {isOverdue ? "En mora" : "Pendiente"}
+                        </span>
+                      </td>
+                      <td className="text-right">
+                        <Link href={`/cuotas/${inst.id}`} className="btn btn-primary btn-xs">
+                          Pagar
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile cards */}
+          <ul data-tour="installment-list" className="lg:hidden space-y-3">
+            {current.map((inst, idx) => {
+              const isOverdue = tab === "overdue";
+              const merchant = inst.transaction?.merchant?.tradeName ?? "Comercio";
+              return (
+                <li key={inst.id} data-tour={idx === 0 ? "installment-card" : undefined}>
+                  <Link
+                    href={`/cuotas/${inst.id}`}
+                    className={`block p-4 rounded-2xl border bg-base-100 hover:shadow-md transition-shadow ${
+                      isOverdue ? "border-error/30" : "border-border"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <div
+                        className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                          isOverdue ? "bg-error/10 text-error" : "bg-primary/10 text-primary"
                         }`}
                       >
-                        {formatWithVES(inst.amount, inst.amountVES)}
-                      </p>
+                        {isOverdue ? (
+                          <AlertTriangle className="w-5 h-5" />
+                        ) : (
+                          <Clock className="w-5 h-5" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-foreground font-display">
+                          Cuota #
+                          {inst.installmentNumber ?? "—"} · {merchant}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Vence: {formatDate(inst.dueDate)}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p
+                          className={`text-base font-bold font-display ${
+                            isOverdue ? "text-error" : "text-foreground"
+                          }`}
+                        >
+                          {formatWithVES(inst.amount, inst.amountVES)}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </>
       )}
     </div>
   );

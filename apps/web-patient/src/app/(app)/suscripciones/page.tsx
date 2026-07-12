@@ -70,7 +70,7 @@ export default function SuscripcionesPage() {
           </Link>
         </div>
       ) : (
-        <ul className="space-y-3">
+        <ul className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {subscriptions.map((sub) => {
             const isActive = sub.status === "ACTIVE";
             return (

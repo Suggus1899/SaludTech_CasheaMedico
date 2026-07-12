@@ -192,7 +192,7 @@ export default function PagarPage() {
   // ─── Scan step ─────────────────────────────────────────────────────────
   if (step === "scan") {
     return (
-      <div className="space-y-5">
+      <div className="max-w-lg mx-auto space-y-5">
         <button
           onClick={() => router.back()}
           aria-label="Volver"
@@ -260,7 +260,7 @@ export default function PagarPage() {
   // ─── Amount entry step ─────────────────────────────────────────────────
   if (step === "amount") {
     return (
-      <div className="space-y-6">
+      <div className="max-w-lg mx-auto space-y-6">
         <button
           onClick={resetToScan}
           aria-label="Volver"
@@ -335,7 +335,7 @@ export default function PagarPage() {
   // ─── Checkout step ─────────────────────────────────────────────────────
   if (step === "checkout" && preview) {
     return (
-      <div className="space-y-6">
+      <div className="max-w-lg mx-auto space-y-6">
         <button
           onClick={resetToScan}
           aria-label="Volver"
@@ -423,7 +423,7 @@ export default function PagarPage() {
   // ─── Success step ──────────────────────────────────────────────────────
   if (step === "success") {
     return (
-      <div className="flex flex-col items-center py-20 px-6 text-center">
+      <div className="max-w-lg mx-auto flex flex-col items-center py-20 px-6 text-center">
         <div className="p-6 rounded-full bg-success/10">
           <CheckCircle2 className="w-14 h-14 text-success" />
         </div>

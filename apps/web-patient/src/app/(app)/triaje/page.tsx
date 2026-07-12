@@ -126,7 +126,8 @@ export default function TriajePage() {
         Triaje Médico
       </h1>
 
-      {/* New triage form */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: New triage form */}
       <form
         onSubmit={handleSubmit}
         className="p-5 rounded-2xl border border-border bg-base-100 space-y-4"
@@ -223,7 +224,7 @@ export default function TriajePage() {
         </button>
       </form>
 
-      {/* History */}
+      {/* Right: History */}
       <section>
         <h2 className="text-lg font-bold text-foreground mb-4 font-display">
           Historial de Consultas
@@ -339,6 +340,7 @@ export default function TriajePage() {
           />
         </div>
       )}
+      </div>
     </div>
   );
 }

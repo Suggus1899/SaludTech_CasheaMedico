@@ -143,7 +143,7 @@ export default function CatalogoPage() {
           No se encontraron resultados
         </p>
       ) : (
-        <div data-tour="catalog-results" className="space-y-3">
+        <div data-tour="catalog-results" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <p className="text-xs text-muted-foreground">
             {results.length} resultado(s)
           </p>

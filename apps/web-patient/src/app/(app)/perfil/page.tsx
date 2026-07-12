@@ -41,9 +41,12 @@ export default function PerfilPage() {
         Mi Perfil
       </h1>
 
-      {/* Level card */}
-      <div
-        className="p-6 rounded-3xl text-white text-center"
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left: Level card */}
+        <div className="lg:col-span-1">
+          {/* Level card */}
+          <div
+            className="p-6 rounded-3xl text-white text-center"
         style={{
           background: `linear-gradient(135deg, ${profileGradient.from}, ${profileGradient.to})`,
           boxShadow: `0 10px 20px ${profileGradient.shadow}`,
@@ -74,8 +77,11 @@ export default function PerfilPage() {
             />
           </div>
         </div>
-      </div>
+        </div>
+        </div>
 
+        {/* Right: Personal data + tutorials */}
+        <div className="lg:col-span-2 space-y-6">
       {/* User info */}
       <div className="p-5 rounded-2xl border border-border bg-base-100 space-y-3">
         <h3 className="text-base font-bold text-foreground font-display">
@@ -163,6 +169,8 @@ export default function PerfilPage() {
         <LogOut className="w-4 h-4" />
         Cerrar Sesión
       </button>
+        </div>
+      </div>
     </div>
   );
 }
