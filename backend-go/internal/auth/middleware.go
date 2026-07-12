@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -56,9 +57,56 @@ func RequireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userID := GetUserID(r.Context())
 		if userID == "" {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			http.Error(w, `{"error":"Unauthorized"}`, http.StatusUnauthorized)
 			return
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+// GetRole extracts the role from the context, or returns "" if not present.
+func GetRole(ctx context.Context) string {
+	if v, ok := ctx.Value(RoleKey).(string); ok {
+		return v
+	}
+	return ""
+}
+
+// RequireRole returns 403 if the authenticated user does not have one of the
+// allowed roles. Must be used after RequireAuth (or within a group that
+// includes RequireAuth).
+func RequireRole(roles ...string) func(http.Handler) http.Handler {
+	allowed := make(map[string]struct{}, len(roles))
+	for _, r := range roles {
+		allowed[r] = struct{}{}
+	}
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			role := GetRole(r.Context())
+			if role == "" {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusUnauthorized)
+				json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+				return
+			}
+			if _, ok := allowed[role]; !ok {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusForbidden)
+				json.NewEncoder(w).Encode(map[string]string{"error": "Forbidden: insufficient role"})
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+// RequireAdmin is a convenience wrapper for RequireRole("ADMIN").
+func RequireAdmin(next http.Handler) http.Handler {
+	return RequireRole("ADMIN")(next)
+}
+
+// RequireMerchant is a convenience wrapper for RequireRole("MERCHANT", "ADMIN").
+// Admins can access merchant endpoints too (useful for support/debugging).
+func RequireMerchant(next http.Handler) http.Handler {
+	return RequireRole("MERCHANT", "ADMIN")(next)
 }

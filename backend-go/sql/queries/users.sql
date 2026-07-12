@@ -16,10 +16,15 @@ INSERT INTO users (
 
 -- name: UpdateUserGamification :one
 UPDATE users
-SET 
+SET
     points = points + $2,
     level = $3,
     total_paid = total_paid + $4,
     installments_paid_count = installments_paid_count + $5
 WHERE id = $1
 RETURNING *;
+
+-- name: UpdateUserPassword :exec
+UPDATE users
+SET password_hash = $2
+WHERE id = $1;

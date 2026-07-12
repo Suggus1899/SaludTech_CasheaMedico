@@ -22,6 +22,7 @@ import (
 	"github.com/saludtech/backend-go/internal/bcv"
 	"github.com/saludtech/backend-go/internal/config"
 	"github.com/saludtech/backend-go/internal/database"
+	"github.com/saludtech/backend-go/internal/admin"
 	"github.com/saludtech/backend-go/internal/fakepay"
 	"github.com/saludtech/backend-go/internal/merchant"
 	"github.com/saludtech/backend-go/internal/patient"
@@ -97,13 +98,24 @@ func main() {
 	paymentHandler := &payment.PaymentHandler{DB: queries}
 	r.With(auth.RequireAuth).Post("/api/v1/payments", paymentHandler.ProcessPayment)
 
-	// Merchant routes
+	// Merchant routes (MERCHANT + ADMIN only)
 	merchantHandler := &merchant.MerchantHandler{DB: queries}
-	r.With(auth.RequireAuth).Get("/api/v1/merchant/payouts", merchantHandler.GetPayouts)
+	r.Group(func(mux chi.Router) {
+		mux.Use(auth.RequireAuth, auth.RequireRole("MERCHANT", "ADMIN"))
+		mux.Mount("/api/v1/merchant", merchantHandler.Routes())
+	})
+
+	// Admin routes (ADMIN only)
+	adminHandler := &admin.AdminHandler{DB: queries}
+	r.Group(func(mux chi.Router) {
+		mux.Use(auth.RequireAuth, auth.RequireRole("ADMIN"))
+		mux.Mount("/api/v1/admin", adminHandler.Routes())
+	})
 
 	// User routes (protected)
 	userHandler := &user.UserHandler{DB: queries}
 	r.With(auth.RequireAuth).Get("/api/v1/users/profile", userHandler.GetProfile)
+	r.With(auth.RequireAuth).Patch("/api/v1/users/password", userHandler.ChangePassword)
 
 	addr := fmt.Sprintf(":%d", cfg.Port)
 	srv := &http.Server{

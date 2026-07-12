@@ -145,7 +145,7 @@ func (q *Queries) GetUserByPhone(ctx context.Context, phone string) (User, error
 
 const updateUserGamification = `-- name: UpdateUserGamification :one
 UPDATE users
-SET 
+SET
     points = points + $2,
     level = $3,
     total_paid = total_paid + $4,
@@ -190,4 +190,20 @@ func (q *Queries) UpdateUserGamification(ctx context.Context, arg UpdateUserGami
 		&i.IsCreditFrozenForElectives,
 	)
 	return i, err
+}
+
+const updateUserPassword = `-- name: UpdateUserPassword :exec
+UPDATE users
+SET password_hash = $2
+WHERE id = $1
+`
+
+type UpdateUserPasswordParams struct {
+	ID           pgtype.UUID `json:"id"`
+	PasswordHash string      `json:"password_hash"`
+}
+
+func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
+	_, err := q.db.Exec(ctx, updateUserPassword, arg.ID, arg.PasswordHash)
+	return err
 }

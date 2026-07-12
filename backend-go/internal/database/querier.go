@@ -16,9 +16,19 @@ type Querier interface {
 	CancelElderCareSub(ctx context.Context, id pgtype.UUID) error
 	CancelSubscription(ctx context.Context, id pgtype.UUID) error
 	CheckAndLevelUpUser(ctx context.Context, id pgtype.UUID) error
+	CountActiveMerchants(ctx context.Context) (int64, error)
+	CountCreditLines(ctx context.Context) (int64, error)
+	CountMerchantTransactions(ctx context.Context, merchantID pgtype.UUID) (int64, error)
+	CountMerchants(ctx context.Context) (int64, error)
+	CountOverdueInstallments(ctx context.Context) (int64, error)
+	CountTransactions(ctx context.Context) (int64, error)
+	CountUsers(ctx context.Context) (int64, error)
+	CountUsersByRole(ctx context.Context, role string) (int64, error)
 	CreateCreditLine(ctx context.Context, arg CreateCreditLineParams) (CreditLine, error)
 	CreateElderCareSub(ctx context.Context, arg CreateElderCareSubParams) (ElderCareSubscription, error)
 	CreateInstallment(ctx context.Context, arg CreateInstallmentParams) (Installment, error)
+	CreateMedicalService(ctx context.Context, arg CreateMedicalServiceParams) (MedicalService, error)
+	CreateMedicalSupply(ctx context.Context, arg CreateMedicalSupplyParams) (MedicalSupply, error)
 	CreatePaymentRecord(ctx context.Context, arg CreatePaymentRecordParams) (Payment, error)
 	CreateSubscription(ctx context.Context, arg CreateSubscriptionParams) (Subscription, error)
 	CreateSubscriptionItem(ctx context.Context, arg CreateSubscriptionItemParams) (SubscriptionItem, error)
@@ -27,6 +37,8 @@ type Querier interface {
 	CreateTriage(ctx context.Context, arg CreateTriageParams) (Triage, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DecrementSupplyStock(ctx context.Context, arg DecrementSupplyStockParams) error
+	DeleteMedicalService(ctx context.Context, arg DeleteMedicalServiceParams) error
+	DeleteMedicalSupply(ctx context.Context, arg DeleteMedicalSupplyParams) error
 	GetAllActiveMerchants(ctx context.Context) ([]GetAllActiveMerchantsRow, error)
 	GetCreditLineByUser(ctx context.Context, arg GetCreditLineByUserParams) (CreditLine, error)
 	GetCreditLinesByUser(ctx context.Context, userID pgtype.UUID) ([]CreditLine, error)
@@ -34,7 +46,11 @@ type Querier interface {
 	GetInstallmentWithDetails(ctx context.Context, id pgtype.UUID) (GetInstallmentWithDetailsRow, error)
 	GetInstallmentsByTransaction(ctx context.Context, transactionID pgtype.UUID) ([]Installment, error)
 	GetMerchantByID(ctx context.Context, id pgtype.UUID) (Merchant, error)
+	GetMerchantByUserID(ctx context.Context, userID pgtype.UUID) (Merchant, error)
+	GetMerchantDashboardStats(ctx context.Context, merchantID pgtype.UUID) (GetMerchantDashboardStatsRow, error)
 	GetMerchantPayouts(ctx context.Context) ([]GetMerchantPayoutsRow, error)
+	GetMerchantPayoutsFiltered(ctx context.Context, merchantID pgtype.UUID) ([]MerchantPayout, error)
+	GetMerchantTransactions(ctx context.Context, arg GetMerchantTransactionsParams) ([]GetMerchantTransactionsRow, error)
 	GetMerchantsByCategory(ctx context.Context, dollar_1 string) ([]Merchant, error)
 	GetOverdueInstallments(ctx context.Context) ([]Installment, error)
 	GetPendingInstallmentsWithDetails(ctx context.Context, userID pgtype.UUID) ([]GetPendingInstallmentsWithDetailsRow, error)
@@ -51,14 +67,28 @@ type Querier interface {
 	GetTriageByUser(ctx context.Context, userID pgtype.UUID) ([]Triage, error)
 	GetUserByEmail(ctx context.Context, email pgtype.Text) (User, error)
 	GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
+	GetUserByIDAdmin(ctx context.Context, id pgtype.UUID) (GetUserByIDAdminRow, error)
 	GetUserByPhone(ctx context.Context, phone string) (User, error)
+	ListAllCreditLines(ctx context.Context, arg ListAllCreditLinesParams) ([]ListAllCreditLinesRow, error)
+	ListAllMerchants(ctx context.Context) ([]Merchant, error)
+	ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error)
 	PauseUserCreditLines(ctx context.Context, userID pgtype.UUID) error
 	ProcessInstallmentPayment(ctx context.Context, id pgtype.UUID) (Installment, error)
 	SearchServices(ctx context.Context, arg SearchServicesParams) ([]SearchServicesRow, error)
 	SearchSupplies(ctx context.Context, arg SearchSuppliesParams) ([]SearchSuppliesRow, error)
+	SumMerchantRevenue(ctx context.Context, merchantID pgtype.UUID) (interface{}, error)
+	SumPendingInstallments(ctx context.Context) (interface{}, error)
+	SumTotalTransactionAmount(ctx context.Context) (interface{}, error)
 	TryScannerLock(ctx context.Context, arg TryScannerLockParams) (bool, error)
+	UpdateCreditLineLimit(ctx context.Context, arg UpdateCreditLineLimitParams) error
 	UpdateCreditLineUsage(ctx context.Context, arg UpdateCreditLineUsageParams) (CreditLine, error)
+	UpdateMedicalService(ctx context.Context, arg UpdateMedicalServiceParams) error
+	UpdateMedicalSupply(ctx context.Context, arg UpdateMedicalSupplyParams) error
+	UpdateMerchantStatus(ctx context.Context, arg UpdateMerchantStatusParams) error
 	UpdateUserGamification(ctx context.Context, arg UpdateUserGamificationParams) (User, error)
+	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error
+	UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) error
+	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) error
 }
 
 var _ Querier = (*Queries)(nil)
