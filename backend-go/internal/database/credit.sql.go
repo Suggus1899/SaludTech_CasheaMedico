@@ -11,6 +11,37 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const createCreditLine = `-- name: CreateCreditLine :one
+INSERT INTO credit_lines (user_id, type, limit_usd, used_usd, status)
+VALUES ($1, $2, $3, 0, 'ACTIVE')
+RETURNING id, user_id, type, limit_usd, used_usd, status, paused_at, reactivated_at, created_at, updated_at, blocked_at
+`
+
+type CreateCreditLineParams struct {
+	UserID   pgtype.UUID    `json:"user_id"`
+	Type     string         `json:"type"`
+	LimitUsd pgtype.Numeric `json:"limit_usd"`
+}
+
+func (q *Queries) CreateCreditLine(ctx context.Context, arg CreateCreditLineParams) (CreditLine, error) {
+	row := q.db.QueryRow(ctx, createCreditLine, arg.UserID, arg.Type, arg.LimitUsd)
+	var i CreditLine
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Type,
+		&i.LimitUsd,
+		&i.UsedUsd,
+		&i.Status,
+		&i.PausedAt,
+		&i.ReactivatedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.BlockedAt,
+	)
+	return i, err
+}
+
 const createInstallment = `-- name: CreateInstallment :one
 INSERT INTO installments (
     transaction_id, user_id, installment_num, amount, due_date
@@ -109,7 +140,7 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 }
 
 const getCreditLineByUser = `-- name: GetCreditLineByUser :one
-SELECT id, user_id, type, limit_usd, used_usd, status, paused_at, reactivated_at, created_at, updated_at FROM credit_lines 
+SELECT id, user_id, type, limit_usd, used_usd, status, paused_at, reactivated_at, created_at, updated_at, blocked_at FROM credit_lines
 WHERE user_id = $1 AND type = $2
 `
 
@@ -132,17 +163,54 @@ func (q *Queries) GetCreditLineByUser(ctx context.Context, arg GetCreditLineByUs
 		&i.ReactivatedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.BlockedAt,
 	)
 	return i, err
 }
 
+const getCreditLinesByUser = `-- name: GetCreditLinesByUser :many
+SELECT id, user_id, type, limit_usd, used_usd, status, paused_at, reactivated_at, created_at, updated_at, blocked_at FROM credit_lines WHERE user_id = $1 ORDER BY created_at
+`
+
+func (q *Queries) GetCreditLinesByUser(ctx context.Context, userID pgtype.UUID) ([]CreditLine, error) {
+	rows, err := q.db.Query(ctx, getCreditLinesByUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CreditLine
+	for rows.Next() {
+		var i CreditLine
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Type,
+			&i.LimitUsd,
+			&i.UsedUsd,
+			&i.Status,
+			&i.PausedAt,
+			&i.ReactivatedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.BlockedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateCreditLineUsage = `-- name: UpdateCreditLineUsage :one
 UPDATE credit_lines
-SET 
+SET
     used_usd = used_usd + $3,
     status = $4
 WHERE user_id = $1 AND type = $2
-RETURNING id, user_id, type, limit_usd, used_usd, status, paused_at, reactivated_at, created_at, updated_at
+RETURNING id, user_id, type, limit_usd, used_usd, status, paused_at, reactivated_at, created_at, updated_at, blocked_at
 `
 
 type UpdateCreditLineUsageParams struct {
@@ -171,6 +239,7 @@ func (q *Queries) UpdateCreditLineUsage(ctx context.Context, arg UpdateCreditLin
 		&i.ReactivatedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.BlockedAt,
 	)
 	return i, err
 }

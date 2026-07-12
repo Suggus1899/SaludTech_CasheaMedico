@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Award, LogOut, Mail, Phone, CreditCard, Shield } from "lucide-react";
 import { clearSession, getStoredUser } from "../../../lib/api";
+import { profileGradient } from "../../../lib/creditLineStyles";
 import type { UserResponse } from "../../../types/patient";
 
 const levelThresholds: Record<number, number> = {
@@ -34,10 +35,7 @@ export default function PerfilPage() {
 
   return (
     <div className="space-y-6">
-      <h1
-        className="text-xl font-bold text-foreground"
-        style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-      >
+      <h1 className="text-xl font-bold text-foreground">
         Mi Perfil
       </h1>
 
@@ -45,17 +43,14 @@ export default function PerfilPage() {
       <div
         className="p-6 rounded-3xl text-white text-center"
         style={{
-          background: "linear-gradient(135deg, #1A6B8A, #0F4C5C)",
-          boxShadow: "0 10px 20px rgba(26, 107, 138, 0.3)",
+          background: `linear-gradient(135deg, ${profileGradient.from}, ${profileGradient.to})`,
+          boxShadow: `0 10px 20px ${profileGradient.shadow}`,
         }}
       >
         <div className="p-4 rounded-full bg-white/15 inline-block">
           <Award className="w-12 h-12" />
         </div>
-        <h2
-          className="text-3xl font-bold mt-4"
-          style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-        >
+        <h2 className="text-3xl font-bold mt-4 font-display">
           Nivel {level}
         </h2>
         <p className="text-sm text-white/90 mt-1">
@@ -81,10 +76,7 @@ export default function PerfilPage() {
 
       {/* User info */}
       <div className="p-5 rounded-2xl border border-border bg-base-100 space-y-3">
-        <h3
-          className="text-base font-bold text-foreground"
-          style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-        >
+        <h3 className="text-base font-bold text-foreground font-display">
           Datos Personales
         </h3>
 
@@ -135,10 +127,7 @@ function InfoRow({
     <div className="flex items-center gap-3 py-2 border-b border-border last:border-0">
       <span className="text-muted-foreground">{icon}</span>
       <span className="text-sm text-muted-foreground flex-1">{label}</span>
-      <span
-        className="text-sm font-semibold text-foreground"
-        style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-      >
+      <span className="text-sm font-semibold text-foreground font-display">
         {value}
       </span>
     </div>

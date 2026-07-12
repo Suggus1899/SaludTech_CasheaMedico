@@ -10,3 +10,6 @@ FROM merchants m
 JOIN transactions t ON m.id = t.merchant_id
 WHERE t.created_at >= CURRENT_DATE - INTERVAL '30 days'
 GROUP BY m.id, m.trade_name;
+
+-- name: GetMerchantByID :one
+SELECT * FROM merchants WHERE id = $1;

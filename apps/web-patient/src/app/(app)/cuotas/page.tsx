@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
 import { getApiUrl } from "../../../lib/api";
-import { formatCurrency, formatDate } from "../../../lib/utils";
+import { formatWithVES, formatDate } from "../../../lib/utils";
 import type { Installment } from "../../../types/patient";
 
 export default function CuotasPage() {
@@ -30,10 +30,7 @@ export default function CuotasPage() {
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1
-          className="text-xl font-bold text-foreground"
-          style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-        >
+        <h1 className="text-xl font-bold text-foreground">
           Mis Cuotas
         </h1>
         <button
@@ -115,10 +112,7 @@ export default function CuotasPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p
-                        className="text-sm font-bold text-foreground"
-                        style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-                      >
+                      <p className="text-sm font-bold text-foreground font-display">
                         Cuota #
                         {inst.installmentNumber ?? "—"} · {merchant}
                       </p>
@@ -126,14 +120,15 @@ export default function CuotasPage() {
                         Vence: {formatDate(inst.dueDate)}
                       </p>
                     </div>
-                    <p
-                      className={`text-base font-bold shrink-0 ${
-                        isOverdue ? "text-error" : "text-foreground"
-                      }`}
-                      style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-                    >
-                      {formatCurrency(inst.amount)}
-                    </p>
+                    <div className="text-right shrink-0">
+                      <p
+                        className={`text-base font-bold font-display ${
+                          isOverdue ? "text-error" : "text-foreground"
+                        }`}
+                      >
+                        {formatWithVES(inst.amount, inst.amountVES)}
+                      </p>
+                    </div>
                   </div>
                 </Link>
               </li>

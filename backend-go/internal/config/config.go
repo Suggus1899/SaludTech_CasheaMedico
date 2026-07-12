@@ -11,11 +11,16 @@ type Config struct {
 	Port        int    `envconfig:"PORT" default:"8081"`
 	DatabaseURL string `envconfig:"DATABASE_URL" required:"true"`
 	JWTSecret   string `envconfig:"SALUDTECH_JWT_SECRET" required:"true"`
+	QRSecret    string `envconfig:"SALUDTECH_QR_SECRET" required:"true"`
+
+	// DolarVZLA API key (required for USDT endpoints; BCV CDN is free)
+	DolarVZLAKey string `envconfig:"DOLARVZLA_KEY"`
+
+	// fakePayment API key (test payment gateway)
+	FakePayKey string `envconfig:"FAKEPAY_API_KEY"`
 }
 
 func Load() *Config {
-	// Intentamos cargar el archivo .env de la raíz (ignoramos error si no existe,
-	// envconfig leerá del entorno nativo)
 	_ = godotenv.Load("../.env")
 
 	var cfg Config

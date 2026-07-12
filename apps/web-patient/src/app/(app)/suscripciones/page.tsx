@@ -34,10 +34,7 @@ export default function SuscripcionesPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1
-          className="text-xl font-bold text-foreground"
-          style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-        >
+        <h1 className="text-xl font-bold text-foreground">
           Mis Suscripciones
         </h1>
         <button
@@ -62,10 +59,7 @@ export default function SuscripcionesPage() {
           <div className="p-6 rounded-full bg-success/10">
             <Pill className="w-12 h-12 text-success" />
           </div>
-          <h2
-            className="text-lg font-bold text-foreground mt-5"
-            style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-          >
+          <h2 className="text-lg font-bold text-foreground mt-5">
             Sin suscripciones de farmacia
           </h2>
           <p className="text-sm text-muted-foreground mt-2 max-w-xs">
@@ -87,10 +81,7 @@ export default function SuscripcionesPage() {
                 }`}
               >
                 <div className="flex items-start justify-between">
-                  <p
-                    className="text-sm font-bold text-foreground"
-                    style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-                  >
+                  <p className="text-sm font-bold text-foreground font-display">
                     {sub.plan ?? "Medicina"}
                   </p>
                   <span
@@ -108,10 +99,7 @@ export default function SuscripcionesPage() {
                     {sub.merchant?.tradeName ?? "—"}
                   </span>
                   <span className="flex-1" />
-                  <span
-                    className="text-sm font-bold text-success"
-                    style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-                  >
+                  <span className="text-sm font-bold text-success font-display">
                     {formatCurrency(sub.monthlyAmount ?? 0)}/mes
                   </span>
                 </div>
@@ -151,11 +139,7 @@ export default function SuscripcionesPage() {
           aria-labelledby="cancel-title"
         >
           <div className="modal-box">
-            <h3
-              id="cancel-title"
-              className="text-lg font-bold"
-              style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-            >
+            <h3 id="cancel-title" className="text-lg font-bold font-display">
               Cancelar Suscripción
             </h3>
             <p className="py-4 text-sm text-muted-foreground">

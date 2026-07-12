@@ -1,8 +1,8 @@
 -- name: ProcessInstallmentPayment :one
 UPDATE installments
-SET 
+SET
     status = 'PAID',
-    paid_date = NOW()
+    paid_at = NOW()
 WHERE id = $1
 RETURNING *;
 

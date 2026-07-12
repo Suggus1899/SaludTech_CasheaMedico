@@ -1,10 +1,18 @@
 -- name: GetCreditLineByUser :one
-SELECT * FROM credit_lines 
+SELECT * FROM credit_lines
 WHERE user_id = $1 AND type = $2;
+
+-- name: GetCreditLinesByUser :many
+SELECT * FROM credit_lines WHERE user_id = $1 ORDER BY created_at;
+
+-- name: CreateCreditLine :one
+INSERT INTO credit_lines (user_id, type, limit_usd, used_usd, status)
+VALUES ($1, $2, $3, 0, 'ACTIVE')
+RETURNING *;
 
 -- name: UpdateCreditLineUsage :one
 UPDATE credit_lines
-SET 
+SET
     used_usd = used_usd + $3,
     status = $4
 WHERE user_id = $1 AND type = $2

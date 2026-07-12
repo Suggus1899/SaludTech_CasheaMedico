@@ -12,20 +12,34 @@ import {
   Calendar,
   RefreshCw,
   Lock,
+  type LucideIcon,
 } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
 import { getApiUrl, getAuthHeaders, getStoredUser } from "../../../lib/api";
 import { formatCurrency, formatDate } from "../../../lib/utils";
+import {
+  elderCareServiceStyles,
+  elderCareHeroGradient,
+  elderCareAccentColor,
+  elderCareEmptyColor,
+} from "../../../lib/creditLineStyles";
 import type { Subscription, UserResponse } from "../../../types/patient";
 
-const services = [
+interface ServiceDef {
+  type: keyof typeof elderCareServiceStyles;
+  label: string;
+  icon: LucideIcon;
+  description: string;
+  defaultAmount: number;
+}
+
+const services: ServiceDef[] = [
   {
     type: "NURSE",
     label: "Enfermera",
     icon: Heart,
     description: "Cuidado de salud profesional en el hogar",
     defaultAmount: 120,
-    color: "#8B5CF6",
   },
   {
     type: "CAREGIVER",
@@ -33,7 +47,6 @@ const services = [
     icon: HeartHandshake,
     description: "Acompañamiento y asistencia diaria",
     defaultAmount: 90,
-    color: "#6366F1",
   },
   {
     type: "PHYSIOTHERAPY",
@@ -41,7 +54,6 @@ const services = [
     icon: Activity,
     description: "Rehabilitación y ejercicio terapéutico",
     defaultAmount: 100,
-    color: "#7C3AED",
   },
   {
     type: "GERIATRIC_SPECIALIST",
@@ -49,9 +61,8 @@ const services = [
     icon: Stethoscope,
     description: "Consulta especializada en adultos mayores",
     defaultAmount: 150,
-    color: "#5B21B6",
   },
-] as const;
+];
 
 const serviceLabels: Record<string, string> = {
   NURSE: "Enfermera",
@@ -77,7 +88,7 @@ export default function CuidadoMayorPage() {
   const { data, loading, refetch } = useFetchData<Subscription[]>(
     getApiUrl("patient/elder-care/subscriptions")
   );
-  const [confirmService, setConfirmService] = useState<(typeof services)[number] | null>(null);
+  const [confirmService, setConfirmService] = useState<ServiceDef | null>(null);
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [cancelId, setCancelId] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
@@ -122,10 +133,7 @@ export default function CuidadoMayorPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1
-          className="text-xl font-bold text-foreground"
-          style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-        >
+        <h1 className="text-xl font-bold text-foreground">
           Cuidado Mayor
         </h1>
         {tab === "subscriptions" && (
@@ -165,14 +173,11 @@ export default function CuidadoMayorPage() {
           <div
             className="p-5 rounded-2xl text-white"
             style={{
-              background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
+              background: `linear-gradient(135deg, ${elderCareHeroGradient.from}, ${elderCareHeroGradient.to})`,
             }}
           >
             <Shield className="w-9 h-9" />
-            <h2
-              className="text-xl font-bold mt-3"
-              style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-            >
+            <h2 className="text-xl font-bold mt-3">
               Cuidado para tus seres queridos
             </h2>
             <p className="text-sm text-white/85 mt-2 leading-relaxed">
@@ -186,10 +191,7 @@ export default function CuidadoMayorPage() {
             <div className="flex items-start gap-3 p-4 rounded-2xl bg-warning/10 border border-warning/30">
               <Lock className="w-5 h-5 text-warning shrink-0 mt-0.5" />
               <div>
-                <p
-                  className="text-sm font-bold text-foreground"
-                  style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-                >
+                <p className="text-sm font-bold text-foreground font-display">
                   Nivel {userLevel} — Bloqueado
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -204,6 +206,7 @@ export default function CuidadoMayorPage() {
           <div className="space-y-3">
             {services.map((s) => {
               const Icon = s.icon;
+              const style = elderCareServiceStyles[s.type];
               return (
                 <div
                   key={s.type}
@@ -213,21 +216,18 @@ export default function CuidadoMayorPage() {
                 >
                   <div
                     className="p-3 rounded-xl"
-                    style={{ backgroundColor: `${s.color}1A`, color: s.color }}
+                    style={{ backgroundColor: `${style.color}1A`, color: style.color }}
                   >
                     <Icon className="w-6 h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p
-                      className="text-sm font-bold text-foreground"
-                      style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-                    >
+                    <p className="text-sm font-bold text-foreground font-display">
                       {s.label}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">{s.description}</p>
                     <p
-                      className="text-sm font-bold mt-1"
-                      style={{ color: s.color, fontFamily: "var(--font-outfit, sans-serif)" }}
+                      className="text-sm font-bold mt-1 font-display"
+                      style={{ color: style.color }}
                     >
                       {formatCurrency(s.defaultAmount)}/mes
                     </p>
@@ -236,7 +236,7 @@ export default function CuidadoMayorPage() {
                     onClick={() => !isLocked && setConfirmService(s)}
                     disabled={isLocked}
                     className="btn btn-sm text-white"
-                    style={{ backgroundColor: s.color }}
+                    style={{ backgroundColor: style.color }}
                   >
                     {isLocked ? <Lock className="w-3.5 h-3.5" /> : "Suscribir"}
                   </button>
@@ -249,15 +249,12 @@ export default function CuidadoMayorPage() {
         <div>
           {loading ? (
             <div className="flex justify-center py-12">
-              <span className="loading loading-spinner" style={{ color: "#7C3AED" }} />
+              <span className="loading loading-spinner" style={{ color: elderCareAccentColor }} />
             </div>
           ) : subscriptions.length === 0 ? (
             <div className="flex flex-col items-center py-16 text-center">
-              <Shield className="w-14 h-14" style={{ color: "#DDD6FE" }} />
-              <h2
-                className="text-lg font-bold text-foreground mt-4"
-                style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-              >
+              <Shield className="w-14 h-14" style={{ color: elderCareEmptyColor }} />
+              <h2 className="text-lg font-bold text-foreground mt-4">
                 Sin suscripciones activas
               </h2>
               <p className="text-sm text-muted-foreground mt-2">
@@ -272,14 +269,11 @@ export default function CuidadoMayorPage() {
                   <li
                     key={sub.id}
                     className={`p-4 rounded-2xl border bg-base-100 ${
-                      isActive ? "border-[#7C3AED]/30" : "border-border"
+                      isActive ? "border-primary/30" : "border-border"
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <p
-                        className="text-sm font-bold text-foreground"
-                        style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-                      >
+                      <p className="text-sm font-bold text-foreground font-display">
                         {sub.merchant?.tradeName ?? "Proveedor"}
                       </p>
                       <span
@@ -297,8 +291,8 @@ export default function CuidadoMayorPage() {
                       </span>
                       <span className="flex-1" />
                       <span
-                        className="text-sm font-bold"
-                        style={{ color: "#7C3AED", fontFamily: "var(--font-outfit, sans-serif)" }}
+                        className="text-sm font-bold font-display"
+                        style={{ color: elderCareAccentColor }}
                       >
                         {formatCurrency(sub.monthlyAmount ?? 0)}/mes
                       </span>
@@ -334,11 +328,8 @@ export default function CuidadoMayorPage() {
         <div className="modal modal-open" role="dialog" aria-modal="true">
           <div className="modal-box">
             <div className="flex items-center gap-2">
-              <confirmService.icon className="w-5 h-5" style={{ color: confirmService.color }} />
-              <h3
-                className="text-lg font-bold"
-                style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-              >
+              <confirmService.icon className="w-5 h-5" style={{ color: elderCareServiceStyles[confirmService.type].color }} />
+              <h3 className="text-lg font-bold font-display">
                 {confirmService.label}
               </h3>
             </div>
@@ -348,9 +339,9 @@ export default function CuidadoMayorPage() {
             </p>
             <div
               className="flex items-start gap-2 p-2.5 rounded-lg"
-              style={{ backgroundColor: `${confirmService.color}14` }}
+              style={{ backgroundColor: `${elderCareServiceStyles[confirmService.type].color}14` }}
             >
-              <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: confirmService.color }} />
+              <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: elderCareServiceStyles[confirmService.type].color }} />
               <p className="text-xs text-muted-foreground">
                 Puedes cancelar en cualquier momento.
               </p>
@@ -363,7 +354,7 @@ export default function CuidadoMayorPage() {
                 onClick={handleSubscribe}
                 disabled={isSubscribing}
                 className="btn btn-sm text-white"
-                style={{ backgroundColor: confirmService.color }}
+                style={{ backgroundColor: elderCareServiceStyles[confirmService.type].color }}
               >
                 {isSubscribing ? <span className="loading loading-spinner loading-xs" /> : null}
                 Confirmar
@@ -382,10 +373,7 @@ export default function CuidadoMayorPage() {
       {cancelId && (
         <div className="modal modal-open" role="dialog" aria-modal="true">
           <div className="modal-box">
-            <h3
-              className="text-lg font-bold"
-              style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-            >
+            <h3 className="text-lg font-bold font-display">
               Cancelar Suscripción
             </h3>
             <p className="py-4 text-sm text-muted-foreground">

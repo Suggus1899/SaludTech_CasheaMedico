@@ -5,186 +5,8 @@
 package database
 
 import (
-	"database/sql/driver"
-	"fmt"
-
 	"github.com/jackc/pgx/v5/pgtype"
 )
-
-type CreditLineStatus string
-
-const (
-	CreditLineStatusACTIVE  CreditLineStatus = "ACTIVE"
-	CreditLineStatusPAUSED  CreditLineStatus = "PAUSED"
-	CreditLineStatusBLOCKED CreditLineStatus = "BLOCKED"
-)
-
-func (e *CreditLineStatus) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = CreditLineStatus(s)
-	case string:
-		*e = CreditLineStatus(s)
-	default:
-		return fmt.Errorf("unsupported scan type for CreditLineStatus: %T", src)
-	}
-	return nil
-}
-
-type NullCreditLineStatus struct {
-	CreditLineStatus CreditLineStatus `json:"credit_line_status"`
-	Valid            bool             `json:"valid"` // Valid is true if CreditLineStatus is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullCreditLineStatus) Scan(value interface{}) error {
-	if value == nil {
-		ns.CreditLineStatus, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.CreditLineStatus.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullCreditLineStatus) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.CreditLineStatus), nil
-}
-
-type InstallmentStatus string
-
-const (
-	InstallmentStatusPENDING InstallmentStatus = "PENDING"
-	InstallmentStatusPAID    InstallmentStatus = "PAID"
-	InstallmentStatusOVERDUE InstallmentStatus = "OVERDUE"
-	InstallmentStatusWAIVED  InstallmentStatus = "WAIVED"
-)
-
-func (e *InstallmentStatus) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = InstallmentStatus(s)
-	case string:
-		*e = InstallmentStatus(s)
-	default:
-		return fmt.Errorf("unsupported scan type for InstallmentStatus: %T", src)
-	}
-	return nil
-}
-
-type NullInstallmentStatus struct {
-	InstallmentStatus InstallmentStatus `json:"installment_status"`
-	Valid             bool              `json:"valid"` // Valid is true if InstallmentStatus is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullInstallmentStatus) Scan(value interface{}) error {
-	if value == nil {
-		ns.InstallmentStatus, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.InstallmentStatus.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullInstallmentStatus) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.InstallmentStatus), nil
-}
-
-type TransactionStatus string
-
-const (
-	TransactionStatusPENDINGPAYMENT TransactionStatus = "PENDING_PAYMENT"
-	TransactionStatusACTIVE         TransactionStatus = "ACTIVE"
-	TransactionStatusCOMPLETED      TransactionStatus = "COMPLETED"
-	TransactionStatusCANCELLED      TransactionStatus = "CANCELLED"
-	TransactionStatusREFUNDED       TransactionStatus = "REFUNDED"
-)
-
-func (e *TransactionStatus) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = TransactionStatus(s)
-	case string:
-		*e = TransactionStatus(s)
-	default:
-		return fmt.Errorf("unsupported scan type for TransactionStatus: %T", src)
-	}
-	return nil
-}
-
-type NullTransactionStatus struct {
-	TransactionStatus TransactionStatus `json:"transaction_status"`
-	Valid             bool              `json:"valid"` // Valid is true if TransactionStatus is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullTransactionStatus) Scan(value interface{}) error {
-	if value == nil {
-		ns.TransactionStatus, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.TransactionStatus.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullTransactionStatus) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.TransactionStatus), nil
-}
-
-type UserRole string
-
-const (
-	UserRolePATIENT  UserRole = "PATIENT"
-	UserRoleMERCHANT UserRole = "MERCHANT"
-	UserRoleADMIN    UserRole = "ADMIN"
-)
-
-func (e *UserRole) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = UserRole(s)
-	case string:
-		*e = UserRole(s)
-	default:
-		return fmt.Errorf("unsupported scan type for UserRole: %T", src)
-	}
-	return nil
-}
-
-type NullUserRole struct {
-	UserRole UserRole `json:"user_role"`
-	Valid    bool     `json:"valid"` // Valid is true if UserRole is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullUserRole) Scan(value interface{}) error {
-	if value == nil {
-		ns.UserRole, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.UserRole.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullUserRole) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.UserRole), nil
-}
 
 type AuditLog struct {
 	ID        int64              `json:"id"`
@@ -208,6 +30,7 @@ type CreditLine struct {
 	ReactivatedAt pgtype.Timestamptz `json:"reactivated_at"`
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt     pgtype.Timestamptz `json:"updated_at"`
+	BlockedAt     pgtype.Timestamptz `json:"blocked_at"`
 }
 
 type ElderCareSubscription struct {
@@ -236,6 +59,37 @@ type Installment struct {
 	DaysOverdue     int32              `json:"days_overdue"`
 	CreatedAt       pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+}
+
+type MedicalService struct {
+	ID          pgtype.UUID        `json:"id"`
+	MerchantID  pgtype.UUID        `json:"merchant_id"`
+	Name        string             `json:"name"`
+	Description pgtype.Text        `json:"description"`
+	Category    string             `json:"category"`
+	Subcategory pgtype.Text        `json:"subcategory"`
+	PriceUsd    pgtype.Numeric     `json:"price_usd"`
+	DurationMin pgtype.Int2        `json:"duration_min"`
+	IsActive    bool               `json:"is_active"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+}
+
+type MedicalSupply struct {
+	ID                   pgtype.UUID        `json:"id"`
+	MerchantID           pgtype.UUID        `json:"merchant_id"`
+	Name                 string             `json:"name"`
+	Description          pgtype.Text        `json:"description"`
+	Category             string             `json:"category"`
+	Subcategory          pgtype.Text        `json:"subcategory"`
+	PriceUsd             pgtype.Numeric     `json:"price_usd"`
+	Unit                 pgtype.Text        `json:"unit"`
+	Stock                int32              `json:"stock"`
+	MinStock             pgtype.Int4        `json:"min_stock"`
+	RequiresPrescription bool               `json:"requires_prescription"`
+	IsActive             bool               `json:"is_active"`
+	CreatedAt            pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt            pgtype.Timestamptz `json:"updated_at"`
 }
 
 type Merchant struct {
@@ -305,6 +159,15 @@ type Subscription struct {
 	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
 }
 
+type SubscriptionItem struct {
+	ID             pgtype.UUID    `json:"id"`
+	SubscriptionID pgtype.UUID    `json:"subscription_id"`
+	SupplyID       pgtype.UUID    `json:"supply_id"`
+	ItemName       string         `json:"item_name"`
+	Quantity       int16          `json:"quantity"`
+	UnitPriceUsd   pgtype.Numeric `json:"unit_price_usd"`
+}
+
 type Transaction struct {
 	ID              pgtype.UUID        `json:"id"`
 	UserID          pgtype.UUID        `json:"user_id"`
@@ -321,6 +184,29 @@ type Transaction struct {
 	Description     pgtype.Text        `json:"description"`
 	CreatedAt       pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+}
+
+type TransactionItem struct {
+	ID            pgtype.UUID        `json:"id"`
+	TransactionID pgtype.UUID        `json:"transaction_id"`
+	ServiceID     pgtype.UUID        `json:"service_id"`
+	SupplyID      pgtype.UUID        `json:"supply_id"`
+	ItemName      string             `json:"item_name"`
+	Quantity      int16              `json:"quantity"`
+	UnitPriceUsd  pgtype.Numeric     `json:"unit_price_usd"`
+	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+}
+
+type Triage struct {
+	ID                pgtype.UUID        `json:"id"`
+	UserID            pgtype.UUID        `json:"user_id"`
+	Symptoms          string             `json:"symptoms"`
+	PerceivedSeverity int16              `json:"perceived_severity"`
+	Priority          string             `json:"priority"`
+	Status            string             `json:"status"`
+	Recommendation    pgtype.Text        `json:"recommendation"`
+	CreatedAt         pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt         pgtype.Timestamptz `json:"updated_at"`
 }
 
 type User struct {
@@ -343,12 +229,12 @@ type User struct {
 }
 
 type UserGamificationHistory struct {
-	ID            pgtype.UUID      `json:"id"`
-	UserID        pgtype.UUID      `json:"user_id"`
-	EventType     string           `json:"event_type"`
-	PointsAwarded int32            `json:"points_awarded"`
-	Description   pgtype.Text      `json:"description"`
-	CreatedAt     pgtype.Timestamp `json:"created_at"`
+	ID            pgtype.UUID        `json:"id"`
+	UserID        pgtype.UUID        `json:"user_id"`
+	EventType     string             `json:"event_type"`
+	PointsAwarded int32              `json:"points_awarded"`
+	Description   pgtype.Text        `json:"description"`
+	CreatedAt     pgtype.Timestamptz `json:"created_at"`
 }
 
 type UserLevelHistory struct {

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import { getApiUrl, getAuthHeaders } from "../../../lib/api";
-import { parseQrPayload, formatCurrency, formatDate } from "../../../lib/utils";
+import { parseQrPayload, formatCurrency, formatWithVES, formatDate } from "../../../lib/utils";
 import type { CheckoutPreview } from "../../../types/patient";
 
 type Step = "scan" | "amount" | "checkout" | "success" | "error";
@@ -201,10 +201,7 @@ export default function PagarPage() {
           <ArrowLeft className="w-4 h-4" /> Volver
         </button>
 
-        <h1
-          className="text-xl font-bold text-foreground"
-          style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-        >
+        <h1 className="text-xl font-bold text-foreground">
           Escanear QR
         </h1>
 
@@ -274,10 +271,7 @@ export default function PagarPage() {
 
         <div className="text-center pt-6">
           <Store className="w-12 h-12 text-primary mx-auto" />
-          <h1
-            className="text-xl font-bold text-foreground mt-4"
-            style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-          >
+          <h1 className="text-xl font-bold text-foreground mt-4">
             Ingresar Monto
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -302,8 +296,7 @@ export default function PagarPage() {
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
                 autoFocus
-                className="input input-bordered w-full text-center text-3xl font-bold pl-10"
-                style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
+                className="input input-bordered w-full text-center text-3xl font-bold pl-10 font-display"
               />
             </div>
           </div>
@@ -351,38 +344,31 @@ export default function PagarPage() {
           <ArrowLeft className="w-4 h-4" /> Volver
         </button>
 
-        <h1
-          className="text-xl font-bold text-foreground"
-          style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-        >
+        <h1 className="text-xl font-bold text-foreground">
           Resumen de Financiamiento
         </h1>
 
         {/* Merchant card */}
         <div className="p-6 rounded-2xl border border-border bg-base-100 text-center">
           <Store className="w-12 h-12 text-primary mx-auto" />
-          <p
-            className="text-lg font-bold text-foreground mt-4"
-            style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-          >
+          <p className="text-lg font-bold text-foreground mt-4 font-display">
             {merchantId}
           </p>
-          <p
-            className="text-4xl font-bold text-foreground mt-2"
-            style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-          >
+          <p className="text-4xl font-bold text-foreground mt-2 font-display">
             {formatCurrency(preview.amount)}
           </p>
+          {preview.amountVES ? (
+            <p className="text-sm text-muted-foreground mt-1">
+              (Bs. {new Intl.NumberFormat("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(preview.amountVES)})
+            </p>
+          ) : null}
           <p className="text-sm text-muted-foreground mt-1">Monto Total a Financiar</p>
         </div>
 
         {/* Installment breakdown */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2
-              className="text-lg font-bold text-foreground"
-              style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-            >
+            <h2 className="text-lg font-bold text-foreground font-display">
               Desglose de Pago ({preview.requestedInstallments} cuotas)
             </h2>
           </div>
@@ -407,12 +393,16 @@ export default function PagarPage() {
                 <span className="text-sm text-muted-foreground">
                   Cuota {inst.installmentNumber} ({formatDate(inst.dueDate)})
                 </span>
-                <span
-                  className="text-sm font-semibold text-foreground"
-                  style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-                >
-                  {formatCurrency(inst.amount)}
-                </span>
+                <div className="text-right">
+                  <span className="text-sm font-semibold text-foreground font-display block">
+                    {formatCurrency(inst.amount)}
+                  </span>
+                  {inst.amountVES ? (
+                    <span className="text-xs text-muted-foreground">
+                      (Bs. {new Intl.NumberFormat("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(inst.amountVES)})
+                    </span>
+                  ) : null}
+                </div>
               </li>
             ))}
           </ul>
@@ -437,10 +427,7 @@ export default function PagarPage() {
         <div className="p-6 rounded-full bg-success/10">
           <CheckCircle2 className="w-14 h-14 text-success" />
         </div>
-        <h2
-          className="text-2xl font-bold text-foreground mt-6"
-          style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-        >
+        <h2 className="text-2xl font-bold text-foreground mt-6 font-display">
           ¡Pago Exitoso!
         </h2>
         <p className="text-sm text-muted-foreground mt-2">

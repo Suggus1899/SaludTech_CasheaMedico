@@ -18,6 +18,7 @@ type AuthHandler struct {
 }
 
 type LoginRequest struct {
+	Email    string `json:"email"`
 	Phone    string `json:"phone"`
 	Password string `json:"password"`
 }
@@ -80,7 +81,21 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.DB.GetUserByPhone(context.Background(), req.Phone)
+	if req.Email == "" && req.Phone == "" {
+		http.Error(w, "Email or phone is required", http.StatusBadRequest)
+		return
+	}
+
+	ctx := context.Background()
+	var user database.User
+	var err error
+
+	if req.Email != "" {
+		emailText := pgtype.Text{String: req.Email, Valid: true}
+		user, err = h.DB.GetUserByEmail(ctx, emailText)
+	} else {
+		user, err = h.DB.GetUserByPhone(ctx, req.Phone)
+	}
 	if err != nil {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return

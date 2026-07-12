@@ -11,6 +11,37 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getMerchantByID = `-- name: GetMerchantByID :one
+SELECT id, legal_name, trade_name, rif, category, address, city, phone, email, contact_name, mdr_rate, bank_account_bs, bank_account_usd, is_active, is_online, min_transaction, created_at, updated_at, subcategory FROM merchants WHERE id = $1
+`
+
+func (q *Queries) GetMerchantByID(ctx context.Context, id pgtype.UUID) (Merchant, error) {
+	row := q.db.QueryRow(ctx, getMerchantByID, id)
+	var i Merchant
+	err := row.Scan(
+		&i.ID,
+		&i.LegalName,
+		&i.TradeName,
+		&i.Rif,
+		&i.Category,
+		&i.Address,
+		&i.City,
+		&i.Phone,
+		&i.Email,
+		&i.ContactName,
+		&i.MdrRate,
+		&i.BankAccountBs,
+		&i.BankAccountUsd,
+		&i.IsActive,
+		&i.IsOnline,
+		&i.MinTransaction,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Subcategory,
+	)
+	return i, err
+}
+
 const getMerchantPayouts = `-- name: GetMerchantPayouts :many
 SELECT 
     m.id AS merchant_id,

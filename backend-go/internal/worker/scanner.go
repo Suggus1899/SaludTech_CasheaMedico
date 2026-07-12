@@ -39,7 +39,10 @@ func (s *InstallmentScanner) Start() {
 
 		// 2. Intentar adquirir el Advisory Lock (ShedLock equivalente)
 		// pg_try_advisory_xact_lock: retorna true si se adquirió, false si ya está tomado
-		locked, err := database.New(tx).TryScannerLock(ctx, scannerLockKey1, scannerLockKey2)
+		locked, err := database.New(tx).TryScannerLock(ctx, database.TryScannerLockParams{
+			PgTryAdvisoryXactLock:   scannerLockKey1,
+			PgTryAdvisoryXactLock_2: scannerLockKey2,
+		})
 		if err != nil {
 			log.Printf("Error acquiring advisory lock: %v", err)
 			return

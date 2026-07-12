@@ -22,6 +22,8 @@ export interface Installment {
   id: string;
   dueDate: string;
   amount: number;
+  amountVES?: number;
+  bcvRate?: number;
   status: "PENDING" | "PAID" | "OVERDUE" | string;
   installmentNumber?: number;
   totalInstallments?: number;
@@ -71,9 +73,16 @@ export interface RecommendedMerchant {
 export interface CheckoutPreview {
   merchantId: string;
   amount: number;
+  amountVES?: number;
+  bcvRate?: number;
   requestedInstallments: number;
+  downPayment?: number;
+  downPaymentVES?: number;
+  financedAmount?: number;
+  financedAmountVES?: number;
   installments: {
     amount: number;
+    amountVES?: number;
     dueDate: string;
     installmentNumber: number;
   }[];
@@ -89,4 +98,75 @@ export interface FetchState<T> {
 export interface FetchAction<T> {
   type: "loading" | "success" | "error";
   payload?: T | string;
+}
+
+// ─── Medical Catalog ──────────────────────────────────────────────────────
+
+export interface Merchant {
+  id: string;
+  tradeName: string;
+  category: string;
+  subcategory?: string;
+  city?: string;
+}
+
+export interface MedicalService {
+  id: string;
+  name: string;
+  description?: string;
+  category: string;
+  subcategory?: string;
+  priceUsd: number;
+  priceVES?: number;
+  durationMin?: number;
+  merchantName?: string;
+  merchantCity?: string;
+  merchantId?: string;
+}
+
+export interface MedicalSupply {
+  id: string;
+  name: string;
+  description?: string;
+  category: string;
+  subcategory?: string;
+  priceUsd: number;
+  priceVES?: number;
+  unit?: string;
+  stock?: number;
+  requiresPrescription?: boolean;
+  merchantName?: string;
+  merchantCity?: string;
+  merchantId?: string;
+}
+
+export interface CheckoutItem {
+  type: "SERVICE" | "SUPPLY";
+  id: string;
+  quantity: number;
+}
+
+export interface CheckoutResponse {
+  transactionId: string;
+  status: string;
+  totalAmount: number;
+  totalAmountVES?: number;
+  downPayment: number;
+  downPaymentVES?: number;
+  financedAmount: number;
+  financedAmountVES?: number;
+  numInstallments: number;
+  bcvRate?: number;
+  creditLineType: string;
+  installments: {
+    amount: number;
+    amountVES?: number;
+    dueDate: string;
+    installmentNumber: number;
+  }[];
+  items: {
+    name: string;
+    quantity: number;
+    priceUsd: number;
+  }[];
 }

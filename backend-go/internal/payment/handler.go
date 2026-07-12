@@ -1,9 +1,11 @@
 package payment
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/saludtech/backend-go/internal/database"
 )
 
@@ -11,24 +13,43 @@ type PaymentHandler struct {
 	DB database.Querier
 }
 
-func (h *PaymentHandler) ProcessPayment(w http.ResponseWriter, r *http.Request) {
-	// En una app real, leeríamos el ID de la cuota desde r.Body
-	// Simularemos con un UUID de prueba o simplemente usaremos el contexto.
-	// ctx := r.Context()
-	
-	// TODO: installmentID y userID deberían venir del request
-	// 1. Marcar cuota como pagada
-	// _, err := h.DB.ProcessInstallmentPayment(ctx, installmentID)
-	
-	// 2. Gamificación: Sumar 15 puntos por pago exitoso
-	// err = h.DB.AddUserPoints(ctx, database.AddUserPointsParams{ID: userID, Points: 15})
+type ProcessPaymentRequest struct {
+	InstallmentID   string  `json:"installment_id"`
+	Method          string  `json:"method"`
+	Amount          float64 `json:"amount"`
+	ReferenceCode   string  `json:"reference_code"`
+	Phone           string  `json:"phone"`
+	Email           string  `json:"email"`
+}
 
-	// 3. Evaluar Level Up
-	// err = h.DB.CheckAndLevelUpUser(ctx, userID)
+func (h *PaymentHandler) ProcessPayment(w http.ResponseWriter, r *http.Request) {
+	var req ProcessPaymentRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid payload", http.StatusBadRequest)
+		return
+	}
+
+	if req.InstallmentID == "" || req.Amount <= 0 {
+		http.Error(w, "Missing required fields: installment_id, amount", http.StatusBadRequest)
+		return
+	}
+
+	var instUUID pgtype.UUID
+	if err := instUUID.Scan(req.InstallmentID); err != nil {
+		http.Error(w, "Invalid installment_id", http.StatusBadRequest)
+		return
+	}
+
+	_, err := h.DB.ProcessInstallmentPayment(context.Background(), instUUID)
+	if err != nil {
+		http.Error(w, "Failed to process payment", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"status": "APPROVED",
-		"message": "Payment recorded. +15 Gamification Points added!",
+		"status":  "PAID",
+		"message": "Payment processed successfully",
 	})
 }

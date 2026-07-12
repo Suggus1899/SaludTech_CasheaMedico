@@ -11,23 +11,12 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const tryScannerLock = `-- name: TryScannerLock :one
-SELECT pg_try_advisory_xact_lock($1, $2) AS acquired
-`
-
-func (q *Queries) TryScannerLock(ctx context.Context, key1 int32, key2 int32) (bool, error) {
-	row := q.db.QueryRow(ctx, tryScannerLock, key1, key2)
-	var acquired bool
-	err := row.Scan(&acquired)
-	return acquired, err
-}
-
 const applyReactivationFee = `-- name: ApplyReactivationFee :one
 UPDATE installments
-SET 
+SET
     status = 'OVERDUE',
     reactivation_fee = 4.00,
-    days_overdue = EXTRACT(DAY FROM (CURRENT_DATE - due_date))
+    days_overdue = CURRENT_DATE - due_date
 WHERE id = $1
 RETURNING id, transaction_id, user_id, installment_num, amount, due_date, paid_at, status, reactivation_fee, days_overdue, created_at, updated_at
 `
@@ -92,13 +81,29 @@ func (q *Queries) GetOverdueInstallments(ctx context.Context) ([]Installment, er
 
 const pauseUserCreditLines = `-- name: PauseUserCreditLines :exec
 UPDATE credit_lines
-SET 
+SET
     status = 'PAUSED',
     paused_at = NOW()
-WHERE user_id = $1 AND type != 'DAILY'
+WHERE user_id = $1 AND type != 'SALUD_COTIDIANA'
 `
 
 func (q *Queries) PauseUserCreditLines(ctx context.Context, userID pgtype.UUID) error {
 	_, err := q.db.Exec(ctx, pauseUserCreditLines, userID)
 	return err
+}
+
+const tryScannerLock = `-- name: TryScannerLock :one
+SELECT pg_try_advisory_xact_lock($1, $2) AS acquired
+`
+
+type TryScannerLockParams struct {
+	PgTryAdvisoryXactLock   int32 `json:"pg_try_advisory_xact_lock"`
+	PgTryAdvisoryXactLock_2 int32 `json:"pg_try_advisory_xact_lock_2"`
+}
+
+func (q *Queries) TryScannerLock(ctx context.Context, arg TryScannerLockParams) (bool, error) {
+	row := q.db.QueryRow(ctx, tryScannerLock, arg.PgTryAdvisoryXactLock, arg.PgTryAdvisoryXactLock_2)
+	var acquired bool
+	err := row.Scan(&acquired)
+	return acquired, err
 }

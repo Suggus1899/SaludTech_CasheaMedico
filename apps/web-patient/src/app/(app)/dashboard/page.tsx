@@ -11,37 +11,18 @@ import {
   AlertCircle,
   Clock,
   Award,
-  CreditCard,
   WifiOff,
+  Store,
+  Search,
 } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
 import { getApiUrl, getStoredUser } from "../../../lib/api";
-import { formatCurrency, formatDate, daysUntil } from "../../../lib/utils";
+import { formatCurrency, formatWithVES, formatDate, daysUntil } from "../../../lib/utils";
+import {
+  getCreditLineStyle,
+  quickActionStyles,
+} from "../../../lib/creditLineStyles";
 import type { CreditLine, Installment, UserResponse } from "../../../types/patient";
-
-const creditLineMeta: Record<
-  string,
-  { title: string; from: string; to: string; icon: typeof Stethoscope }
-> = {
-  ESPECIALIDAD_PRINCIPAL: {
-    title: "Especialidad Principal",
-    from: "#60A5FA",
-    to: "#2563EB",
-    icon: Stethoscope,
-  },
-  SALUD_COTIDIANA: {
-    title: "Salud Cotidiana",
-    from: "#34D399",
-    to: "#10B981",
-    icon: Pill,
-  },
-  MAYOR_CUIDADO: {
-    title: "Mayor Cuidado",
-    from: "#A78BFA",
-    to: "#7C3AED",
-    icon: Shield,
-  },
-};
 
 export default function DashboardPage() {
   const [user, setUser] = useState<UserResponse | null>(null);
@@ -88,10 +69,7 @@ export default function DashboardPage() {
 
       {/* Quick actions */}
       <section>
-        <h2
-          className="text-base font-bold text-foreground mb-3.5"
-          style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-        >
+        <h2 className="text-base font-bold text-foreground mb-3.5">
           Acciones Rápidas
         </h2>
         <div className="grid grid-cols-4 gap-3">
@@ -99,33 +77,45 @@ export default function DashboardPage() {
             href="/triaje"
             icon={<Stethoscope className="w-5 h-5" />}
             label="Triaje"
-            color="#1A6B8A"
+            color={quickActionStyles.triaje.color}
           />
           <QuickAction
             href="/pagar"
             icon={<QrCode className="w-5 h-5" />}
             label="Pagar"
-            color="#6366F1"
+            color={quickActionStyles.pagar.color}
           />
           <QuickAction
             href="/suscripciones"
             icon={<Pill className="w-5 h-5" />}
             label="Medicinas"
-            color="#10B981"
+            color={quickActionStyles.medicinas.color}
           />
           <QuickAction
             href="/cuidado-mayor"
             icon={<Shield className="w-5 h-5" />}
             label="Cuidado Mayor"
-            color="#7C3AED"
+            color={quickActionStyles.cuidadoMayor.color}
           />
         </div>
         <div className="grid grid-cols-4 gap-3 mt-3">
           <QuickAction
+            href="/comercios"
+            icon={<Store className="w-5 h-5" />}
+            label="Comercios"
+            color="#2563eb"
+          />
+          <QuickAction
+            href="/catalogo"
+            icon={<Search className="w-5 h-5" />}
+            label="Catálogo"
+            color="#0891b2"
+          />
+          <QuickAction
             href="/cuotas"
             icon={<CalendarDays className="w-5 h-5" />}
             label="Cuotas"
-            color="#0EA5E9"
+            color={quickActionStyles.cuotas.color}
           />
         </div>
       </section>
@@ -133,10 +123,7 @@ export default function DashboardPage() {
       {/* Upcoming payments */}
       <section>
         <div className="flex items-center justify-between mb-3">
-          <h2
-            className="text-base font-bold text-foreground"
-            style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-          >
+          <h2 className="text-base font-bold text-foreground">
             Próximos Pagos
           </h2>
           <Link
@@ -174,6 +161,7 @@ export default function DashboardPage() {
                         : `Vence el ${formatDate(inst.dueDate)}`
                     }
                     amount={inst.amount}
+                    amountVES={inst.amountVES}
                     isUrgent={isUrgent}
                   />
                 </Link>
@@ -187,12 +175,7 @@ export default function DashboardPage() {
 }
 
 function CreditLineCard({ line, level }: { line: CreditLine; level?: number }) {
-  const meta = creditLineMeta[line.type] ?? {
-    title: "Línea de Salud",
-    from: "#60A5FA",
-    to: "#2563EB",
-    icon: CreditCard,
-  };
+  const meta = getCreditLineStyle(line.type);
   const Icon = meta.icon;
   const used = line.limitAmount - line.available;
   const progress = line.limitAmount > 0 ? (used / line.limitAmount) * 100 : 0;
@@ -221,10 +204,7 @@ function CreditLineCard({ line, level }: { line: CreditLine; level?: number }) {
         )}
       </div>
 
-      <p
-        className="text-4xl font-bold mt-5 leading-none"
-        style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-      >
+      <p className="text-4xl font-bold mt-5 leading-none font-display">
         ${line.available.toFixed(2)}
       </p>
       <p className="text-sm text-black/65 mt-1">Disponible para financiar</p>
@@ -269,10 +249,7 @@ function QuickAction({
       >
         {icon}
       </div>
-      <span
-        className="text-xs font-semibold text-foreground text-center leading-tight"
-        style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-      >
+      <span className="text-xs font-semibold text-foreground text-center leading-tight font-display">
         {label}
       </span>
     </Link>
@@ -284,12 +261,14 @@ function PaymentCard({
   installment,
   dueLabel,
   amount,
+  amountVES,
   isUrgent,
 }: {
   storeName: string;
   installment: string;
   dueLabel: string;
   amount: number;
+  amountVES?: number;
   isUrgent: boolean;
 }) {
   return (
@@ -310,10 +289,7 @@ function PaymentCard({
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p
-          className="text-sm font-semibold text-foreground truncate"
-          style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-        >
+        <p className="text-sm font-semibold text-foreground truncate font-display">
           Cuota {installment} · {storeName}
         </p>
         <p
@@ -324,12 +300,16 @@ function PaymentCard({
           {dueLabel}
         </p>
       </div>
-      <p
-        className="text-base font-bold text-foreground shrink-0"
-        style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-      >
-        {formatCurrency(amount)}
-      </p>
+      <div className="text-right shrink-0">
+        <p className="text-base font-bold text-foreground font-display">
+          {formatCurrency(amount)}
+        </p>
+        {amountVES ? (
+          <p className="text-xs text-muted-foreground">
+            (Bs. {new Intl.NumberFormat("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amountVES)})
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

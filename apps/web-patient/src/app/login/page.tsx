@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff, AlertCircle, HeartPulse, ShieldCheck, Clock } from "lucide-react";
-import { Logo } from "../../components/Logo";
+import { Logo } from "@saludtech/ui";
 import { getApiUrl, setSession } from "../../lib/api";
 import type { UserResponse } from "../../types/patient";
 
@@ -42,7 +42,7 @@ export default function PatientLoginPage() {
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
       {/* ─── Brand Panel ─── */}
-      <div className="hidden lg:flex flex-col justify-between p-12 relative overflow-hidden bg-gradient-to-br from-[#0a2535] via-[#0d3347] to-[#134e6b]">
+      <div className="hidden lg:flex flex-col justify-between p-12 relative overflow-hidden bg-hero-gradient">
         {/* Decorative blurs */}
         <div className="absolute top-1/4 -right-32 w-96 h-96 rounded-full bg-primary/15 blur-3xl" />
         <div className="absolute bottom-1/4 -left-32 w-80 h-80 rounded-full bg-secondary/15 blur-3xl" />

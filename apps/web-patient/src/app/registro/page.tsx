@@ -95,10 +95,7 @@ export default function PatientRegisterPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1
-            className="font-bold text-foreground"
-            style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
-          >
+          <h1 className="font-bold text-foreground font-display">
             Crear Cuenta
           </h1>
         </div>

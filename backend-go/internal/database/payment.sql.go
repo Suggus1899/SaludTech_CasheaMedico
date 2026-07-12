@@ -40,9 +40,9 @@ func (q *Queries) CheckAndLevelUpUser(ctx context.Context, id pgtype.UUID) error
 
 const processInstallmentPayment = `-- name: ProcessInstallmentPayment :one
 UPDATE installments
-SET 
+SET
     status = 'PAID',
-    paid_date = NOW()
+    paid_at = NOW()
 WHERE id = $1
 RETURNING id, transaction_id, user_id, installment_num, amount, due_date, paid_at, status, reactivation_fee, days_overdue, created_at, updated_at
 `

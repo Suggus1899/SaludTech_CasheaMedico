@@ -13,6 +13,24 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+export function formatVES(amount: number): string {
+  return new Intl.NumberFormat("es-VE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
+/**
+ * Format a USD amount with its VES equivalent in parentheses.
+ * Example: "$13.33 (Bs. 9,615.54)"
+ * If amountVES is not provided, only the USD amount is shown.
+ */
+export function formatWithVES(amount: number, amountVES?: number): string {
+  const usd = formatCurrency(amount);
+  if (amountVES == null || amountVES <= 0) return usd;
+  return `${usd} (Bs. ${formatVES(amountVES)})`;
+}
+
 export function formatDate(iso: string): string {
   if (!iso) return "—";
   const d = new Date(iso);
