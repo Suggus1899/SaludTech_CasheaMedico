@@ -22,7 +22,6 @@ export default function MerchantLoginPage() {
 
   const handleDemoMode = () => {
     const demoUser = { id: "mc-001", email: "comercio@saludtech.com", firstName: "Clínica", lastName: "Santa María", role: "MERCHANT", merchantId: "m-001" };
-    localStorage.setItem("jwt_token", "demo-token");
     localStorage.setItem("merchant_user", JSON.stringify(demoUser));
     document.cookie = "jwt_token=demo-token; path=/; max-age=86400; SameSite=Lax";
     router.push("/");
@@ -36,6 +35,7 @@ export default function MerchantLoginPage() {
       const res = await fetch(getApiUrl("auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
       if (!res.ok) {
@@ -43,9 +43,8 @@ export default function MerchantLoginPage() {
         throw new Error(data.message ?? "Credenciales incorrectas");
       }
       const data = await res.json();
-      localStorage.setItem("jwt_token", data.token);
+      // JWT is now stored in an httpOnly cookie by the backend.
       localStorage.setItem("merchant_user", JSON.stringify(data.user));
-      document.cookie = `jwt_token=${data.token}; path=/; max-age=86400; SameSite=Lax`;
       router.push("/");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error al iniciar sesión");

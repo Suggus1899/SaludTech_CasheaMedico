@@ -24,13 +24,10 @@ export default function CheckoutAuthorizationPage() {
 
     const fetchPending = async () => {
       try {
-        const token = localStorage.getItem("jwt_token");
-        if (!token) return;
-
         const res = await fetch(`${API_BASE}/merchant/reconciliation/transactions/today`, {
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         });
 

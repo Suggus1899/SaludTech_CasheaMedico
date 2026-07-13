@@ -14,24 +14,36 @@ type contextKey string
 const UserIDKey contextKey = "user_id"
 const RoleKey contextKey = "role"
 
-// Middleware extracts the JWT from the Authorization header and injects
-// the user_id and role into the request context.
+// Middleware extracts the JWT from the httpOnly cookie (preferred) or the
+// Authorization header (backward compatibility) and injects the user_id
+// and role into the request context.
 func Middleware(cfg *config.Config) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			authHeader := r.Header.Get("Authorization")
-			if authHeader == "" {
+			tokenString := ""
+
+			// Prefer httpOnly cookie
+			if cookie, err := r.Cookie("jwt_token"); err == nil && cookie.Value != "" {
+				tokenString = cookie.Value
+			}
+
+			// Fall back to Authorization header (backward compatibility)
+			if tokenString == "" {
+				authHeader := r.Header.Get("Authorization")
+				if authHeader != "" {
+					parts := strings.SplitN(authHeader, " ", 2)
+					if len(parts) == 2 && parts[0] == "Bearer" {
+						tokenString = parts[1]
+					}
+				}
+			}
+
+			if tokenString == "" {
 				next.ServeHTTP(w, r)
 				return
 			}
 
-			parts := strings.SplitN(authHeader, " ", 2)
-			if len(parts) != 2 || parts[0] != "Bearer" {
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			claims, err := ValidateToken(parts[1], cfg)
+			claims, err := ValidateToken(tokenString, cfg)
 			if err != nil {
 				next.ServeHTTP(w, r)
 				return

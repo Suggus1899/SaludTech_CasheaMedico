@@ -12,13 +12,30 @@ import {
   Clock,
   Package,
 } from "lucide-react";
-import { getApiUrl, getAuthHeaders } from "../../../../lib/api";
+import { getApiUrl, apiFetch, getStoredUser } from "../../../../lib/api";
 import { formatCurrency, formatWithVES, formatDate } from "../../../../lib/utils";
 import type {
   MedicalService,
   MedicalSupply,
   CheckoutResponse,
+  UserResponse,
 } from "../../../../types/patient";
+
+// Max installments allowed per user level (Modo Más Cuotas)
+const maxInstallmentsForLevel = (level: number): number => {
+  if (level >= 6) return 12;
+  if (level >= 5) return 9;
+  if (level >= 3) return 6;
+  return 3;
+};
+
+// Minimum purchase amount for a given number of installments
+const minAmountForInstallments = (n: number): number => {
+  if (n >= 12) return 600;
+  if (n >= 9) return 450;
+  if (n >= 6) return 300;
+  return 0;
+};
 
 type Tab = "services" | "supplies";
 
@@ -42,13 +59,19 @@ export default function MerchantDetailPage({
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [userLevel, setUserLevel] = useState(1);
+
+  useEffect(() => {
+    const user = getStoredUser<UserResponse>();
+    if (user?.level) setUserLevel(user.level);
+  }, []);
 
   useEffect(() => {
     (async () => {
       try {
         const [svcRes, supRes] = await Promise.all([
-          fetch(getApiUrl(`patient/merchants/${id}/services`), { headers: getAuthHeaders() }),
-          fetch(getApiUrl(`patient/merchants/${id}/supplies`), { headers: getAuthHeaders() }),
+          apiFetch(getApiUrl(`patient/merchants/${id}/services`)),
+          apiFetch(getApiUrl(`patient/merchants/${id}/supplies`)),
         ]);
         if (svcRes.ok) setServices(await svcRes.json());
         if (supRes.ok) setSupplies(await supRes.json());
@@ -85,9 +108,9 @@ export default function MerchantDetailPage({
     setError(null);
     setIsProcessing(true);
     try {
-      const res = await fetch(getApiUrl("patient/transactions/checkout"), {
+      const res = await apiFetch(getApiUrl("patient/transactions/checkout"), {
         method: "POST",
-        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           merchantId: id,
           items: cart.map((c) => ({ type: c.type, id: c.id, quantity: c.qty })),
@@ -437,7 +460,12 @@ export default function MerchantDetailPage({
               </label>
               <select
                 value={creditLineType}
-                onChange={(e) => setCreditLineType(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setCreditLineType(val);
+                  if (val === "SALUD_COTIDIANA") setNumInstallments(1);
+                  else if (numInstallments === 1) setNumInstallments(3);
+                }}
                 className="select select-bordered w-full text-sm"
               >
                 <option value="ESPECIALIDAD_PRINCIPAL">Especialidad Principal</option>
@@ -446,22 +474,52 @@ export default function MerchantDetailPage({
               </select>
             </div>
 
-            {/* Installments selector */}
+            {/* Installments selector — dynamic by user level */}
             <div className="mt-3">
               <label className="label pb-1">
-                <span className="label-text font-medium text-sm">Cuotas</span>
+                <span className="label-text font-medium text-sm">
+                  Cuotas {creditLineType === "SALUD_COTIDIANA" && "(Línea Cotidiana: 1 cuota)"}
+                </span>
               </label>
-              <div className="grid grid-cols-4 gap-2">
-                {[3, 6, 9, 12].map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => setNumInstallments(n)}
-                    className={`btn btn-sm ${numInstallments === n ? "btn-primary" : "btn-outline"}`}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
+              {creditLineType === "SALUD_COTIDIANA" ? (
+                <div className="alert alert-info text-xs py-2">
+                  La Línea Cotidiana usa 1 sola cuota a 14 días, sin interés.
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[3, 6, 9, 12].map((n) => {
+                      const maxAllowed = maxInstallmentsForLevel(userLevel);
+                      const minAmount = minAmountForInstallments(n);
+                      const isLocked = n > maxAllowed;
+                      const isAmountLow = cartTotal < minAmount;
+                      const isDisabled = isLocked || isAmountLow;
+                      return (
+                        <button
+                          key={n}
+                          onClick={() => !isDisabled && setNumInstallments(n)}
+                          disabled={isDisabled}
+                          title={
+                            isLocked
+                              ? `Tu nivel (${userLevel}) permite máximo ${maxAllowed} cuotas`
+                              : isAmountLow
+                              ? `Monto mínimo para ${n} cuotas: $${minAmount}`
+                              : `${n} cuotas quincenales`
+                          }
+                          className={`btn btn-sm ${
+                            numInstallments === n ? "btn-primary" : isDisabled ? "btn-disabled opacity-40" : "btn-outline"
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Nivel {userLevel} · Máx {maxInstallmentsForLevel(userLevel)} cuotas
+                  </p>
+                </>
+              )}
             </div>
 
             {error && (

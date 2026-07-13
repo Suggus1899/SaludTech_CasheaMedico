@@ -22,7 +22,6 @@ export default function AdminLoginPage() {
 
   const handleDemoMode = () => {
     const demoUser = { id: "admin-001", email: "admin@saludtech.com", firstName: "Admin", lastName: "Demo", role: "ADMIN" };
-    localStorage.setItem("jwt_token", "demo-token");
     localStorage.setItem("admin_user", JSON.stringify(demoUser));
     document.cookie = "jwt_token=demo-token; path=/; max-age=86400; SameSite=Lax";
     router.push("/");
@@ -36,6 +35,7 @@ export default function AdminLoginPage() {
       const res = await fetch(getApiUrl("auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
       if (!res.ok) {
@@ -43,9 +43,9 @@ export default function AdminLoginPage() {
         throw new Error(data.message ?? "Credenciales incorrectas");
       }
       const data = await res.json();
-      localStorage.setItem("jwt_token", data.token);
+      // JWT is now stored in an httpOnly cookie by the backend.
+      // We only keep the user object in localStorage for UI display.
       localStorage.setItem("admin_user", JSON.stringify(data.user));
-      document.cookie = `jwt_token=${data.token}; path=/; max-age=86400; SameSite=Lax`;
       router.push("/");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error al iniciar sesión");

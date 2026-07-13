@@ -52,6 +52,9 @@ func (h *MerchantHandler) Routes() http.Handler {
 	mux.HandleFunc("POST /supplies", h.CreateSupply)
 	mux.HandleFunc("PUT /supplies/{id}", h.UpdateSupply)
 	mux.HandleFunc("DELETE /supplies/{id}", h.DeleteSupply)
+	mux.HandleFunc("POST /qr/generate", h.GenerateQR)
+	mux.HandleFunc("GET /qr/{token}/status", h.GetQRStatus)
+	mux.HandleFunc("GET /elder-care/subscriptions", h.ListElderCareSubs)
 	return mux
 }
 
@@ -494,4 +497,92 @@ func parsePagination(r *http.Request, defaultLimit int) (int, int) {
 		}
 	}
 	return limit, offset
+}
+
+// ─── QR Token Generation ───────────────────────────────────────────────────
+
+func (h *MerchantHandler) GenerateQR(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	merchantID, err := h.getMerchantID(ctx)
+	if err != nil {
+		http.Error(w, `{"error":"No merchant profile linked to this user"}`, http.StatusNotFound)
+		return
+	}
+
+	var req struct {
+		Amount      float64 `json:"amount"`
+		Description string  `json:"description"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, `{"error":"Invalid request body"}`, http.StatusBadRequest)
+		return
+	}
+	if req.Amount <= 0 {
+		http.Error(w, `{"error":"Amount must be positive"}`, http.StatusBadRequest)
+		return
+	}
+
+	var desc pgtype.Text
+	if req.Description != "" {
+		desc = pgtype.Text{String: req.Description, Valid: true}
+	}
+
+	token, err := h.DB.CreateQRToken(ctx, database.CreateQRTokenParams{
+		MerchantID:  merchantID,
+		Amount:      floatToNumeric(req.Amount),
+		Description: desc,
+	})
+	if err != nil {
+		http.Error(w, `{"error":"Failed to generate QR token"}`, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"qrToken":   token.Token,
+		"amount":    req.Amount,
+		"expiresAt": token.ExpiresAt,
+	})
+}
+
+func (h *MerchantHandler) GetQRStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	token := r.PathValue("token")
+	if token == "" {
+		http.Error(w, `{"error":"Token required"}`, http.StatusBadRequest)
+		return
+	}
+
+	qr, err := h.DB.GetQRToken(ctx, token)
+	if err != nil {
+		http.Error(w, `{"error":"QR token not found or expired"}`, http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":   qr.Status,
+		"amount":   qr.Amount,
+		"token":    qr.Token,
+	})
+}
+
+// ─── Elder Care Subscriptions ──────────────────────────────────────────────
+
+func (h *MerchantHandler) ListElderCareSubs(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	merchantID, err := h.getMerchantID(ctx)
+	if err != nil {
+		http.Error(w, `{"error":"No merchant profile linked to this user"}`, http.StatusNotFound)
+		return
+	}
+
+	subs, err := h.DB.ListElderCareSubsByMerchant(ctx, merchantID)
+	if err != nil {
+		http.Error(w, `{"error":"Failed to fetch elder care subscriptions"}`, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(subs)
 }

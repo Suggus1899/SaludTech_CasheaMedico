@@ -13,7 +13,7 @@ import {
   Keyboard,
 } from "lucide-react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
 import { parseQrPayload, formatCurrency, formatWithVES, formatDate } from "../../../lib/utils";
 import type { CheckoutPreview } from "../../../types/patient";
 
@@ -108,9 +108,8 @@ export default function PagarPage() {
     installments = 3
   ) => {
     try {
-      const res = await fetch(getApiUrl("patient/transactions/preview"), {
+      const res = await apiFetch(getApiUrl("patient/transactions/preview"), {
         method: "POST",
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           merchantId: mId,
           amount: amt,
@@ -159,9 +158,8 @@ export default function PagarPage() {
     try {
       const qrToken =
         manualPayload || `${merchantId}:${preview.amount}:${Date.now()}`;
-      const res = await fetch(getApiUrl("patient/transactions"), {
+      const res = await apiFetch(getApiUrl("patient/transactions"), {
         method: "POST",
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           merchantId,
           amount: preview.amount,

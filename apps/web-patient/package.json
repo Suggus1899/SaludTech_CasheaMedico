@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@saludtech/shared": "workspace:^",
     "@saludtech/ui": "workspace:*",
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",

@@ -16,6 +16,11 @@ import {
   LogOut,
   Menu,
   X,
+  Heart,
+  FileText,
+  CalendarPlus,
+  Bell,
+  Users,
 } from "lucide-react";
 import { clearSession, getStoredUser } from "../../lib/api";
 import { TourProvider, TourOverlay } from "../../lib/tours";
@@ -30,6 +35,11 @@ const navItems = [
   { href: "/suscripciones", label: "Suscripciones", icon: Pill },
   { href: "/cuidado-mayor", label: "Cuidado Mayor", icon: Shield },
   { href: "/triaje", label: "Triaje", icon: Stethoscope },
+  { href: "/salud", label: "Perfil de Salud", icon: Heart },
+  { href: "/historial", label: "Historial", icon: FileText },
+  { href: "/citas", label: "Citas", icon: CalendarPlus },
+  { href: "/recordatorios", label: "Recordatorios", icon: Bell },
+  { href: "/familia", label: "Familia", icon: Users },
   { href: "/perfil", label: "Perfil", icon: User },
 ];
 
@@ -52,8 +62,8 @@ export default function AppLayout({
     setSidebarOpen(false);
   }, [pathname]);
 
-  const handleLogout = () => {
-    clearSession();
+  const handleLogout = async () => {
+    await clearSession();
     router.push("/login");
   };
 

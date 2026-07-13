@@ -15,7 +15,7 @@ type Claims struct {
 }
 
 func GenerateToken(userID string, role string, cfg *config.Config) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(time.Duration(cfg.JWTExpirationHours) * time.Hour)
 	claims := &Claims{
 		UserID: userID,
 		Role:   role,
@@ -31,6 +31,11 @@ func GenerateToken(userID string, role string, cfg *config.Config) (string, erro
 func ValidateToken(tokenString string, cfg *config.Config) (*Claims, error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		// Verify the signing method is HMAC (HS256) to prevent algorithm
+		// confusion attacks where an attacker swaps alg to "none" or RS256.
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrTokenSignatureInvalid
+		}
 		return []byte(cfg.JWTSecret), nil
 	})
 

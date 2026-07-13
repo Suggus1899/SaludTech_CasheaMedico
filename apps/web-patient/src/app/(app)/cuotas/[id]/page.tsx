@@ -10,16 +10,16 @@ import {
   AlertCircle,
   ArrowLeft,
 } from "lucide-react";
-import { getApiUrl, getAuthHeaders } from "../../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../../lib/api";
 import { formatCurrency, formatWithVES, formatDate } from "../../../../lib/utils";
 import type { Installment } from "../../../../types/patient";
 
-const testCards = [
+const testCards = process.env.NODE_ENV === "development" ? [
   { label: "Visa", number: "4111111111111111" },
   { label: "Mastercard", number: "5555555555554444" },
   { label: "Amex", number: "378282246310005" },
   { label: "Discover", number: "6011111111111117" },
-];
+] : [];
 
 export default function PayInstallmentPage({
   params,
@@ -44,9 +44,7 @@ export default function PayInstallmentPage({
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(getApiUrl(`patient/installments/${id}`), {
-          headers: getAuthHeaders(),
-        });
+        const res = await apiFetch(getApiUrl(`patient/installments/${id}`));
         if (!res.ok) throw new Error("Error");
         const data = (await res.json()) as Installment;
         setInstallment(data ?? null);
@@ -63,9 +61,9 @@ export default function PayInstallmentPage({
     setError(null);
     setIsPaying(true);
     try {
-      const res = await fetch(getApiUrl("patient/payments"), {
+      const res = await apiFetch(getApiUrl("patient/payments"), {
         method: "POST",
-        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           installmentId: installment.id,
           method: "CARD",

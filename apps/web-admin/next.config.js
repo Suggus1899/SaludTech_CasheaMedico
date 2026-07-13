@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@saludtech/ui"],
+  transpilePackages: ["@saludtech/ui", "@saludtech/shared"],
   eslint: {
     ignoreDuringBuilds: true,
   },

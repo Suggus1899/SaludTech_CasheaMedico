@@ -4,7 +4,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { DollarSign, TrendingUp, Clock, QrCode, AlertCircle, RefreshCw, CheckCircle2, ArrowRight } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
+import { Transaction, TransactionsResponse } from "../../../types/merchant";
 
 interface DailyTx {
   id: string;
@@ -37,20 +38,19 @@ export default function GenerarQRPage() {
   );
 
   const fetchTodayTransactions = async () => {
-    const res = await fetch(getApiUrl("merchant/reconciliation/transactions/today"), {
-      headers: getAuthHeaders(),
-    });
+    const res = await apiFetch(getApiUrl("merchant/transactions?limit=20&offset=0"), {});
     if (!res.ok) return [];
-    const data = await res.json();
-    return (data as Array<Record<string, unknown>>).map((tx) => ({
+    const data = await res.json() as TransactionsResponse;
+    const txs: Transaction[] = data.transactions || [];
+    return txs.map((tx) => ({
       id: String(tx.id).slice(0, 8).toUpperCase(),
-      amount: `$${Number(tx.totalAmount).toFixed(2)}`,
-      mdrFee: `$${(Number(tx.totalAmount) * 0.035).toFixed(2)}`,
-      time: new Date(String(tx.createdAt)).toLocaleTimeString("es-VE", {
+      amount: `$${Number(tx.total_amount || 0).toFixed(2)}`,
+      mdrFee: `$${Number(tx.mdr_fee || 0).toFixed(2)}`,
+      time: new Date(String(tx.created_at)).toLocaleTimeString("es-VE", {
         hour: "2-digit",
         minute: "2-digit",
       }),
-      status: tx.status === "ACTIVE" || tx.status === "COMPLETED" ? "Liquidado" : "Pendiente",
+      status: tx.status === "COMPLETED" ? "Liquidado" : "Pendiente",
     }));
   };
 
@@ -65,9 +65,8 @@ export default function GenerarQRPage() {
   }, []);
 
   const fetchQrToken = async (amount: number, description: string): Promise<string> => {
-    const res = await fetch(getApiUrl("merchant/qr/generate"), {
+    const res = await apiFetch(getApiUrl("merchant/qr/generate"), {
       method: "POST",
-      headers: getAuthHeaders(),
       body: JSON.stringify({ amount, description }),
     });
     if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
@@ -76,9 +75,7 @@ export default function GenerarQRPage() {
   };
 
   const fetchQrStatus = async (token: string): Promise<string> => {
-    const res = await fetch(getApiUrl(`merchant/qr/${token}/status`), {
-      headers: getAuthHeaders(),
-    });
+    const res = await apiFetch(getApiUrl(`merchant/qr/${token}/status`), {});
     if (!res.ok) return "UNKNOWN";
     const data = await res.json();
     return data.status as string;

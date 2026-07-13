@@ -34,6 +34,10 @@ func (h *AdminHandler) Routes() http.Handler {
 	mux.HandleFunc("PATCH /merchants/{id}/status", h.UpdateMerchantStatus)
 	mux.HandleFunc("GET /credit-lines", h.ListCreditLines)
 	mux.HandleFunc("PATCH /credit-lines/{id}/limit", h.UpdateCreditLineLimit)
+	mux.HandleFunc("GET /triage/pending", h.ListPendingTriage)
+	mux.HandleFunc("PUT /triage/{id}/respond", h.RespondTriage)
+	mux.HandleFunc("GET /subscriptions/all", h.ListAllSubscriptions)
+	mux.HandleFunc("GET /elder-care", h.ListAllElderCare)
 	return mux
 }
 
@@ -307,4 +311,123 @@ func parsePagination(r *http.Request, defaultLimit int) (int, int) {
 }
 
 // Ensure unused import is referenced
+
+// ─── Triage Management ────────────────────────────────────────────────────
+
+func (h *AdminHandler) ListPendingTriage(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	limit, offset := parsePagination(r, 50)
+
+	triage, err := h.DB.ListPendingTriage(ctx, database.ListPendingTriageParams{
+		Limit:  int32(limit),
+		Offset: int32(offset),
+	})
+	if err != nil {
+		http.Error(w, `{"error":"Failed to fetch triage"}`, http.StatusInternalServerError)
+		return
+	}
+
+	total, _ := h.DB.CountPendingTriage(ctx)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"triage": triage,
+		"total":  total,
+		"limit":  limit,
+		"offset": offset,
+	})
+}
+
+func (h *AdminHandler) RespondTriage(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	id := r.PathValue("id")
+	var triageID pgtype.UUID
+	if err := triageID.Scan(id); err != nil {
+		http.Error(w, `{"error":"Invalid triage ID"}`, http.StatusBadRequest)
+		return
+	}
+
+	var req struct {
+		Status         string `json:"status"`
+		Recommendation string `json:"recommendation"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, `{"error":"Invalid request body"}`, http.StatusBadRequest)
+		return
+	}
+
+	if req.Status == "" {
+		req.Status = "RESOLVED"
+	}
+
+	var rec pgtype.Text
+	if req.Recommendation != "" {
+		rec = pgtype.Text{String: req.Recommendation, Valid: true}
+	}
+
+	if err := h.DB.RespondTriage(ctx, database.RespondTriageParams{
+		ID:             triageID,
+		ID_2:           triageID,
+		Status:         req.Status,
+		Recommendation: rec,
+	}); err != nil {
+		http.Error(w, `{"error":"Failed to respond to triage"}`, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"message": "Triage updated"})
+}
+
+// ─── All Subscriptions ─────────────────────────────────────────────────────
+
+func (h *AdminHandler) ListAllSubscriptions(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	limit, offset := parsePagination(r, 50)
+
+	subs, err := h.DB.ListAllSubscriptions(ctx, database.ListAllSubscriptionsParams{
+		Limit:  int32(limit),
+		Offset: int32(offset),
+	})
+	if err != nil {
+		http.Error(w, `{"error":"Failed to fetch subscriptions"}`, http.StatusInternalServerError)
+		return
+	}
+
+	total, _ := h.DB.CountAllSubscriptions(ctx)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"subscriptions": subs,
+		"total":         total,
+		"limit":         limit,
+		"offset":        offset,
+	})
+}
+
+// ─── All Elder Care ─────────────────────────────────────────────────────────
+
+func (h *AdminHandler) ListAllElderCare(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	limit, offset := parsePagination(r, 50)
+
+	subs, err := h.DB.ListAllElderCareSubs(ctx, database.ListAllElderCareSubsParams{
+		Limit:  int32(limit),
+		Offset: int32(offset),
+	})
+	if err != nil {
+		http.Error(w, `{"error":"Failed to fetch elder care subscriptions"}`, http.StatusInternalServerError)
+		return
+	}
+
+	total, _ := h.DB.CountAllElderCareSubs(ctx)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"subscriptions": subs,
+		"total":          total,
+		"limit":          limit,
+		"offset":          offset,
+	})
+}
 var _ = auth.GetRole

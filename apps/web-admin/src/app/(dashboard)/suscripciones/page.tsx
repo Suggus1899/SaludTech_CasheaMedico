@@ -7,14 +7,14 @@ import { getApiUrl } from "../../../lib/api";
 
 export default function SuscripcionesPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data, loading } = useFetchData<any[]>(getApiUrl("admin/subscriptions/all"));
+  const { data, loading } = useFetchData<any>(getApiUrl("admin/subscriptions/all?limit=50&offset=0"));
 
   if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando suscripciones...</div>;
 
-  const subs: any[] = data || [];
+  const subs: any[] = data?.subscriptions || [];
   const filtered = subs.filter((s: any) =>
-    s.productName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.merchantName?.toLowerCase().includes(searchTerm.toLowerCase())
+    s.product_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    s.merchant_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -39,6 +39,7 @@ export default function SuscripcionesPage() {
                   <tr className="border-base-300">
                     <th>Producto</th>
                     <th>Farmacia</th>
+                    <th>Paciente</th>
                     <th>Monto/Mes</th>
                     <th>Próximo Cobro</th>
                     <th>Estado</th>
@@ -47,10 +48,11 @@ export default function SuscripcionesPage() {
                 <tbody>
                   {filtered.map((s: any) => (
                     <tr key={s.id} className="hover:bg-base-200/40 border-base-300/60">
-                      <td className="font-medium">{s.productName}</td>
-                      <td className="opacity-60">{s.merchantName}</td>
-                      <td className="font-semibold">${s.amount?.toFixed(2)}</td>
-                      <td className="text-xs opacity-60">{s.nextBillingDate ? new Date(s.nextBillingDate).toLocaleDateString('es-VE') : '—'}</td>
+                      <td className="font-medium">{s.product_name}</td>
+                      <td className="opacity-60">{s.merchant_name || "—"}</td>
+                      <td className="opacity-60 text-xs">{s.user_name || "—"}</td>
+                      <td className="font-semibold">${Number(s.amount || 0).toFixed(2)}</td>
+                      <td className="text-xs opacity-60">{s.next_billing_date ? new Date(s.next_billing_date).toLocaleDateString('es-VE') : '—'}</td>
                       <td>
                         <span className={`badge badge-sm ${s.status === 'ACTIVE' ? 'badge-primary' : 'badge-ghost'}`}>{s.status}</span>
                       </td>

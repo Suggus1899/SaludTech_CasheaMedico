@@ -24,6 +24,7 @@ import (
 	"github.com/saludtech/backend-go/internal/database"
 	"github.com/saludtech/backend-go/internal/admin"
 	"github.com/saludtech/backend-go/internal/fakepay"
+	appmw "github.com/saludtech/backend-go/internal/middleware"
 	"github.com/saludtech/backend-go/internal/merchant"
 	"github.com/saludtech/backend-go/internal/patient"
 	"github.com/saludtech/backend-go/internal/payment"
@@ -67,7 +68,7 @@ func main() {
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
 		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
+		AllowCredentials: true, // Required for httpOnly cookies
 		MaxAge:           300,
 	}))
 	r.Use(middleware.RequestID)
@@ -84,19 +85,24 @@ func main() {
 		w.Write([]byte("OK - Go Backend Running"))
 	})
 
-	// Auth routes (public)
-	r.Post("/api/v1/auth/login", authHandler.Login)
-	r.Post("/api/v1/auth/register", registerWithCreditLines(queries, authHandler))
+	// Rate limiters for sensitive endpoints
+	authLimiter := appmw.NewRateLimiter(5, time.Minute)   // 5 login/register attempts per minute per IP
+	payLimiter := appmw.NewRateLimiter(10, time.Minute)   // 10 payment attempts per minute per IP
+
+	// Auth routes (public) — rate limited to prevent brute force
+	r.With(authLimiter.Middleware).Post("/api/v1/auth/login", authHandler.Login)
+	r.With(authLimiter.Middleware).Post("/api/v1/auth/register", registerWithCreditLines(queries, authHandler, cfg))
+	r.Post("/api/v1/auth/logout", authHandler.Logout)
 
 	// Patient routes (protected)
 	bcvClient := bcv.NewClient(cfg.DolarVZLAKey)
 	fakePayClient := fakepay.NewClient(cfg.FakePayKey)
-	patientHandler := &patient.PatientHandler{DB: queries, BCVClient: bcvClient, FakePay: fakePayClient}
+	patientHandler := &patient.PatientHandler{DB: queries, Pool: pool, BCVClient: bcvClient, FakePay: fakePayClient}
 	r.Route("/api/v1/patient", patientHandler.Routes())
 
-	// Payment routes (protected — legacy endpoint)
+	// Payment routes (protected — legacy endpoint) — rate limited
 	paymentHandler := &payment.PaymentHandler{DB: queries}
-	r.With(auth.RequireAuth).Post("/api/v1/payments", paymentHandler.ProcessPayment)
+	r.With(auth.RequireAuth, payLimiter.Middleware).Post("/api/v1/payments", paymentHandler.ProcessPayment)
 
 	// Merchant routes (MERCHANT + ADMIN only)
 	merchantHandler := &merchant.MerchantHandler{DB: queries}
@@ -147,7 +153,7 @@ func main() {
 
 // registerWithCreditLines wraps the auth register handler and creates
 // default credit lines for the new patient user.
-func registerWithCreditLines(queries *database.Queries, h *auth.AuthHandler) http.HandlerFunc {
+func registerWithCreditLines(queries *database.Queries, h *auth.AuthHandler, cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Capture the response to get the user ID
 		rec := &responseRecorder{ResponseWriter: w, statusCode: 200}
@@ -177,19 +183,21 @@ func registerWithCreditLines(queries *database.Queries, h *auth.AuthHandler) htt
 			typ   string
 			limit float64
 		}{
-			{"ESPECIALIDAD_PRINCIPAL", 500},
-			{"SALUD_COTIDIANA", 200},
+			{"ESPECIALIDAD_PRINCIPAL", cfg.DefaultCreditLimitMain},
+			{"SALUD_COTIDIANA", cfg.DefaultCreditLimitDaily},
 			{"MAYOR_CUIDADO", 0},
 		}
 
 		for _, line := range defaultLines {
 			var limitNumeric pgtype.Numeric
 			limitNumeric.Scan(fmt.Sprintf("%.2f", line.limit))
-			_, _ = queries.CreateCreditLine(r.Context(), database.CreateCreditLineParams{
+			if _, err := queries.CreateCreditLine(r.Context(), database.CreateCreditLineParams{
 				UserID:   uid,
 				Type:     line.typ,
 				LimitUsd: limitNumeric,
-			})
+			}); err != nil {
+				log.Printf("Failed to create %s credit line for user %s: %v", line.typ, resp.User.ID, err)
+			}
 		}
 
 		log.Printf("✅ Created default credit lines for user %s", resp.User.ID)

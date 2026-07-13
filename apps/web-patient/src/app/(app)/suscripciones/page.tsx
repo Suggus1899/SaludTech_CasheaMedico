@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Pill, RefreshCw, Store, Calendar, X, Plus, QrCode } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
 import { formatCurrency, formatDate } from "../../../lib/utils";
 import type { Subscription } from "../../../types/patient";
 
@@ -20,9 +20,8 @@ export default function SuscripcionesPage() {
   const handleCancel = async (id: string) => {
     setCancellingId(id);
     try {
-      await fetch(getApiUrl(`patient/subscriptions/${id}`), {
+      await apiFetch(getApiUrl(`patient/subscriptions/${id}`), {
         method: "DELETE",
-        headers: getAuthHeaders(),
       });
       setConfirmId(null);
       refetch();

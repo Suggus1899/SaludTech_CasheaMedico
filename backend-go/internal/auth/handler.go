@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -11,6 +10,34 @@ import (
 	"github.com/saludtech/backend-go/internal/database"
 	"golang.org/x/crypto/bcrypt"
 )
+
+// setAuthCookie sets the JWT as an httpOnly, Secure, SameSite=Lax cookie.
+// In development (HTTP), Secure is omitted so the cookie works on localhost.
+func setAuthCookie(w http.ResponseWriter, r *http.Request, token string, maxAgeSeconds int) {
+	cookie := &http.Cookie{
+		Name:     "jwt_token",
+		Value:    token,
+		Path:     "/",
+		MaxAge:   maxAgeSeconds,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+		Secure:   r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https",
+	}
+	http.SetCookie(w, cookie)
+}
+
+// clearAuthCookie expires the jwt_token cookie immediately.
+func clearAuthCookie(w http.ResponseWriter) {
+	cookie := &http.Cookie{
+		Name:     "jwt_token",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	}
+	http.SetCookie(w, cookie)
+}
 
 type AuthHandler struct {
 	DB  database.Querier
@@ -86,7 +113,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := context.Background()
+	ctx := r.Context()
 	var user database.User
 	var err error
 
@@ -113,12 +140,22 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	setAuthCookie(w, r, token, h.Cfg.JWTExpirationHours*3600)
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"access_token": token,
 		"token":        token,
 		"user":         toUserResponse(user),
 	})
+}
+
+// Logout clears the jwt_token cookie.
+func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	clearAuthCookie(w)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Logged out"})
 }
 
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
@@ -138,8 +175,10 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx := r.Context()
+
 	// Check if phone already exists
-	existing, err := h.DB.GetUserByPhone(context.Background(), req.Phone)
+	existing, err := h.DB.GetUserByPhone(ctx, req.Phone)
 	if err == nil && existing.ID.Valid {
 		http.Error(w, "Phone already registered", http.StatusConflict)
 		return
@@ -147,7 +186,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	// Check if email already exists
 	emailText := pgtype.Text{String: req.Email, Valid: true}
-	existingEmail, err := h.DB.GetUserByEmail(context.Background(), emailText)
+	existingEmail, err := h.DB.GetUserByEmail(ctx, emailText)
 	if err == nil && existingEmail.ID.Valid {
 		http.Error(w, "Email already registered", http.StatusConflict)
 		return
@@ -162,7 +201,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	fullName := strings.TrimSpace(req.FirstName + " " + req.LastName)
 	nationalID := pgtype.Text{String: req.IdentityDocument, Valid: req.IdentityDocument != ""}
 
-	user, err := h.DB.CreateUser(context.Background(), database.CreateUserParams{
+	user, err := h.DB.CreateUser(ctx, database.CreateUserParams{
 		Phone:        req.Phone,
 		Email:        emailText,
 		PasswordHash: string(hashedPassword),
@@ -180,6 +219,8 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
 	}
+
+	setAuthCookie(w, r, token, h.Cfg.JWTExpirationHours*3600)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

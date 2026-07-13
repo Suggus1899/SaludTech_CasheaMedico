@@ -13,7 +13,7 @@ import {
   Search,
   ArrowLeft,
 } from "lucide-react";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
 import type { Merchant } from "../../../types/patient";
 
 const categoryConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
@@ -34,9 +34,7 @@ export default function ComerciosPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(getApiUrl("patient/merchants"), {
-          headers: getAuthHeaders(),
-        });
+        const res = await apiFetch(getApiUrl("patient/merchants"));
         if (!res.ok) throw new Error("fetch failed");
         const data = (await res.json()) as Merchant[];
         setMerchants(data);

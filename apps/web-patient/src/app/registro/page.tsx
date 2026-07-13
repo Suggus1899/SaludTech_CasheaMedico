@@ -56,6 +56,7 @@ export default function PatientRegisterPage() {
       const res = await fetch(getApiUrl("auth/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           firstName: form.firstName.trim(),
           lastName: form.lastName.trim(),

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Clock, Filter, Download, RefreshCw } from "lucide-react";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
 
 interface HistoryTx {
   id: string;
@@ -22,19 +22,18 @@ export default function HistorialPage() {
     const fetchAllTransactions = async () => {
       setHistoryLoading(true);
       try {
-        const res = await fetch(getApiUrl("merchant/reconciliation/transactions"), {
-          headers: getAuthHeaders(),
-        });
+        const res = await apiFetch(getApiUrl("merchant/transactions?limit=100&offset=0"), {});
         if (!res.ok) return;
         const data = await res.json();
-        const mapped = (data as Array<Record<string, unknown>>).map((tx) => ({
+        const txs = data.transactions || [];
+        const mapped = txs.map((tx: any) => ({
           id: String(tx.id).slice(0, 8).toUpperCase(),
-          totalAmount: Number(tx.totalAmount),
-          status: String(tx.status),
+          totalAmount: Number(tx.total_amount || 0),
+          status: String(tx.status || "PENDING"),
           description: String(tx.description ?? "Cobro Médico"),
-          mdrFee: Number(tx.totalAmount) * 0.035,
-          createdAt: String(tx.createdAt),
-          creditLineType: tx.creditLineType as string | undefined,
+          mdrFee: Number(tx.mdr_fee || 0),
+          createdAt: String(tx.created_at),
+          creditLineType: tx.credit_line_type as string | undefined,
         }));
         setHistoryTxs(mapped);
       } finally {

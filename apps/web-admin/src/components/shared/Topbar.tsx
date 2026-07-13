@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Menu, Search, Sun, Moon, Bell, ChevronDown, User, Settings, HelpCircle, LogOut, AlertTriangle, X, CheckCircle2, Clock } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { NAV_ITEMS } from "../../lib/constants";
-import { getApiUrl, getAuthHeaders } from "../../lib/api";
+import { getApiUrl, apiFetch } from "../../lib/api";
 import { OverdueInstallment } from "../../types/admin";
 
 export function Topbar({
@@ -42,7 +42,7 @@ export function Topbar({
     if (!notifOpen && overdueList.length === 0) {
       setNotifLoading(true);
       try {
-        const res = await fetch(getApiUrl("admin/installments/overdue"), { headers: getAuthHeaders() });
+        const res = await apiFetch(getApiUrl("admin/installments/overdue"));
         if (res.ok) setOverdueList(await res.json());
       } finally {
         setNotifLoading(false);
@@ -51,9 +51,14 @@ export function Topbar({
   }, [notifOpen, overdueList.length]);
 
   const handleLogout = useCallback(() => {
-    localStorage.removeItem("jwt_token");
+    // JWT cookie is cleared by the backend logout endpoint.
+    // Call it fire-and-forget; redirect immediately for UX.
+    fetch(getApiUrl("auth/logout"), {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    }).catch(() => {});
     localStorage.removeItem("admin_user");
-    document.cookie = "jwt_token=; path=/; max-age=0";
     router.push("/login");
   }, [router]);
 

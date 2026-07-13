@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { Wallet, Calendar, RefreshCw } from "lucide-react";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
 
 interface Payout {
   id: string;
-  periodStart: string;
-  periodEnd: string;
-  grossAmount: number;
-  mdrDeducted: number;
-  netAmount: number;
+  period_start: string;
+  period_end: string;
+  gross_amount: number;
+  mdr_deducted: number;
+  net_amount: number;
   status: string;
-  paidAt: string | null;
+  paid_at: string | null;
 }
 
 export default function LiquidacionesPage() {
@@ -24,10 +24,11 @@ export default function LiquidacionesPage() {
     const fetchPayouts = async () => {
       setPayoutsLoading(true);
       try {
-        const res = await fetch(getApiUrl("merchant/payouts"), {
-          headers: getAuthHeaders(),
-        });
-        if (res.ok) setPayouts(await res.json());
+        const res = await apiFetch(getApiUrl("merchant/payouts"), {});
+        if (res.ok) {
+          const data = await res.json();
+          setPayouts(data.payouts || data || []);
+        }
       } finally {
         setPayoutsLoading(false);
       }
@@ -72,12 +73,12 @@ export default function LiquidacionesPage() {
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                            <span>{p.periodStart} — {p.periodEnd}</span>
+                            <span>{p.period_start} — {p.period_end}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-right font-medium">${p.grossAmount.toFixed(2)}</td>
-                        <td className="px-4 py-3 text-right text-destructive">-${p.mdrDeducted.toFixed(2)}</td>
-                        <td className="px-4 py-3 text-right font-semibold text-primary">${p.netAmount.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-right font-medium">${Number(p.gross_amount || 0).toFixed(2)}</td>
+                        <td className="px-4 py-3 text-right text-destructive">-${Number(p.mdr_deducted || 0).toFixed(2)}</td>
+                        <td className="px-4 py-3 text-right font-semibold text-primary">${Number(p.net_amount || 0).toFixed(2)}</td>
                         <td className="px-4 py-3 text-center">
                           <span className={`badge ${p.status === "PAID" ? "badge-primary" : "badge-ghost"}`}>
                             {p.status === "PAID" ? "Liquidado" : "Pendiente"}
@@ -103,15 +104,15 @@ export default function LiquidacionesPage() {
         <div className="modal modal-open">
           <div className="modal-box max-w-md p-6">
             <h3 className="font-bold text-lg font-(family-name:--font-syne)">Detalle de Liquidación</h3>
-            <p className="text-sm opacity-60 mb-4">Período: {selectedPayout?.periodStart} — {selectedPayout?.periodEnd}</p>
+            <p className="text-sm opacity-60 mb-4">Período: {selectedPayout?.period_start} — {selectedPayout?.period_end}</p>
             {selectedPayout && (
               <div className="space-y-3">
                 {[
-                  { label: "Monto Bruto", value: `$${selectedPayout.grossAmount.toFixed(2)}` },
-                  { label: "Comisión MDR (3.5%)", value: `-$${selectedPayout.mdrDeducted.toFixed(2)}`, red: true },
-                  { label: "Monto Neto", value: `$${selectedPayout.netAmount.toFixed(2)}`, bold: true },
+                  { label: "Monto Bruto", value: `$${Number(selectedPayout.gross_amount || 0).toFixed(2)}` },
+                  { label: "Comisión MDR (3.5%)", value: `-$${Number(selectedPayout.mdr_deducted || 0).toFixed(2)}`, red: true },
+                  { label: "Monto Neto", value: `$${Number(selectedPayout.net_amount || 0).toFixed(2)}`, bold: true },
                   { label: "Estado", value: selectedPayout.status === "PAID" ? "Liquidado" : "Pendiente" },
-                  { label: "Fecha de pago", value: selectedPayout.paidAt ? new Date(selectedPayout.paidAt).toLocaleDateString("es-VE") : "—" },
+                  { label: "Fecha de pago", value: selectedPayout.paid_at ? new Date(selectedPayout.paid_at).toLocaleDateString("es-VE") : "—" },
                 ].map((row) => (
                   <div key={row.label} className="flex justify-between text-sm border-b border-base-300 pb-2 last:border-0">
                     <span className="opacity-60">{row.label}</span>

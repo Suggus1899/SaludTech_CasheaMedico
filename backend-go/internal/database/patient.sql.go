@@ -12,20 +12,30 @@ import (
 )
 
 const cancelElderCareSub = `-- name: CancelElderCareSub :exec
-UPDATE elder_care_subscriptions SET status = 'CANCELLED' WHERE id = $1
+UPDATE elder_care_subscriptions SET status = 'CANCELLED' WHERE id = $1 AND user_id = $2
 `
 
-func (q *Queries) CancelElderCareSub(ctx context.Context, id pgtype.UUID) error {
-	_, err := q.db.Exec(ctx, cancelElderCareSub, id)
+type CancelElderCareSubParams struct {
+	ID     pgtype.UUID `json:"id"`
+	UserID pgtype.UUID `json:"user_id"`
+}
+
+func (q *Queries) CancelElderCareSub(ctx context.Context, arg CancelElderCareSubParams) error {
+	_, err := q.db.Exec(ctx, cancelElderCareSub, arg.ID, arg.UserID)
 	return err
 }
 
 const cancelSubscription = `-- name: CancelSubscription :exec
-UPDATE subscriptions SET status = 'CANCELLED' WHERE id = $1
+UPDATE subscriptions SET status = 'CANCELLED' WHERE id = $1 AND user_id = $2
 `
 
-func (q *Queries) CancelSubscription(ctx context.Context, id pgtype.UUID) error {
-	_, err := q.db.Exec(ctx, cancelSubscription, id)
+type CancelSubscriptionParams struct {
+	ID     pgtype.UUID `json:"id"`
+	UserID pgtype.UUID `json:"user_id"`
+}
+
+func (q *Queries) CancelSubscription(ctx context.Context, arg CancelSubscriptionParams) error {
+	_, err := q.db.Exec(ctx, cancelSubscription, arg.ID, arg.UserID)
 	return err
 }
 
@@ -257,12 +267,18 @@ SELECT
     t.total_amount,
     t.num_installments,
     t.merchant_id,
+    t.credit_line_id,
     m.trade_name AS merchant_name
 FROM installments i
 JOIN transactions t ON i.transaction_id = t.id
 LEFT JOIN merchants m ON t.merchant_id = m.id
-WHERE i.id = $1
+WHERE i.id = $1 AND i.user_id = $2
 `
+
+type GetInstallmentWithDetailsParams struct {
+	ID     pgtype.UUID `json:"id"`
+	UserID pgtype.UUID `json:"user_id"`
+}
 
 type GetInstallmentWithDetailsRow struct {
 	InstallmentID   pgtype.UUID        `json:"installment_id"`
@@ -279,11 +295,12 @@ type GetInstallmentWithDetailsRow struct {
 	TotalAmount     pgtype.Numeric     `json:"total_amount"`
 	NumInstallments int16              `json:"num_installments"`
 	MerchantID      pgtype.UUID        `json:"merchant_id"`
+	CreditLineID    pgtype.UUID        `json:"credit_line_id"`
 	MerchantName    pgtype.Text        `json:"merchant_name"`
 }
 
-func (q *Queries) GetInstallmentWithDetails(ctx context.Context, id pgtype.UUID) (GetInstallmentWithDetailsRow, error) {
-	row := q.db.QueryRow(ctx, getInstallmentWithDetails, id)
+func (q *Queries) GetInstallmentWithDetails(ctx context.Context, arg GetInstallmentWithDetailsParams) (GetInstallmentWithDetailsRow, error) {
+	row := q.db.QueryRow(ctx, getInstallmentWithDetails, arg.ID, arg.UserID)
 	var i GetInstallmentWithDetailsRow
 	err := row.Scan(
 		&i.InstallmentID,
@@ -300,6 +317,7 @@ func (q *Queries) GetInstallmentWithDetails(ctx context.Context, id pgtype.UUID)
 		&i.TotalAmount,
 		&i.NumInstallments,
 		&i.MerchantID,
+		&i.CreditLineID,
 		&i.MerchantName,
 	)
 	return i, err
@@ -340,6 +358,27 @@ func (q *Queries) GetInstallmentsByTransaction(ctx context.Context, transactionI
 		return nil, err
 	}
 	return items, nil
+}
+
+const getPaymentByReference = `-- name: GetPaymentByReference :one
+SELECT id, installment_id, user_id, amount_paid, payment_method, reference_code, verified, verified_by, paid_at FROM payments WHERE reference_code = $1 LIMIT 1
+`
+
+func (q *Queries) GetPaymentByReference(ctx context.Context, referenceCode pgtype.Text) (Payment, error) {
+	row := q.db.QueryRow(ctx, getPaymentByReference, referenceCode)
+	var i Payment
+	err := row.Scan(
+		&i.ID,
+		&i.InstallmentID,
+		&i.UserID,
+		&i.AmountPaid,
+		&i.PaymentMethod,
+		&i.ReferenceCode,
+		&i.Verified,
+		&i.VerifiedBy,
+		&i.PaidAt,
+	)
+	return i, err
 }
 
 const getPendingInstallmentsWithDetails = `-- name: GetPendingInstallmentsWithDetails :many

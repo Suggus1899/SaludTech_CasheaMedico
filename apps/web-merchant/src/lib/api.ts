@@ -1,14 +1,17 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost/api/v1";
+import {
+  getApiUrl,
+  getAuthHeaders,
+  apiFetch,
+  createSessionHelpers,
+} from "@saludtech/shared";
+import type { FetchState, FetchAction } from "@saludtech/shared";
+import { useFetchData } from "@saludtech/shared";
 
-export function getApiUrl(path: string): string {
-  if (process.env.NEXT_PUBLIC_MOCK_API === "true") return `/api/mock/${path}`;
-  return `${API_BASE}/${path}`;
-}
+export { getApiUrl, getAuthHeaders, apiFetch, useFetchData };
+export type { FetchState, FetchAction };
 
-export function getAuthHeaders(): Record<string, string> {
-  const token = typeof window !== "undefined" ? localStorage.getItem("jwt_token") : null;
-  return {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
+// Merchant-specific session helpers (stores user under "merchant_user")
+const session = createSessionHelpers("merchant_user");
+export const setSession = session.setSession;
+export const clearSession = session.clearSession;
+export const getStoredUser = session.getStoredUser;

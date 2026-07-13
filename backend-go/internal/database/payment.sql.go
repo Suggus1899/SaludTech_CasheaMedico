@@ -38,12 +38,24 @@ func (q *Queries) CheckAndLevelUpUser(ctx context.Context, id pgtype.UUID) error
 	return err
 }
 
+const countOverdueByUser = `-- name: CountOverdueByUser :one
+SELECT COUNT(*) FROM installments
+WHERE user_id = $1 AND status = 'OVERDUE'
+`
+
+func (q *Queries) CountOverdueByUser(ctx context.Context, userID pgtype.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, countOverdueByUser, userID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const processInstallmentPayment = `-- name: ProcessInstallmentPayment :one
 UPDATE installments
 SET
     status = 'PAID',
     paid_at = NOW()
-WHERE id = $1
+WHERE id = $1 AND status IN ('PENDING', 'OVERDUE')
 RETURNING id, transaction_id, user_id, installment_num, amount, due_date, paid_at, status, reactivation_fee, days_overdue, created_at, updated_at
 `
 
@@ -63,6 +75,51 @@ func (q *Queries) ProcessInstallmentPayment(ctx context.Context, id pgtype.UUID)
 		&i.DaysOverdue,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const reactivateUserCreditLines = `-- name: ReactivateUserCreditLines :exec
+UPDATE credit_lines
+SET
+    status = 'ACTIVE',
+    reactivated_at = NOW(),
+    paused_at = NULL
+WHERE user_id = $1 AND status = 'PAUSED'
+`
+
+func (q *Queries) ReactivateUserCreditLines(ctx context.Context, userID pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, reactivateUserCreditLines, userID)
+	return err
+}
+
+const releaseCreditLineUsage = `-- name: ReleaseCreditLineUsage :one
+UPDATE credit_lines
+SET used_usd = used_usd - $2
+WHERE id = $1 AND used_usd >= $2
+RETURNING id, user_id, type, limit_usd, used_usd, status, paused_at, reactivated_at, created_at, updated_at, blocked_at
+`
+
+type ReleaseCreditLineUsageParams struct {
+	ID      pgtype.UUID    `json:"id"`
+	UsedUsd pgtype.Numeric `json:"used_usd"`
+}
+
+func (q *Queries) ReleaseCreditLineUsage(ctx context.Context, arg ReleaseCreditLineUsageParams) (CreditLine, error) {
+	row := q.db.QueryRow(ctx, releaseCreditLineUsage, arg.ID, arg.UsedUsd)
+	var i CreditLine
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Type,
+		&i.LimitUsd,
+		&i.UsedUsd,
+		&i.Status,
+		&i.PausedAt,
+		&i.ReactivatedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.BlockedAt,
 	)
 	return i, err
 }

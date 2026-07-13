@@ -10,7 +10,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
 import { formatDate } from "../../../lib/utils";
 import type { Triage, RecommendedMerchant } from "../../../types/patient";
 
@@ -80,9 +80,8 @@ export default function TriajePage() {
         ? `${symptoms.trim()} [Categorías: ${selected}]`
         : symptoms.trim();
 
-      const res = await fetch(getApiUrl("patient/triage"), {
+      const res = await apiFetch(getApiUrl("patient/triage"), {
         method: "POST",
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           symptoms: fullSymptoms,
           perceivedSeverity: severity,
@@ -106,9 +105,8 @@ export default function TriajePage() {
     setMerchantsLoading(true);
     setMerchants([]);
     try {
-      const res = await fetch(
-        getApiUrl(`patient/triage/${triageId}/recommended-merchants`),
-        { headers: getAuthHeaders() }
+      const res = await apiFetch(
+        getApiUrl(`patient/triage/${triageId}/recommended-merchants`)
       );
       if (!res.ok) throw new Error();
       const data = (await res.json()) as RecommendedMerchant[];

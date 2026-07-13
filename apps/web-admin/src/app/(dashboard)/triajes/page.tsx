@@ -3,20 +3,20 @@
 import { useState } from "react";
 import { Activity, Send } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
 
 export default function TriajesPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data, loading, refetch } = useFetchData<any[]>(getApiUrl("admin/triage/pending"));
+  const { data, loading, refetch } = useFetchData<any>(getApiUrl("admin/triage/pending?limit=50&offset=0"));
   const [responding, setResponding] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
   const [respondStatus, setRespondStatus] = useState("RESOLVED");
 
-  const triages = data || [];
+  const triages = data?.triage || [];
   const filtered = triages.filter(
     (t: any) =>
       t.symptoms?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.urgencyLevel?.toLowerCase().includes(searchTerm.toLowerCase())
+      t.priority?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const URGENCY_COLOR: Record<string, string> = {
@@ -35,10 +35,9 @@ export default function TriajesPage() {
   const handleRespond = async (id: string) => {
     if (!notes.trim()) return;
     try {
-      const res = await fetch(getApiUrl(`admin/triage/${id}/respond`), {
+      const res = await apiFetch(getApiUrl(`admin/triage/${id}/respond`), {
         method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ doctorNotes: notes, status: respondStatus }),
+        body: JSON.stringify({ recommendation: notes, status: respondStatus }),
       });
       if (res.ok) { setResponding(null); setNotes(""); refetch(); }
     } catch (e) { console.error(e); }
@@ -62,24 +61,25 @@ export default function TriajesPage() {
       ) : (
         <div className="space-y-3">
           {filtered.map((t: any) => (
-            <div key={t.id} className={`card bg-base-100 shadow-sm ${t.urgencyLevel === 'EMERGENCY' ? 'border border-red-300' : 'border border-base-300'}`}>
+            <div key={t.id} className={`card bg-base-100 shadow-sm ${t.priority === 'EMERGENCY' ? 'border border-red-300' : 'border border-base-300'}`}>
               <div className="card-body p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${URGENCY_COLOR[t.urgencyLevel] ?? URGENCY_COLOR.LOW}`}>
-                        {URGENCY_LABEL[t.urgencyLevel] ?? t.urgencyLevel}
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${URGENCY_COLOR[t.priority] ?? URGENCY_COLOR.LOW}`}>
+                        {URGENCY_LABEL[t.priority] ?? t.priority}
                       </span>
                       <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
-                        {t.specialtyRecommended?.replace('_', ' ')}
+                        Severidad: {t.perceived_severity}/10
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        {t.createdAt ? new Date(t.createdAt).toLocaleString('es-VE') : ''}
+                        {t.user_name && `👤 ${t.user_name} · `}
+                        {t.created_at ? new Date(t.created_at).toLocaleString('es-VE') : ''}
                       </span>
                     </div>
                     <p className="text-sm text-foreground">{t.symptoms}</p>
-                    {t.aiSummary && (
-                      <p className="text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2">{t.aiSummary}</p>
+                    {t.recommendation && (
+                      <p className="text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2">{t.recommendation}</p>
                     )}
                   </div>
                   <button className="btn btn-primary btn-sm gap-1 shrink-0" onClick={() => setResponding(t.id)}>

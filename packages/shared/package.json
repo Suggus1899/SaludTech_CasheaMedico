@@ -1,0 +1,14 @@
+{
+  "name": "@saludtech/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "dependencies": {
+    "jose": "^5.0.0",
+    "react": "19.2.6"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "typescript": "^5.0.0"
+  }
+}

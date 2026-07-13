@@ -13,23 +13,41 @@ import (
 type Querier interface {
 	AddUserPoints(ctx context.Context, arg AddUserPointsParams) error
 	ApplyReactivationFee(ctx context.Context, id pgtype.UUID) (Installment, error)
-	CancelElderCareSub(ctx context.Context, id pgtype.UUID) error
-	CancelSubscription(ctx context.Context, id pgtype.UUID) error
+	CancelAppointment(ctx context.Context, arg CancelAppointmentParams) error
+	CancelElderCareSub(ctx context.Context, arg CancelElderCareSubParams) error
+	CancelSubscription(ctx context.Context, arg CancelSubscriptionParams) error
 	CheckAndLevelUpUser(ctx context.Context, id pgtype.UUID) error
+	CheckAppointmentConflict(ctx context.Context, arg CheckAppointmentConflictParams) (pgtype.UUID, error)
 	CountActiveMerchants(ctx context.Context) (int64, error)
+	CountAllElderCareSubs(ctx context.Context) (int64, error)
+	CountAllSubscriptions(ctx context.Context) (int64, error)
+	CountAllTriage(ctx context.Context) (int64, error)
+	CountAppointments(ctx context.Context, userID pgtype.UUID) (int64, error)
 	CountCreditLines(ctx context.Context) (int64, error)
+	CountMedicalRecords(ctx context.Context, userID pgtype.UUID) (int64, error)
 	CountMerchantTransactions(ctx context.Context, merchantID pgtype.UUID) (int64, error)
 	CountMerchants(ctx context.Context) (int64, error)
+	CountOverdueByUser(ctx context.Context, userID pgtype.UUID) (int64, error)
 	CountOverdueInstallments(ctx context.Context) (int64, error)
+	CountPendingTriage(ctx context.Context) (int64, error)
 	CountTransactions(ctx context.Context) (int64, error)
 	CountUsers(ctx context.Context) (int64, error)
 	CountUsersByRole(ctx context.Context, role string) (int64, error)
+	CreateAppointment(ctx context.Context, arg CreateAppointmentParams) (Appointment, error)
 	CreateCreditLine(ctx context.Context, arg CreateCreditLineParams) (CreditLine, error)
 	CreateElderCareSub(ctx context.Context, arg CreateElderCareSubParams) (ElderCareSubscription, error)
+	CreateFamilyMember(ctx context.Context, arg CreateFamilyMemberParams) (FamilyMember, error)
+	CreateHealthProfile(ctx context.Context, arg CreateHealthProfileParams) (HealthProfile, error)
 	CreateInstallment(ctx context.Context, arg CreateInstallmentParams) (Installment, error)
+	CreateMedicalRecord(ctx context.Context, arg CreateMedicalRecordParams) (MedicalRecord, error)
 	CreateMedicalService(ctx context.Context, arg CreateMedicalServiceParams) (MedicalService, error)
 	CreateMedicalSupply(ctx context.Context, arg CreateMedicalSupplyParams) (MedicalSupply, error)
+	CreateMedicationReminder(ctx context.Context, arg CreateMedicationReminderParams) (MedicationReminder, error)
 	CreatePaymentRecord(ctx context.Context, arg CreatePaymentRecordParams) (Payment, error)
+	// ════════════════════════════════════════════════════════════
+	// Merchant: QR tokens
+	// ════════════════════════════════════════════════════════════
+	CreateQRToken(ctx context.Context, arg CreateQRTokenParams) (QrToken, error)
 	CreateSubscription(ctx context.Context, arg CreateSubscriptionParams) (Subscription, error)
 	CreateSubscriptionItem(ctx context.Context, arg CreateSubscriptionItemParams) (SubscriptionItem, error)
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
@@ -37,14 +55,26 @@ type Querier interface {
 	CreateTriage(ctx context.Context, arg CreateTriageParams) (Triage, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DecrementSupplyStock(ctx context.Context, arg DecrementSupplyStockParams) error
+	DeleteFamilyMember(ctx context.Context, arg DeleteFamilyMemberParams) error
+	DeleteMedicalRecord(ctx context.Context, arg DeleteMedicalRecordParams) error
 	DeleteMedicalService(ctx context.Context, arg DeleteMedicalServiceParams) error
 	DeleteMedicalSupply(ctx context.Context, arg DeleteMedicalSupplyParams) error
+	DeleteMedicationReminder(ctx context.Context, arg DeleteMedicationReminderParams) error
+	FindUserByPhoneOrEmail(ctx context.Context, phone string) (FindUserByPhoneOrEmailRow, error)
 	GetAllActiveMerchants(ctx context.Context) ([]GetAllActiveMerchantsRow, error)
+	GetAppointment(ctx context.Context, arg GetAppointmentParams) (GetAppointmentRow, error)
 	GetCreditLineByUser(ctx context.Context, arg GetCreditLineByUserParams) (CreditLine, error)
 	GetCreditLinesByUser(ctx context.Context, userID pgtype.UUID) ([]CreditLine, error)
 	GetElderCareSubsByUser(ctx context.Context, userID pgtype.UUID) ([]GetElderCareSubsByUserRow, error)
-	GetInstallmentWithDetails(ctx context.Context, id pgtype.UUID) (GetInstallmentWithDetailsRow, error)
+	GetFamilyMember(ctx context.Context, id pgtype.UUID) (FamilyMember, error)
+	// ════════════════════════════════════════════════════════════
+	// Health Profile
+	// ════════════════════════════════════════════════════════════
+	GetHealthProfile(ctx context.Context, userID pgtype.UUID) (HealthProfile, error)
+	GetInstallmentWithDetails(ctx context.Context, arg GetInstallmentWithDetailsParams) (GetInstallmentWithDetailsRow, error)
 	GetInstallmentsByTransaction(ctx context.Context, transactionID pgtype.UUID) ([]Installment, error)
+	GetMedicalRecord(ctx context.Context, arg GetMedicalRecordParams) (MedicalRecord, error)
+	GetMedicationReminder(ctx context.Context, arg GetMedicationReminderParams) (MedicationReminder, error)
 	GetMerchantByID(ctx context.Context, id pgtype.UUID) (Merchant, error)
 	GetMerchantByUserID(ctx context.Context, userID pgtype.UUID) (Merchant, error)
 	GetMerchantDashboardStats(ctx context.Context, merchantID pgtype.UUID) (GetMerchantDashboardStatsRow, error)
@@ -53,7 +83,9 @@ type Querier interface {
 	GetMerchantTransactions(ctx context.Context, arg GetMerchantTransactionsParams) ([]GetMerchantTransactionsRow, error)
 	GetMerchantsByCategory(ctx context.Context, dollar_1 string) ([]Merchant, error)
 	GetOverdueInstallments(ctx context.Context) ([]Installment, error)
+	GetPaymentByReference(ctx context.Context, referenceCode pgtype.Text) (Payment, error)
 	GetPendingInstallmentsWithDetails(ctx context.Context, userID pgtype.UUID) ([]GetPendingInstallmentsWithDetailsRow, error)
+	GetQRToken(ctx context.Context, token string) (QrToken, error)
 	GetServiceByID(ctx context.Context, id pgtype.UUID) (MedicalService, error)
 	GetServicesByMerchant(ctx context.Context, merchantID pgtype.UUID) ([]MedicalService, error)
 	GetSubscriptionItems(ctx context.Context, subscriptionID pgtype.UUID) ([]SubscriptionItem, error)
@@ -70,25 +102,70 @@ type Querier interface {
 	GetUserByIDAdmin(ctx context.Context, id pgtype.UUID) (GetUserByIDAdminRow, error)
 	GetUserByPhone(ctx context.Context, phone string) (User, error)
 	ListAllCreditLines(ctx context.Context, arg ListAllCreditLinesParams) ([]ListAllCreditLinesRow, error)
+	// ════════════════════════════════════════════════════════════
+	// Admin: All elder care subscriptions
+	// ════════════════════════════════════════════════════════════
+	ListAllElderCareSubs(ctx context.Context, arg ListAllElderCareSubsParams) ([]ListAllElderCareSubsRow, error)
 	ListAllMerchants(ctx context.Context) ([]Merchant, error)
+	// ════════════════════════════════════════════════════════════
+	// Admin: All subscriptions
+	// ════════════════════════════════════════════════════════════
+	ListAllSubscriptions(ctx context.Context, arg ListAllSubscriptionsParams) ([]ListAllSubscriptionsRow, error)
+	ListAllTriage(ctx context.Context, arg ListAllTriageParams) ([]ListAllTriageRow, error)
+	// ════════════════════════════════════════════════════════════
+	// Appointments
+	// ════════════════════════════════════════════════════════════
+	ListAppointments(ctx context.Context, arg ListAppointmentsParams) ([]ListAppointmentsRow, error)
+	ListCaregivers(ctx context.Context, patientID pgtype.UUID) ([]ListCaregiversRow, error)
+	// ════════════════════════════════════════════════════════════
+	// Merchant: Elder care subscriptions for this merchant
+	// ════════════════════════════════════════════════════════════
+	ListElderCareSubsByMerchant(ctx context.Context, merchantID pgtype.UUID) ([]ListElderCareSubsByMerchantRow, error)
+	// ════════════════════════════════════════════════════════════
+	// Family / Caregiver
+	// ════════════════════════════════════════════════════════════
+	ListFamilyMembers(ctx context.Context, caregiverID pgtype.UUID) ([]ListFamilyMembersRow, error)
+	// ════════════════════════════════════════════════════════════
+	// Medical Records
+	// ════════════════════════════════════════════════════════════
+	ListMedicalRecords(ctx context.Context, arg ListMedicalRecordsParams) ([]MedicalRecord, error)
+	// ════════════════════════════════════════════════════════════
+	// Medication Reminders
+	// ════════════════════════════════════════════════════════════
+	ListMedicationReminders(ctx context.Context, userID pgtype.UUID) ([]MedicationReminder, error)
+	ListMerchantTransactionsToday(ctx context.Context, merchantID pgtype.UUID) ([]ListMerchantTransactionsTodayRow, error)
+	// ════════════════════════════════════════════════════════════
+	// Admin: Triage management
+	// ════════════════════════════════════════════════════════════
+	ListPendingTriage(ctx context.Context, arg ListPendingTriageParams) ([]ListPendingTriageRow, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error)
 	PauseUserCreditLines(ctx context.Context, userID pgtype.UUID) error
 	ProcessInstallmentPayment(ctx context.Context, id pgtype.UUID) (Installment, error)
+	ReactivateUserCreditLines(ctx context.Context, userID pgtype.UUID) error
+	ReleaseCreditLineUsage(ctx context.Context, arg ReleaseCreditLineUsageParams) (CreditLine, error)
+	RespondTriage(ctx context.Context, arg RespondTriageParams) error
 	SearchServices(ctx context.Context, arg SearchServicesParams) ([]SearchServicesRow, error)
 	SearchSupplies(ctx context.Context, arg SearchSuppliesParams) ([]SearchSuppliesRow, error)
 	SumMerchantRevenue(ctx context.Context, merchantID pgtype.UUID) (interface{}, error)
 	SumPendingInstallments(ctx context.Context) (interface{}, error)
 	SumTotalTransactionAmount(ctx context.Context) (interface{}, error)
 	TryScannerLock(ctx context.Context, arg TryScannerLockParams) (bool, error)
+	UpdateAppointmentStatus(ctx context.Context, arg UpdateAppointmentStatusParams) error
 	UpdateCreditLineLimit(ctx context.Context, arg UpdateCreditLineLimitParams) error
 	UpdateCreditLineUsage(ctx context.Context, arg UpdateCreditLineUsageParams) (CreditLine, error)
+	UpdateFamilyMemberPermissions(ctx context.Context, arg UpdateFamilyMemberPermissionsParams) error
+	UpdateFamilyMemberStatus(ctx context.Context, arg UpdateFamilyMemberStatusParams) error
+	UpdateMedicalRecord(ctx context.Context, arg UpdateMedicalRecordParams) error
 	UpdateMedicalService(ctx context.Context, arg UpdateMedicalServiceParams) error
 	UpdateMedicalSupply(ctx context.Context, arg UpdateMedicalSupplyParams) error
+	UpdateMedicationReminder(ctx context.Context, arg UpdateMedicationReminderParams) error
 	UpdateMerchantStatus(ctx context.Context, arg UpdateMerchantStatusParams) error
+	UpdateQRTokenStatus(ctx context.Context, arg UpdateQRTokenStatusParams) error
 	UpdateUserGamification(ctx context.Context, arg UpdateUserGamificationParams) (User, error)
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error
 	UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) error
 	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) error
+	UpsertHealthProfile(ctx context.Context, arg UpsertHealthProfileParams) (HealthProfile, error)
 }
 
 var _ Querier = (*Queries)(nil)

@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { Users, CheckCircle2, XCircle } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
 
 export default function PacientesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const { data, loading } = useFetchData<any>(getApiUrl("admin/users?size=50"), [refreshTrigger]);
+  const { data, loading } = useFetchData<any>(getApiUrl("admin/users?limit=50&offset=0"), [refreshTrigger]);
   
   // Modal state
   const [isAddPatientOpen, setIsAddPatientOpen] = useState(false);
@@ -22,9 +22,8 @@ export default function PacientesPage() {
     setPatientError(null);
     setPatientLoading(true);
     try {
-      const res = await fetch(getApiUrl("admin/users"), {
+      const res = await apiFetch(getApiUrl("admin/users"), {
         method: "POST",
-        headers: getAuthHeaders(),
         body: JSON.stringify(patientForm),
       });
       if (!res.ok) {
@@ -47,11 +46,11 @@ export default function PacientesPage() {
 
   if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando pacientes...</div>;
 
-  const users = data?.content || [];
+  const users = data?.users || [];
   const filtered = users.filter(
     (p: any) =>
-      p.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.identityDocument?.toLowerCase().includes(searchTerm.toLowerCase())
+      p.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -77,46 +76,52 @@ export default function PacientesPage() {
               <table className="table table-sm w-full">
                 <thead>
                   <tr className="border-base-300">
-                    <th>Documento</th>
+                    <th>Cédula</th>
                     <th>Paciente</th>
+                    <th>Email</th>
+                    <th>Rol</th>
                     <th>Nivel</th>
                     <th>Teléfono</th>
-                    <th>Estado Cuenta</th>
+                    <th>Estado</th>
                     <th className="text-right">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((p: any) => (
                     <tr key={p.id} className="hover:bg-base-200/40 transition-colors cursor-pointer border-base-300/60">
-                      <td className="opacity-60 font-mono text-xs">{p.identityDocument}</td>
-                      <td className="font-medium">{p.fullName}</td>
+                      <td className="opacity-60 font-mono text-xs">{p.national_id || "—"}</td>
+                      <td className="font-medium">{p.full_name}</td>
+                      <td className="opacity-60 text-xs">{p.email}</td>
+                      <td>
+                        <span className={`badge badge-sm ${p.role === "ADMIN" ? "badge-secondary" : p.role === "MERCHANT" ? "badge-accent" : "badge-ghost"}`}>{p.role}</span>
+                      </td>
                       <td>
                         <span className="badge badge-sm badge-primary badge-outline">Nv. {p.level}</span>
                       </td>
-                      <td>{p.phone}</td>
+                      <td className="text-xs">{p.phone}</td>
                       <td>
-                        <span className={`badge badge-sm ${p.active ? "badge-primary" : "badge-ghost"}`}>
-                          {p.active ? "Activo" : "Pausado"}
+                        <span className={`badge badge-sm ${p.is_active ? "badge-primary" : "badge-ghost"}`}>
+                          {p.is_active ? "Activo" : "Pausado"}
                         </span>
                       </td>
                       <td className="text-right space-x-2">
-                        {!p.active && (
+                        {!p.is_active && (
                           <button className="btn btn-xs btn-outline" onClick={async () => {
                             try {
-                              const res = await fetch(getApiUrl(`admin/users/${p.id}/status?activate=true`), {
-                                method: 'POST',
-                                headers: getAuthHeaders(),
+                              const res = await apiFetch(getApiUrl(`admin/users/${p.id}/status`), {
+                                method: 'PATCH',
+                                body: JSON.stringify({ isActive: true }),
                               });
                               if (res.ok) setRefreshTrigger(prev => prev + 1);
                             } catch (e) { console.error(e); }
                           }}>Activar</button>
                         )}
-                        {p.active && (
+                        {p.is_active && (
                           <button className="btn btn-xs btn-error" onClick={async () => {
                             try {
-                              const res = await fetch(getApiUrl(`admin/users/${p.id}/status?activate=false`), {
-                                method: 'POST',
-                                headers: getAuthHeaders(),
+                              const res = await apiFetch(getApiUrl(`admin/users/${p.id}/status`), {
+                                method: 'PATCH',
+                                body: JSON.stringify({ isActive: false }),
                               });
                               if (res.ok) setRefreshTrigger(prev => prev + 1);
                             } catch (e) { console.error(e); }

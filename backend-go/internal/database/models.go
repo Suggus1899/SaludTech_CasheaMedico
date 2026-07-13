@@ -8,6 +8,20 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Appointment struct {
+	ID              pgtype.UUID        `json:"id"`
+	UserID          pgtype.UUID        `json:"user_id"`
+	MerchantID      pgtype.UUID        `json:"merchant_id"`
+	ServiceID       pgtype.UUID        `json:"service_id"`
+	AppointmentDate pgtype.Date        `json:"appointment_date"`
+	AppointmentTime pgtype.Time        `json:"appointment_time"`
+	DurationMin     int16              `json:"duration_min"`
+	Status          string             `json:"status"`
+	Notes           pgtype.Text        `json:"notes"`
+	CreatedAt       pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+}
+
 type AuditLog struct {
 	ID        int64              `json:"id"`
 	UserID    pgtype.UUID        `json:"user_id"`
@@ -46,6 +60,34 @@ type ElderCareSubscription struct {
 	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
 }
 
+type FamilyMember struct {
+	ID          pgtype.UUID        `json:"id"`
+	CaregiverID pgtype.UUID        `json:"caregiver_id"`
+	PatientID   pgtype.UUID        `json:"patient_id"`
+	Relation    pgtype.Text        `json:"relation"`
+	Status      string             `json:"status"`
+	Permissions []string           `json:"permissions"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+}
+
+type HealthProfile struct {
+	ID                       pgtype.UUID        `json:"id"`
+	UserID                   pgtype.UUID        `json:"user_id"`
+	BloodType                pgtype.Text        `json:"blood_type"`
+	HeightCm                 pgtype.Int2        `json:"height_cm"`
+	WeightKg                 pgtype.Numeric     `json:"weight_kg"`
+	Allergies                []string           `json:"allergies"`
+	ChronicConditions        []string           `json:"chronic_conditions"`
+	CurrentMedications       []string           `json:"current_medications"`
+	EmergencyContactName     pgtype.Text        `json:"emergency_contact_name"`
+	EmergencyContactPhone    pgtype.Text        `json:"emergency_contact_phone"`
+	EmergencyContactRelation pgtype.Text        `json:"emergency_contact_relation"`
+	Notes                    pgtype.Text        `json:"notes"`
+	CreatedAt                pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt                pgtype.Timestamptz `json:"updated_at"`
+}
+
 type Installment struct {
 	ID              pgtype.UUID        `json:"id"`
 	TransactionID   pgtype.UUID        `json:"transaction_id"`
@@ -59,6 +101,22 @@ type Installment struct {
 	DaysOverdue     int32              `json:"days_overdue"`
 	CreatedAt       pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+}
+
+type MedicalRecord struct {
+	ID            pgtype.UUID        `json:"id"`
+	UserID        pgtype.UUID        `json:"user_id"`
+	TransactionID pgtype.UUID        `json:"transaction_id"`
+	MerchantID    pgtype.UUID        `json:"merchant_id"`
+	ServiceID     pgtype.UUID        `json:"service_id"`
+	RecordType    string             `json:"record_type"`
+	Diagnosis     pgtype.Text        `json:"diagnosis"`
+	Prescription  pgtype.Text        `json:"prescription"`
+	DoctorName    pgtype.Text        `json:"doctor_name"`
+	Notes         pgtype.Text        `json:"notes"`
+	RecordDate    pgtype.Date        `json:"record_date"`
+	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt     pgtype.Timestamptz `json:"updated_at"`
 }
 
 type MedicalService struct {
@@ -90,6 +148,21 @@ type MedicalSupply struct {
 	IsActive             bool               `json:"is_active"`
 	CreatedAt            pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt            pgtype.Timestamptz `json:"updated_at"`
+}
+
+type MedicationReminder struct {
+	ID             pgtype.UUID        `json:"id"`
+	UserID         pgtype.UUID        `json:"user_id"`
+	MedicationName string             `json:"medication_name"`
+	Dosage         pgtype.Text        `json:"dosage"`
+	Frequency      string             `json:"frequency"`
+	Times          []string           `json:"times"`
+	StartDate      pgtype.Date        `json:"start_date"`
+	EndDate        pgtype.Date        `json:"end_date"`
+	IsActive       bool               `json:"is_active"`
+	Notes          pgtype.Text        `json:"notes"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
 }
 
 type Merchant struct {
@@ -144,6 +217,19 @@ type Payment struct {
 	Verified      bool               `json:"verified"`
 	VerifiedBy    pgtype.UUID        `json:"verified_by"`
 	PaidAt        pgtype.Timestamptz `json:"paid_at"`
+}
+
+type QrToken struct {
+	ID            pgtype.UUID        `json:"id"`
+	Token         string             `json:"token"`
+	MerchantID    pgtype.UUID        `json:"merchant_id"`
+	Amount        pgtype.Numeric     `json:"amount"`
+	Description   pgtype.Text        `json:"description"`
+	Status        string             `json:"status"`
+	TransactionID pgtype.UUID        `json:"transaction_id"`
+	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt     pgtype.Timestamptz `json:"updated_at"`
+	ExpiresAt     pgtype.Timestamptz `json:"expires_at"`
 }
 
 type Subscription struct {

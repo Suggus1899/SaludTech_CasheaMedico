@@ -15,7 +15,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
-import { getApiUrl, getAuthHeaders, getStoredUser } from "../../../lib/api";
+import { getApiUrl, apiFetch, getStoredUser } from "../../../lib/api";
 import { formatCurrency, formatDate } from "../../../lib/utils";
 import {
   elderCareServiceStyles,
@@ -99,9 +99,8 @@ export default function CuidadoMayorPage() {
     if (!confirmService) return;
     setIsSubscribing(true);
     try {
-      await fetch(getApiUrl("patient/elder-care/subscriptions"), {
+      await apiFetch(getApiUrl("patient/elder-care/subscriptions"), {
         method: "POST",
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           merchantId: PLACEHOLDER_MERCHANT_ID,
           serviceType: confirmService.type,
@@ -119,9 +118,8 @@ export default function CuidadoMayorPage() {
   const handleCancel = async (id: string) => {
     setIsCancelling(true);
     try {
-      await fetch(getApiUrl(`patient/elder-care/subscriptions/${id}`), {
+      await apiFetch(getApiUrl(`patient/elder-care/subscriptions/${id}`), {
         method: "DELETE",
-        headers: getAuthHeaders(),
       });
       setCancelId(null);
       refetch();

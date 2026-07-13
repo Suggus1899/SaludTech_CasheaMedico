@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Store, Building2, Pill, CheckCircle2, XCircle } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
 
 export default function ComerciosPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,9 +22,8 @@ export default function ComerciosPage() {
     setMerchantError(null);
     setMerchantLoading(true);
     try {
-      const res = await fetch(getApiUrl("admin/merchants"), {
+      const res = await apiFetch(getApiUrl("admin/merchants"), {
         method: "POST",
-        headers: getAuthHeaders(),
         body: JSON.stringify(merchantForm),
       });
       if (!res.ok) {
@@ -47,10 +46,10 @@ export default function ComerciosPage() {
 
   if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando comercios...</div>;
 
-  const merchants = data || [];
+  const merchants = data?.merchants || [];
   const filtered = merchants.filter(
     (c: any) =>
-      c.tradeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.trade_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.category?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -77,23 +76,22 @@ export default function ComerciosPage() {
               <div className="card-body p-4 space-y-2">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="font-semibold text-base">{c.tradeName}</h4>
-                    <p className="text-xs opacity-60 mt-0.5">{c.rif}</p>
+                    <h4 className="font-semibold text-base">{c.trade_name}</h4>
+                    <p className="text-xs opacity-60 mt-0.5">{c.tax_id || "—"}</p>
                   </div>
-                  <span className={`badge badge-sm ${c.isActive ? "badge-primary" : "badge-ghost"}`}>{c.isActive ? "Activo" : "Pendiente"}</span>
+                  <span className={`badge badge-sm ${c.is_active ? "badge-primary" : "badge-ghost"}`}>{c.is_active ? "Activo" : "Pendiente"}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Pill className="w-3.5 h-3.5 opacity-60" />
                   <span className="text-sm opacity-60">{c.category}</span>
                 </div>
                 <div className="flex justify-between text-sm pt-2 border-t border-base-300 items-center">
-                  <span className="opacity-60">{c.city}</span>
-                  {!c.isActive ? (
+                  <span className="opacity-60">{c.city || "—"}</span>
+                  {!c.is_active ? (
                     <button className="btn btn-xs btn-primary" onClick={async () => {
                       try {
-                        const res = await fetch(getApiUrl(`admin/merchants/${c.id}/approve`), {
+                        const res = await apiFetch(getApiUrl(`admin/merchants/${c.id}/approve`), {
                           method: 'POST',
-                          headers: getAuthHeaders(),
                         });
                         if (res.ok) setRefreshTrigger(prev => prev + 1);
                       } catch (e) {
@@ -101,7 +99,7 @@ export default function ComerciosPage() {
                       }
                     }}>Aprobar</button>
                   ) : (
-                    <span className="font-semibold">{c.phone}</span>
+                    <span className="font-semibold">{c.contact_phone || "—"}</span>
                   )}
                 </div>
               </div>

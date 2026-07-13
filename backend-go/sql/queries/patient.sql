@@ -37,11 +37,15 @@ SELECT
     t.total_amount,
     t.num_installments,
     t.merchant_id,
+    t.credit_line_id,
     m.trade_name AS merchant_name
 FROM installments i
 JOIN transactions t ON i.transaction_id = t.id
 LEFT JOIN merchants m ON t.merchant_id = m.id
-WHERE i.id = $1;
+WHERE i.id = $1 AND i.user_id = $2;
+
+-- name: GetPaymentByReference :one
+SELECT * FROM payments WHERE reference_code = $1 LIMIT 1;
 
 -- name: GetSubscriptionsByUser :many
 SELECT
@@ -61,7 +65,7 @@ INSERT INTO subscriptions (
 ) RETURNING *;
 
 -- name: CancelSubscription :exec
-UPDATE subscriptions SET status = 'CANCELLED' WHERE id = $1;
+UPDATE subscriptions SET status = 'CANCELLED' WHERE id = $1 AND user_id = $2;
 
 -- name: GetElderCareSubsByUser :many
 SELECT
@@ -81,7 +85,7 @@ INSERT INTO elder_care_subscriptions (
 ) RETURNING *;
 
 -- name: CancelElderCareSub :exec
-UPDATE elder_care_subscriptions SET status = 'CANCELLED' WHERE id = $1;
+UPDATE elder_care_subscriptions SET status = 'CANCELLED' WHERE id = $1 AND user_id = $2;
 
 -- name: GetTransactionsByUser :many
 SELECT * FROM transactions WHERE user_id = $1 ORDER BY created_at DESC;

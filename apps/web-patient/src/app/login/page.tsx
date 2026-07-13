@@ -23,6 +23,7 @@ export default function PatientLoginPage() {
       const res = await fetch(getApiUrl("auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
       if (!res.ok) {

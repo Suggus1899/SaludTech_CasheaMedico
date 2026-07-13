@@ -1,25 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { DollarSign, Users, Store, AlertTriangle, TrendingUp, TrendingDown, Search } from "lucide-react";
+import { DollarSign, Users, Store, AlertTriangle, TrendingUp, TrendingDown, Search, CreditCard } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
 import { getApiUrl } from "../../../lib/api";
+import { AdminUser, AdminUsersResponse, DashboardStats } from "../../../types/admin";
 
 export default function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: stats, loading: statsLoading } = useFetchData<any>(getApiUrl("admin/dashboard/stats"));
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: txData, loading: txLoading } = useFetchData<any>(getApiUrl("admin/transactions?size=5"));
+  const { data: stats, loading: statsLoading } = useFetchData<DashboardStats>(getApiUrl("admin/dashboard"));
+  const { data: usersData, loading: usersLoading } = useFetchData<AdminUsersResponse>(getApiUrl("admin/users?limit=5&offset=0"));
 
-  if (statsLoading || txLoading) return <div className="p-8 text-center text-muted-foreground">Cargando dashboard...</div>;
+  if (statsLoading || usersLoading) return <div className="p-8 text-center text-muted-foreground">Cargando dashboard...</div>;
 
-  const transactions = txData?.content || [];
-  const filtered = transactions.filter(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (tx: any) =>
-      tx.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tx.merchant?.tradeName?.toLowerCase().includes(searchTerm.toLowerCase())
+  const users: AdminUser[] = usersData?.users || [];
+  const filtered = users.filter(
+    (u) =>
+      u.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -28,25 +26,25 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[
           {
-            title: "Volumen Financiado",
-            value: `$${stats?.totalActiveDebt?.toFixed(2) || "0.00"}`,
-            sub: "Total deuda activa",
+            title: "Volumen Total",
+            value: `$${Number(stats?.totalRevenue || 0).toFixed(2)}`,
+            sub: "Transacciones totales",
             icon: DollarSign,
             trend: "up",
             progress: 100,
           },
           {
-            title: "Pacientes Activos",
-            value: stats?.totalPatients || 0,
-            sub: "Registrados",
+            title: "Pacientes",
+            value: stats?.patients || 0,
+            sub: `${stats?.users || 0} usuarios totales`,
             icon: Users,
             trend: "up",
             progress: 100,
           },
           {
-            title: "Comercios Afiliados",
+            title: "Comercios Activos",
             value: stats?.activeMerchants || 0,
-            sub: "Clínicas y farmacias",
+            sub: `${stats?.merchants || 0} comercios totales`,
             icon: Store,
             trend: "neutral",
             progress: 100,
@@ -54,10 +52,10 @@ export default function DashboardPage() {
           {
             title: "Cuotas en Mora",
             value: stats?.overdueInstallments || 0,
-            sub: `$${stats?.overdueAmount?.toFixed(2) || "0.00"} vencido`,
+            sub: `$${Number(stats?.pendingAmount || 0).toFixed(2)} pendiente`,
             icon: AlertTriangle,
-            trend: stats?.overdueInstallments > 0 ? "down" : "up",
-            progress: (stats?.defaultRate || 0),
+            trend: (stats?.overdueInstallments ?? 0) > 0 ? "down" : "up",
+            progress: stats?.creditLines ? Math.min(((stats?.overdueInstallments ?? 0) / stats?.creditLines) * 100, 100) : 0,
           },
         ].map((kpi) => (
           <div
@@ -94,7 +92,7 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-7">
         <div className="card bg-base-100 border border-base-300 shadow-sm lg:col-span-4">
           <div className="card-body">
-            <h3 className="card-title font-(family-name:--font-syne)">Transacciones Recientes</h3>
+            <h3 className="card-title font-(family-name:--font-syne)">Usuarios Recientes</h3>
             {filtered.length === 0 ? (
               <div className="text-center py-12 opacity-40">
                 <Search className="w-10 h-10 mx-auto mb-3" />
@@ -105,28 +103,50 @@ export default function DashboardPage() {
                 <table className="table table-sm w-full">
                   <thead>
                     <tr className="border-base-300">
-                      <th>Paciente</th>
-                      <th>Comercio</th>
-                      <th>Estado</th>
-                      <th className="text-right">Monto</th>
+                      <th>Nombre</th>
+                      <th>Email</th>
+                      <th>Rol</th>
+                      <th>Nivel</th>
+                      <th className="text-right">Total Pagado</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {filtered.map((tx: any) => (
-                      <tr key={tx.id} className="hover:bg-base-200/40 transition-colors cursor-pointer border-base-300/60">
-                        <td className="font-medium">{tx.user?.fullName}</td>
-                        <td className="opacity-60">{tx.merchant?.tradeName}</td>
+                    {filtered.map((u) => (
+                      <tr key={u.id} className="hover:bg-base-200/40 transition-colors cursor-pointer border-base-300/60">
+                        <td className="font-medium">{u.full_name}</td>
+                        <td className="opacity-60">{u.email}</td>
                         <td>
-                          <span className={`badge badge-sm ${tx.status === "COMPLETED" ? "badge-primary" : "badge-ghost"}`}>{tx.status}</span>
+                          <span className={`badge badge-sm ${u.role === "ADMIN" ? "badge-secondary" : u.role === "MERCHANT" ? "badge-accent" : "badge-ghost"}`}>{u.role}</span>
                         </td>
-                        <td className="text-right font-semibold">${tx.amount?.toFixed(2)}</td>
+                        <td>
+                          <span className="badge badge-sm badge-primary badge-outline">Nv. {u.level}</span>
+                        </td>
+                        <td className="text-right font-semibold">${Number(u.total_paid || 0).toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             )}
+          </div>
+        </div>
+        <div className="card bg-base-100 border border-base-300 shadow-sm lg:col-span-3">
+          <div className="card-body">
+            <h3 className="card-title font-(family-name:--font-syne)">Resumen</h3>
+            <div className="space-y-3 pt-2">
+              <div className="flex justify-between items-center pb-2 border-b border-base-300">
+                <span className="text-sm opacity-60 flex items-center gap-2"><CreditCard className="w-4 h-4" /> Transacciones</span>
+                <span className="font-bold">{stats?.transactions || 0}</span>
+              </div>
+              <div className="flex justify-between items-center pb-2 border-b border-base-300">
+                <span className="text-sm opacity-60 flex items-center gap-2"><CreditCard className="w-4 h-4" /> Líneas de Crédito</span>
+                <span className="font-bold">{stats?.creditLines || 0}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm opacity-60 flex items-center gap-2"><DollarSign className="w-4 h-4" /> Monto Pendiente</span>
+                <span className="font-bold text-error">${Number(stats?.pendingAmount || 0).toFixed(2)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

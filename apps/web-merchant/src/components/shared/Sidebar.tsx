@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Clock, QrCode, Wallet, Shield, Stethoscope, LogOut } from "lucide-react";
+import { Clock, QrCode, Wallet, Shield, Stethoscope, LogOut, Package, Store } from "lucide-react";
 import { Logo } from "@saludtech/ui";
 import { useCallback, useEffect, useState } from "react";
+import { getApiUrl } from "../../lib/api";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -18,18 +19,25 @@ export function Sidebar() {
   }, []);
 
   const handleLogout = useCallback(() => {
-    localStorage.removeItem("jwt_token");
+    // JWT cookie is cleared by the backend logout endpoint.
+    fetch(getApiUrl("auth/logout"), {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    }).catch(() => {});
     localStorage.removeItem("merchant_user");
-    document.cookie = "jwt_token=; path=/; max-age=0";
     router.push("/login");
   }, [router]);
 
   const navItems = [
     { href: "/checkout", icon: Clock, label: "Autorizaciones (Caja)" },
     { href: "/dashboard", icon: QrCode, label: "Generar QR" },
+    { href: "/servicios", icon: Stethoscope, label: "Servicios" },
+    { href: "/insumos", icon: Package, label: "Insumos" },
     { href: "/liquidaciones", icon: Wallet, label: "Liquidaciones" },
     { href: "/historial", icon: Clock, label: "Historial de Transacciones" },
     { href: "/suscripciones-ec", icon: Shield, label: "Elder Care" },
+    { href: "/perfil", icon: Store, label: "Mi Perfil" },
   ];
 
   return (

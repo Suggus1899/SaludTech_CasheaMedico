@@ -6,12 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
 const (
-	baseURL    = "https://fakepayment.onrender.com"
-	timeout    = 30 * time.Second
+	baseURL = "https://fakepayment.onrender.com"
+	timeout = 30 * time.Second
 )
 
 // Client calls the fakePayment API to process test payments.
@@ -21,10 +22,17 @@ type Client struct {
 }
 
 // NewClient creates a fakePayment API client.
+// The HTTP client does NOT follow redirects automatically — we handle the
+// 302 from the API manually to avoid POST→GET conversion issues.
 func NewClient(apiKey string) *Client {
 	return &Client{
-		httpClient: &http.Client{Timeout: timeout},
-		apiKey:     apiKey,
+		httpClient: &http.Client{
+			Timeout:   timeout,
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		},
+		apiKey: apiKey,
 	}
 }
 
@@ -89,6 +97,21 @@ func (c *Client) ProcessPayment(ctx context.Context, req PaymentRequest) (*Payme
 		return nil, fmt.Errorf("call fakePayment API: %w", err)
 	}
 	defer resp.Body.Close()
+
+	// The API returns 302 with Location: /payments/{id} on success.
+	// We extract the transaction ID and fetch it via GET.
+	if resp.StatusCode == http.StatusFound {
+		location := resp.Header.Get("Location")
+		if location == "" {
+			return nil, fmt.Errorf("fakePayment API returned 302 without Location header")
+		}
+		// Location is a relative path like /payments/{id}
+		txID := strings.TrimPrefix(location, "/payments/")
+		if txID == location {
+			return nil, fmt.Errorf("unexpected Location format: %s", location)
+		}
+		return c.GetTransaction(ctx, txID)
+	}
 
 	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated {
 		var result PaymentResponse

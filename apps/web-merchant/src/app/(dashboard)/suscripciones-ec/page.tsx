@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Shield, UserPlus, Activity, RefreshCw } from "lucide-react";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
 
 export default function SuscripcionesEcPage() {
   const [subs, setSubs] = useState<any[]>([]);
@@ -11,9 +11,7 @@ export default function SuscripcionesEcPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(getApiUrl("merchant/elder-care/subscriptions"), {
-          headers: getAuthHeaders(),
-        });
+        const res = await apiFetch(getApiUrl("merchant/elder-care/subscriptions"), {});
         if (res.ok) setSubs(await res.json());
       } catch (e) {
         console.error(e);
@@ -38,14 +36,17 @@ export default function SuscripcionesEcPage() {
       </div>
     );
 
+  const activeCount = subs.filter((s: any) => s.status === "ACTIVE").length;
+  const serviceTypes = new Set(subs.map((s: any) => s.service_type)).size;
+
   return (
     <div className="max-w-4xl space-y-6">
       {/* KPI */}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
-          { label: "Suscriptores Activos", value: 124, icon: Shield, color: "text-violet-600" },
-          { label: "Nuevas Suscripciones", value: "+12", icon: UserPlus, color: "text-blue-600" },
-          { label: "Servicios Diferentes", value: "8", icon: Activity, color: "text-pink-600" },
+          { label: "Suscriptores Activos", value: activeCount, icon: Shield, color: "text-violet-600" },
+          { label: "Total Suscripciones", value: subs.length, icon: UserPlus, color: "text-blue-600" },
+          { label: "Servicios Diferentes", value: serviceTypes, icon: Activity, color: "text-pink-600" },
         ].map((kpi) => (
           <div key={kpi.label} className="card bg-base-100 border border-base-300 shadow-sm">
             <div className="card-body flex-row items-center gap-4 p-5">
@@ -85,16 +86,16 @@ export default function SuscripcionesEcPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {subs.map((s) => (
+                  {subs.map((s: any) => (
                     <tr key={s.id} className="border-b border-border/60 hover:bg-accent/40 transition-colors">
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-violet-100 text-violet-700 text-xs font-semibold">
                           <Shield className="w-3 h-3" />
-                          {SERVICE_LABELS[s.serviceType] ?? s.serviceType}
+                          {SERVICE_LABELS[s.service_type] ?? s.service_type}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right font-semibold text-primary">
-                        ${(s.monthlyAmount ?? 0).toFixed(2)}
+                        ${Number(s.monthly_amount ?? 0).toFixed(2)}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`badge ${s.status === "ACTIVE" ? "badge-primary" : "badge-ghost"}`}>
@@ -102,8 +103,8 @@ export default function SuscripcionesEcPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground text-xs">
-                        {s.nextBillingDate
-                          ? new Date(s.nextBillingDate).toLocaleDateString("es-VE")
+                        {s.next_billing_date
+                          ? new Date(s.next_billing_date).toLocaleDateString("es-VE")
                           : "—"}
                       </td>
                     </tr>

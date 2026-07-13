@@ -21,6 +21,14 @@ type Config struct {
 
 	// Comma-separated list of allowed CORS origins
 	CORSAllowedOrigins string `envconfig:"CORS_ALLOWED_ORIGINS" default:"http://localhost:3000,http://localhost:3001,http://localhost:3002"`
+
+	// ─── Business rules (previously hardcoded) ────────────────────
+	JWTExpirationHours     int     `envconfig:"JWT_EXPIRATION_HOURS" default:"24"`
+	ReactivationFeeUSD     float64 `envconfig:"REACTIVATION_FEE_USD" default:"4.00"`
+	PaymentPointsReward    int     `envconfig:"PAYMENT_POINTS_REWARD" default:"10"`
+	InstallmentIntervalDays int    `envconfig:"INSTALLMENT_INTERVAL_DAYS" default:"14"`
+	DefaultCreditLimitMain float64 `envconfig:"DEFAULT_CREDIT_LIMIT_MAIN" default:"500"`
+	DefaultCreditLimitDaily float64 `envconfig:"DEFAULT_CREDIT_LIMIT_DAILY" default:"200"`
 }
 
 func Load() *Config {

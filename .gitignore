@@ -6,6 +6,10 @@ backend/.mvn/wrapper/maven-wrapper.jar
 *.class
 *.log
 
+# Go binaries
+backend-go/api.exe
+backend-go/bin/
+
 # Spring Boot
 backend/src/main/resources/application-local.yml
 

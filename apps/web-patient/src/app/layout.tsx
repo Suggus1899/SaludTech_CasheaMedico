@@ -50,7 +50,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var m=localStorage.getItem('theme');if(m==='dark')document.documentElement.setAttribute('data-theme','saludtech-dark');}catch(e){}})();`,
+            __html: `(function(){try{var m=localStorage.getItem('theme');var t=m==='dark'?'saludtech-dark':'saludtech';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
           }}
         />
       </head>

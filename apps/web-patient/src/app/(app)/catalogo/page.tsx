@@ -10,7 +10,7 @@ import {
   AlertTriangle,
   Store,
 } from "lucide-react";
-import { getApiUrl, getAuthHeaders } from "../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../lib/api";
 import { formatCurrency } from "../../../lib/utils";
 import type { MedicalService, MedicalSupply } from "../../../types/patient";
 
@@ -53,9 +53,7 @@ export default function CatalogoPage() {
 
     (async () => {
       try {
-        const res = await fetch(getApiUrl(`${endpoint}?${params}`), {
-          headers: getAuthHeaders(),
-        });
+        const res = await apiFetch(getApiUrl(`${endpoint}?${params}`));
         if (!res.ok) throw new Error("fetch failed");
         const data = await res.json();
         if (tab === "services") {

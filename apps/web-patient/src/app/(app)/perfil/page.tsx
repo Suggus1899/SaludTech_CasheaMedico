@@ -26,8 +26,8 @@ export default function PerfilPage() {
     setUser(getStoredUser<UserResponse>());
   }, []);
 
-  const handleLogout = () => {
-    clearSession();
+  const handleLogout = async () => {
+    await clearSession();
     router.push("/login");
   };
 

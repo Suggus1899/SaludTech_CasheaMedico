@@ -17,7 +17,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useTheme } from "../../../../hooks/useTheme";
-import { getApiUrl, getAuthHeaders } from "../../../../lib/api";
+import { getApiUrl, apiFetch } from "../../../../lib/api";
 
 type NotificationPrefs = {
   push: boolean;
@@ -94,9 +94,8 @@ export default function ConfiguracionPage() {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch(getApiUrl("users/password"), {
+      const res = await apiFetch(getApiUrl("users/password"), {
         method: "PATCH",
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           currentPassword,
           newPassword,
