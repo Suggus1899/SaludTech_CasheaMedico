@@ -11,30 +11,66 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// setAuthCookie sets the JWT as an httpOnly, Secure, SameSite=Lax cookie.
-// In development (HTTP), Secure is omitted so the cookie works on localhost.
+// setAuthCookie sets the JWT as an httpOnly, Secure cookie.
+// Uses SameSite=None when cross-origin (Render backend + Vercel frontend)
+// so the cookie is sent with credentials: "include" fetch calls.
+// Uses SameSite=Lax for same-origin (localhost dev or same-domain prod).
 func setAuthCookie(w http.ResponseWriter, r *http.Request, token string, maxAgeSeconds int) {
+	isHTTPS := r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https"
+
+	// Determine if this is a cross-origin request by checking the Origin header.
+	origin := r.Header.Get("Origin")
+	isCrossOrigin := origin != "" && !isSameSite(origin, r.Host)
+
 	cookie := &http.Cookie{
 		Name:     "jwt_token",
 		Value:    token,
 		Path:     "/",
 		MaxAge:   maxAgeSeconds,
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-		Secure:   r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https",
+		Secure:   isHTTPS,
+	}
+	if isCrossOrigin && isHTTPS {
+		// Cross-origin requires SameSite=None + Secure to be sent by the browser
+		cookie.SameSite = http.SameSiteNoneMode
+	} else {
+		// Same-origin or dev: Lax is more secure and sufficient
+		cookie.SameSite = http.SameSiteLaxMode
 	}
 	http.SetCookie(w, cookie)
 }
 
+// isSameSite checks if the Origin header matches the request Host (same-site).
+func isSameSite(origin, host string) bool {
+	// Strip scheme from origin
+	originHost := origin
+	if idx := strings.Index(origin, "://"); idx >= 0 {
+		originHost = origin[idx+3:]
+	}
+	// Strip port from both for comparison
+	originHost = strings.Split(originHost, ":")[0]
+	hostOnly := strings.Split(host, ":")[0]
+	return originHost == hostOnly
+}
+
 // clearAuthCookie expires the jwt_token cookie immediately.
-func clearAuthCookie(w http.ResponseWriter) {
+func clearAuthCookie(w http.ResponseWriter, r *http.Request) {
+	isHTTPS := r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https"
+	origin := r.Header.Get("Origin")
+	isCrossOrigin := origin != "" && !isSameSite(origin, r.Host)
+
 	cookie := &http.Cookie{
 		Name:     "jwt_token",
 		Value:    "",
 		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   isHTTPS,
+	}
+	if isCrossOrigin && isHTTPS {
+		cookie.SameSite = http.SameSiteNoneMode
+	} else {
+		cookie.SameSite = http.SameSiteLaxMode
 	}
 	http.SetCookie(w, cookie)
 }
@@ -152,7 +188,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 // Logout clears the jwt_token cookie.
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	clearAuthCookie(w)
+	clearAuthCookie(w, r)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Logged out"})
