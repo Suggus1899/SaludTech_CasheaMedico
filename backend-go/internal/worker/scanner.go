@@ -19,15 +19,20 @@ const (
 )
 
 type InstallmentScanner struct {
-	Pool   *pgxpool.Pool
-	Sender *email.Sender
+	Pool      *pgxpool.Pool
+	Sender    *email.Sender
+	Schedule  string
 }
 
 func (s *InstallmentScanner) Start() {
 	c := cron.New()
 
-	// Correr todos los días a las 00:00 (o cada minuto para pruebas)
-	_, err := c.AddFunc("@daily", func() {
+	schedule := s.Schedule
+	if schedule == "" {
+		schedule = "@daily"
+	}
+
+	_, err := c.AddFunc(schedule, func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancel()
 

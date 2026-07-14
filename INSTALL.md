@@ -318,11 +318,17 @@ openssl rand -hex 32
 |----------|-----------|---------|-------------|
 | `PORT` | No | `8081` | Puerto del backend |
 | `DATABASE_URL` | **Sí** | — | URL de conexión PostgreSQL |
-| `SALUDTECH_JWT_SECRET` | **Sí** | — | Secret para firmar JWT (min 32 chars) |
+| `SALUDTECH_JWT_SECRET` | **Sí** | — | Secret para firmar JWT (min 32 chars). **Debe ser igual a `JWT_SECRET` en Vercel.** |
 | `SALUDTECH_QR_SECRET` | **Sí** | — | Secret para firmar QR tokens |
 | `CORS_ALLOWED_ORIGINS` | No | `http://localhost:3000,...` | Origins permitidos para CORS |
 | `DOLARVZLA_KEY` | No | — | API key DolarVZLA (USDT; BCV es gratis) |
 | `FAKEPAY_API_KEY` | No | — | API key FakePay (pagos de prueba) |
+| `RESEND_API_KEY` | No | — | API key Resend para emails transaccionales |
+| `EMAIL_FROM` | No | `onboarding@resend.dev` | Email remitente (sandbox o dominio verificado) |
+| `FRONTEND_URL` | No | URL de Vercel | URL del frontend para links en emails |
+| `SCANNER_CRON_SCHEDULE` | No | `@daily` | Cron schedule del scanner de mora |
+
+> **Nota sobre JWT:** El backend usa `SALUDTECH_JWT_SECRET` y los frontends (Vercel) usan `JWT_SECRET`. **Ambos deben tener el mismo valor.** Esto es así porque el backend firma los tokens y los frontends los verifican en middleware.
 
 ---
 

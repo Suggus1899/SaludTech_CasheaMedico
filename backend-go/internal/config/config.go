@@ -38,6 +38,10 @@ type Config struct {
 	InstallmentIntervalDays int    `envconfig:"INSTALLMENT_INTERVAL_DAYS" default:"14"`
 	DefaultCreditLimitMain float64 `envconfig:"DEFAULT_CREDIT_LIMIT_MAIN" default:"500"`
 	DefaultCreditLimitDaily float64 `envconfig:"DEFAULT_CREDIT_LIMIT_DAILY" default:"200"`
+
+	// Cron schedule for the installment scanner (mora detection).
+	// Use @daily for production, @every 1m for testing.
+	ScannerCronSchedule string `envconfig:"SCANNER_CRON_SCHEDULE" default:"@daily"`
 }
 
 func Load() *Config {

@@ -57,7 +57,7 @@ func main() {
 
 	authHandler := &auth.AuthHandler{DB: queries, Cfg: cfg, Email: emailSender}
 
-	scanner := &worker.InstallmentScanner{Pool: pool, Sender: emailSender}
+	scanner := &worker.InstallmentScanner{Pool: pool, Sender: emailSender, Schedule: cfg.ScannerCronSchedule}
 	scanner.Start()
 
 	// Email payment reminders (daily at 09:00)

@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 const rawSecret = process.env.JWT_SECRET;
-if (!rawSecret && process.env.NODE_ENV === "production") {
-  throw new Error("JWT_SECRET environment variable is required in production");
+if (!rawSecret) {
+  throw new Error("JWT_SECRET environment variable is required");
 }
-const JWT_SECRET = new TextEncoder().encode(rawSecret ?? "fallback-dev-only-change-me");
+const JWT_SECRET = new TextEncoder().encode(rawSecret);
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("jwt_token")?.value;
