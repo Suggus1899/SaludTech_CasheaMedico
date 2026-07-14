@@ -15,6 +15,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { getApiUrl, setSession } from "../../lib/api";
+import { registerSchema } from "../../lib/validations";
 import type { UserResponse } from "../../types/patient";
 
 export default function PatientRegisterPage() {
@@ -39,16 +40,9 @@ export default function PatientRegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (form.password.length < 8) {
-      setError("La contraseña debe tener mínimo 8 caracteres");
-      return;
-    }
-    if (form.password !== form.confirmPassword) {
-      setError("Las contraseñas no coinciden");
-      return;
-    }
-    if (!form.email.includes("@")) {
-      setError("Email inválido");
+    const result = registerSchema.safeParse(form);
+    if (!result.success) {
+      setError(result.error.issues[0].message);
       return;
     }
     setIsLoading(true);

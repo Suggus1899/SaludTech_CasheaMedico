@@ -139,6 +139,101 @@ export const tours: TourDefinition[] = [
       },
     ],
   },
+  {
+    id: "health-profile",
+    name: "Tour de Mi Salud",
+    startRoute: "/salud",
+    steps: [
+      {
+        selector: '[data-tour="health-summary"]',
+        title: "Tu perfil de salud",
+        body: "Aquí ves tu resumen general: tipo sanguíneo, alergias, condiciones crónicas y medicamentos actuales. Mantén esto actualizado para mejor atención.",
+        side: "bottom",
+      },
+      {
+        selector: '[data-tour="health-vitals"]',
+        title: "Signos vitales",
+        body: "Registra tu presión, peso, glucosa y temperatura. Los datos se grafican para que veas tu evolución a lo largo del tiempo.",
+        side: "top",
+      },
+    ],
+  },
+  {
+    id: "medical-records",
+    name: "Tour de Historial Médico",
+    startRoute: "/historial",
+    steps: [
+      {
+        selector: '[data-tour="records-list"]',
+        title: "Tu historial médico",
+        body: "Todos tus diagnósticos, tratamientos y resultados de exámenes en un solo lugar. Ordenados por fecha, los más recientes primero.",
+        side: "bottom",
+      },
+      {
+        selector: '[data-tour="record-detail"]',
+        title: "Detalle de registro",
+        body: "Toca cualquier registro para ver el detalle: diagnóstico, tratamiento, médico tratante y notas. Puedes descargarlo o compartirlo.",
+        side: "top",
+      },
+    ],
+  },
+  {
+    id: "appointments",
+    name: "Tour de Citas Médicas",
+    startRoute: "/citas",
+    steps: [
+      {
+        selector: '[data-tour="appointment-list"]',
+        title: "Tus citas",
+        body: "Próximas citas médicas con fecha, hora, médico y consultorio. Las pasadas se archivan automáticamente.",
+        side: "bottom",
+      },
+      {
+        selector: '[data-tour="appointment-schedule"]',
+        title: "Agendar cita",
+        body: "Solicita una nueva cita seleccionando el tipo de consulta y el comercio. El comercio confirmará fecha y hora.",
+        side: "top",
+      },
+    ],
+  },
+  {
+    id: "medication-reminders",
+    name: "Tour de Recordatorios",
+    startRoute: "/recordatorios",
+    steps: [
+      {
+        selector: '[data-tour="reminder-list"]',
+        title: "Recordatorios de medicación",
+        body: "Tus medicamentos activos con horarios y dosis. Recibirás notificaciones para no olvidar ninguna toma.",
+        side: "bottom",
+      },
+      {
+        selector: '[data-tour="reminder-add"]',
+        title: "Agregar recordatorio",
+        body: "Crea un nuevo recordatorio con nombre del medicamento, dosis, frecuencia y hora de inicio.",
+        side: "top",
+      },
+    ],
+  },
+  {
+    id: "family-members",
+    name: "Tour de Familiares",
+    startRoute: "/familia",
+    steps: [
+      {
+        selector: '[data-tour="family-list"]',
+        title: "Miembros familiares",
+        body: "Gestiona el historial de salud de tu familia: hijos, padres, cónyuge. Cada uno tiene su propio perfil de salud independiente.",
+        side: "bottom",
+      },
+      {
+        selector: '[data-tour="family-add"]',
+        title: "Agregar familiar",
+        body: "Registra un nuevo miembro con sus datos básicos y parentesco. Podrás agendar citas y ver su historial desde tu cuenta.",
+        side: "top",
+      },
+    ],
+  },
 ];
 
 export function getTourById(id: string): TourDefinition | undefined {

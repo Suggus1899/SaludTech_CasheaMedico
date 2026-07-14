@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff, AlertCircle, HeartPulse, ShieldCheck, Clock } from "lucide-react";
 import { Logo } from "@saludtech/ui";
 import { getApiUrl, setSession } from "../../lib/api";
+import { loginSchema } from "../../lib/validations";
 import type { UserResponse } from "../../types/patient";
 
 export default function PatientLoginPage() {
@@ -18,6 +19,11 @@ export default function PatientLoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    const result = loginSchema.safeParse({ email, password });
+    if (!result.success) {
+      setError(result.error.issues[0].message);
+      return;
+    }
     setIsLoading(true);
     try {
       const res = await fetch(getApiUrl("auth/login"), {
