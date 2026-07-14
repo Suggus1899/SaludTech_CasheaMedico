@@ -31,7 +31,10 @@ export const registerSchema = z
     password: z
       .string()
       .min(8, "La contraseña debe tener mínimo 8 caracteres")
-      .max(100, "La contraseña no puede exceder 100 caracteres"),
+      .max(100, "La contraseña no puede exceder 100 caracteres")
+      .regex(/[A-Z]/, "Debe incluir al menos una mayúscula")
+      .regex(/[a-z]/, "Debe incluir al menos una minúscula")
+      .regex(/[0-9]/, "Debe incluir al menos un número"),
     confirmPassword: z.string().min(1, "Confirma tu contraseña"),
   })
   .refine((data) => data.password === data.confirmPassword, {
