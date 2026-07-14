@@ -318,6 +318,10 @@ func (h *AdminHandler) UpdateCreditLineLimit(w http.ResponseWriter, r *http.Requ
 		http.Error(w, `{"error":"Limit must be greater than 0"}`, http.StatusBadRequest)
 		return
 	}
+	if req.LimitUSD > 100000 {
+		http.Error(w, `{"error":"Limit must not exceed $100,000"}`, http.StatusBadRequest)
+		return
+	}
 
 	if err := h.DB.UpdateCreditLineLimit(ctx, database.UpdateCreditLineLimitParams{
 		ID:       uuid,

@@ -133,7 +133,17 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Email == "" && req.Phone == "" {
-		http.Error(w, "Email or phone is required", http.StatusBadRequest)
+		http.Error(w, `{"error":"Email or phone is required"}`, http.StatusBadRequest)
+		return
+	}
+
+	if req.Email != "" && !validateEmail(req.Email) {
+		http.Error(w, `{"error":"Invalid email format"}`, http.StatusBadRequest)
+		return
+	}
+
+	if req.Phone != "" && !validatePhone(req.Phone) {
+		http.Error(w, `{"error":"Invalid phone format. Use +584XXXXXXXXX"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -190,12 +200,32 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Phone == "" || req.Password == "" || req.Email == "" {
-		http.Error(w, "Phone, email and password are required", http.StatusBadRequest)
+		http.Error(w, `{"error":"Phone, email and password are required"}`, http.StatusBadRequest)
 		return
 	}
 
-	if len(req.Password) < 8 {
-		http.Error(w, "Password must be at least 8 characters", http.StatusBadRequest)
+	if !validateEmail(req.Email) {
+		http.Error(w, `{"error":"Invalid email format"}`, http.StatusBadRequest)
+		return
+	}
+
+	if !validatePhone(req.Phone) {
+		http.Error(w, `{"error":"Invalid phone format. Use +584XXXXXXXXX"}`, http.StatusBadRequest)
+		return
+	}
+
+	if !validateNationalID(req.IdentityDocument) {
+		http.Error(w, `{"error":"Invalid national ID format. Use V12345678"}`, http.StatusBadRequest)
+		return
+	}
+
+	if msg := validatePasswordComplexity(req.Password); msg != "" {
+		http.Error(w, `{"error":"`+msg+`"}`, http.StatusBadRequest)
+		return
+	}
+
+	if len(req.FirstName) > 100 || len(req.LastName) > 100 {
+		http.Error(w, `{"error":"Name fields must not exceed 100 characters"}`, http.StatusBadRequest)
 		return
 	}
 

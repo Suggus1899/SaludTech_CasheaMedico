@@ -102,11 +102,15 @@ func TestValidateToken_TamperedToken(t *testing.T) {
 	cfg := testConfig()
 	token, _ := GenerateToken("user-123", "PATIENT", cfg)
 
-	// Tamper with the token by changing the last character
-	tampered := token[:len(token)-1] + "X"
-	if tampered == token {
-		tampered = token[:len(token)-1] + "Y"
+	// Tamper with the token by flipping a character in the middle
+	runes := []rune(token)
+	mid := len(runes) / 2
+	if runes[mid] == 'A' {
+		runes[mid] = 'B'
+	} else {
+		runes[mid] = 'A'
 	}
+	tampered := string(runes)
 
 	_, err := ValidateToken(tampered, cfg)
 	if err == nil {

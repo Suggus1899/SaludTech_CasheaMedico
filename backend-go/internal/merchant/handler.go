@@ -218,6 +218,10 @@ func (h *MerchantHandler) CreateService(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, `{"error":"Name and price are required"}`, http.StatusBadRequest)
 		return
 	}
+	if req.PriceUSD > 10000 {
+		http.Error(w, `{"error":"Price must not exceed $10,000"}`, http.StatusBadRequest)
+		return
+	}
 
 	duration := int16(30)
 	if req.DurationMin > 0 {
@@ -366,6 +370,10 @@ func (h *MerchantHandler) CreateSupply(w http.ResponseWriter, r *http.Request) {
 
 	if req.Name == "" || req.PriceUSD <= 0 {
 		http.Error(w, `{"error":"Name and price are required"}`, http.StatusBadRequest)
+		return
+	}
+	if req.PriceUSD > 10000 {
+		http.Error(w, `{"error":"Price must not exceed $10,000"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -519,6 +527,10 @@ func (h *MerchantHandler) GenerateQR(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Amount <= 0 {
 		http.Error(w, `{"error":"Amount must be positive"}`, http.StatusBadRequest)
+		return
+	}
+	if req.Amount > 10000 {
+		http.Error(w, `{"error":"Amount must not exceed $10,000"}`, http.StatusBadRequest)
 		return
 	}
 

@@ -96,8 +96,8 @@ func (h *UserHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(req.NewPassword) < 8 {
-		http.Error(w, `{"error":"New password must be at least 8 characters"}`, http.StatusBadRequest)
+	if msg := auth.ValidatePasswordComplexity(req.NewPassword); msg != "" {
+		http.Error(w, `{"error":"`+msg+`"}`, http.StatusBadRequest)
 		return
 	}
 

@@ -70,7 +70,11 @@ func (h *PatientHandler) CreateTriage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if strings.TrimSpace(req.Symptoms) == "" {
-		http.Error(w, "symptoms is required", http.StatusBadRequest)
+		http.Error(w, `{"error":"Symptoms is required"}`, http.StatusBadRequest)
+		return
+	}
+	if len(req.Symptoms) > 2000 {
+		http.Error(w, `{"error":"Symptoms must not exceed 2000 characters"}`, http.StatusBadRequest)
 		return
 	}
 
