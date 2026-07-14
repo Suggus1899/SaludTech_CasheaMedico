@@ -4,19 +4,68 @@
 -- Addresses audit findings: several UNIQUE/business-critical columns
 -- allowed NULL when they should be required.
 --
--- IMPORTANT: Run this only after confirming no NULL values exist in
--- production data. If NULLs exist, backfill or clean them first.
+-- This migration includes backfill statements to handle existing
+-- NULL values before applying NOT NULL constraints.
 -- ============================================================
 
--- ─── 1. users: email and national_id ──────────────────────────
--- email is UNIQUE but allowed NULL. Application requires it.
-ALTER TABLE users ALTER COLUMN email SET NOT NULL;
+-- ─── 0. Backfill existing NULLs ────────────────────────────────
+-- users: email is required by application
+UPDATE users SET email = 'unknown-' || id::text || '@placeholder.local' WHERE email IS NULL;
 
--- national_id is UNIQUE but allowed NULL. Required for KYC.
--- Only set NOT NULL if all existing users have a national_id.
--- If some users lack it, run: UPDATE users SET national_id = 'PENDING-' || id::text WHERE national_id IS NULL;
--- before this migration. For now, we leave it nullable since the
--- application treats it as optional during registration.
+-- merchants: required business fields
+UPDATE merchants SET address = 'N/A' WHERE address IS NULL;
+UPDATE merchants SET city = 'N/A' WHERE city IS NULL;
+UPDATE merchants SET phone = '+580000000000' WHERE phone IS NULL;
+UPDATE merchants SET contact_name = 'N/A' WHERE contact_name IS NULL;
+
+-- transactions: critical financial fields
+UPDATE transactions SET down_payment = 0 WHERE down_payment IS NULL;
+UPDATE transactions SET qr_code_token = 'legacy-' || id::text WHERE qr_code_token IS NULL;
+UPDATE transactions SET description = 'N/A' WHERE description IS NULL;
+
+-- payments: reference_code (verified_by left nullable — unverified payments have no verifier)
+UPDATE payments SET reference_code = 'N/A' WHERE reference_code IS NULL;
+
+-- subscriptions: delete orphan rows missing credit_line_id (incomplete records)
+DELETE FROM subscriptions WHERE credit_line_id IS NULL;
+UPDATE subscriptions SET next_billing_date = created_at WHERE next_billing_date IS NULL;
+
+-- elder_care_subscriptions: same treatment
+DELETE FROM elder_care_subscriptions WHERE credit_line_id IS NULL;
+UPDATE elder_care_subscriptions SET next_billing_date = created_at WHERE next_billing_date IS NULL;
+
+-- medical_services: catalog completeness
+UPDATE medical_services SET description = 'N/A' WHERE description IS NULL;
+UPDATE medical_services SET subcategory = 'general' WHERE subcategory IS NULL;
+UPDATE medical_services SET duration_min = 30 WHERE duration_min IS NULL;
+
+-- health_profiles: required medical fields
+UPDATE health_profiles SET blood_type = 'Unknown' WHERE blood_type IS NULL;
+UPDATE health_profiles SET emergency_contact_name = 'N/A' WHERE emergency_contact_name IS NULL;
+UPDATE health_profiles SET emergency_contact_phone = '+580000000000' WHERE emergency_contact_phone IS NULL;
+
+-- medical_records: delete orphans missing FKs, backfill text fields
+DELETE FROM medical_records WHERE transaction_id IS NULL;
+DELETE FROM medical_records WHERE merchant_id IS NULL;
+DELETE FROM medical_records WHERE service_id IS NULL;
+UPDATE medical_records SET diagnosis = 'N/A' WHERE diagnosis IS NULL;
+UPDATE medical_records SET prescription = 'N/A' WHERE prescription IS NULL;
+UPDATE medical_records SET doctor_name = 'N/A' WHERE doctor_name IS NULL;
+
+-- appointments: delete orphans missing service_id
+DELETE FROM appointments WHERE service_id IS NULL;
+
+-- medication_reminders: required fields
+UPDATE medication_reminders SET dosage = 'N/A' WHERE dosage IS NULL;
+
+-- family_members: required fields
+UPDATE family_members SET relation = 'Otro' WHERE relation IS NULL;
+
+-- qr_tokens: delete orphans missing transaction_id
+DELETE FROM qr_tokens WHERE transaction_id IS NULL;
+
+-- ─── 1. users: email ──────────────────────────────────────────
+ALTER TABLE users ALTER COLUMN email SET NOT NULL;
 
 -- ─── 2. merchants: required business fields ───────────────────
 ALTER TABLE merchants ALTER COLUMN address SET NOT NULL;
@@ -31,7 +80,7 @@ ALTER TABLE transactions ALTER COLUMN description SET NOT NULL;
 
 -- ─── 4. payments: verification tracking ───────────────────────
 ALTER TABLE payments ALTER COLUMN reference_code SET NOT NULL;
-ALTER TABLE payments ALTER COLUMN verified_by SET NOT NULL;
+-- verified_by left nullable: unverified payments legitimately have no verifier
 
 -- ─── 5. subscriptions: billing-critical fields ────────────────
 ALTER TABLE subscriptions ALTER COLUMN credit_line_id SET NOT NULL;
