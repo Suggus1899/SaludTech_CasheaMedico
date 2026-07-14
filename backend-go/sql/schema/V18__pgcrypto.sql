@@ -1,0 +1,21 @@
+-- ============================================================
+-- V18: Enable pgcrypto for future PII encryption
+-- ============================================================
+-- This migration enables the pgcrypto extension so that column-level
+-- encryption can be applied to PII fields (health data, banking info).
+--
+-- PENDING: The actual column encryption for these tables still needs
+-- to be implemented in a follow-up migration:
+--   - health_profiles: blood_type, allergies, chronic_conditions,
+--     current_medications, emergency_contact_name, emergency_contact_phone
+--   - medical_records: diagnosis, prescription, doctor_name, notes
+--   - users: phone, email, full_name, national_id
+--   - merchants: bank_account_bs, bank_account_usd
+--
+-- The encryption will use pgp_sym_encrypt/pgp_sym_decrypt with a key
+-- provided by the DB_ENCRYPTION_KEY environment variable.
+--
+-- This MUST be implemented before storing real patient data in production.
+-- ============================================================
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;

@@ -42,6 +42,11 @@ type Config struct {
 	// Cron schedule for the installment scanner (mora detection).
 	// Use @daily for production, @every 1m for testing.
 	ScannerCronSchedule string `envconfig:"SCANNER_CRON_SCHEDULE" default:"@daily"`
+
+	// Encryption key for PII columns (pgcrypto pgp_sym_encrypt).
+	// Required in production when PII encryption is enabled.
+	// Generate with: openssl rand -base64 32
+	DBEncryptionKey string `envconfig:"DB_ENCRYPTION_KEY"`
 }
 
 func Load() *Config {
