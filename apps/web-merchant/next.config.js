@@ -24,7 +24,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' " + (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost"),
+              "connect-src 'self' " + new URL(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost").origin,
               "frame-ancestors 'none'",
             ].join("; "),
           },
