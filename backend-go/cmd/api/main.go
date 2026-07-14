@@ -52,8 +52,8 @@ func main() {
 
 	queries := database.New(pool)
 
-	// Email sender (Resend) — shared across handlers and workers
-	emailSender := email.New(cfg.ResendAPIKey, cfg.EmailFrom)
+	// Email sender — supports Resend (if RESEND_API_KEY set) or Gmail SMTP (if GMAIL_APP_PASSWORD set)
+	emailSender := email.NewWithGmail(cfg.ResendAPIKey, cfg.EmailFrom, cfg.GmailUser, cfg.GmailAppPassword)
 
 	authHandler := &auth.AuthHandler{DB: queries, Cfg: cfg, Email: emailSender}
 
