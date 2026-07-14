@@ -93,6 +93,12 @@ func main() {
 		w.Write([]byte("OK - Go Backend Running"))
 	})
 
+	// Root handler for Render health checks (HEAD / and GET /)
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("SaludTech API"))
+	})
+
 	// Rate limiters for sensitive endpoints
 	authLimiter := appmw.NewRateLimiter(5, time.Minute)   // 5 login/register attempts per minute per IP
 	payLimiter := appmw.NewRateLimiter(10, time.Minute)   // 10 payment attempts per minute per IP
