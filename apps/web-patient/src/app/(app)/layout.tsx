@@ -26,22 +26,44 @@ import { clearSession, getStoredUser } from "../../lib/api";
 import { TourProvider, TourOverlay } from "../../lib/tours";
 import type { UserResponse } from "../../types/patient";
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/pagar", label: "Pagar", icon: QrCode },
-  { href: "/comercios", label: "Comercios", icon: Store },
-  { href: "/catalogo", label: "Catálogo", icon: Search },
-  { href: "/cuotas", label: "Cuotas", icon: CalendarDays },
-  { href: "/suscripciones", label: "Suscripciones", icon: Pill },
-  { href: "/cuidado-mayor", label: "Cuidado Mayor", icon: Shield },
-  { href: "/triaje", label: "Triaje", icon: Stethoscope },
-  { href: "/salud", label: "Perfil de Salud", icon: Heart },
-  { href: "/historial", label: "Historial", icon: FileText },
-  { href: "/citas", label: "Citas", icon: CalendarPlus },
-  { href: "/recordatorios", label: "Recordatorios", icon: Bell },
-  { href: "/familia", label: "Familia", icon: Users },
-  { href: "/perfil", label: "Perfil", icon: User },
+const navSections = [
+  {
+    title: "Principal",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: Home },
+      { href: "/pagar", label: "Pagar", icon: QrCode },
+      { href: "/cuotas", label: "Cuotas", icon: CalendarDays },
+    ],
+  },
+  {
+    title: "Comprar",
+    items: [
+      { href: "/comercios", label: "Comercios", icon: Store },
+      { href: "/catalogo", label: "Catálogo", icon: Search },
+      { href: "/suscripciones", label: "Suscripciones", icon: Pill },
+    ],
+  },
+  {
+    title: "Mi Salud",
+    items: [
+      { href: "/triaje", label: "Triaje", icon: Stethoscope },
+      { href: "/cuidado-mayor", label: "Cuidado Mayor", icon: Shield },
+      { href: "/salud", label: "Perfil de Salud", icon: Heart },
+      { href: "/historial", label: "Historial", icon: FileText },
+      { href: "/citas", label: "Citas", icon: CalendarPlus },
+      { href: "/recordatorios", label: "Recordatorios", icon: Bell },
+      { href: "/familia", label: "Familia", icon: Users },
+    ],
+  },
+  {
+    title: "Cuenta",
+    items: [
+      { href: "/perfil", label: "Perfil", icon: User },
+    ],
+  },
 ];
+
+const allNavItems = navSections.flatMap((s) => s.items);
 
 export default function AppLayout({
   children,
@@ -67,7 +89,7 @@ export default function AppLayout({
     router.push("/login");
   };
 
-  const currentPage = navItems.find((n) => pathname.startsWith(n.href));
+  const currentPage = allNavItems.find((n) => pathname.startsWith(n.href));
 
   return (
     <TourProvider>
@@ -85,26 +107,35 @@ export default function AppLayout({
           </div>
 
           {/* Nav items */}
-          <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={isActive ? "page" : undefined}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-primary text-primary-content"
-                      : "text-muted-foreground hover:bg-base-200 hover:text-foreground"
-                  }`}
-                >
-                  <Icon className="w-4.5 h-4.5 shrink-0" />
-                  {item.label}
-                </Link>
-              );
-            })}
+          <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-4">
+            {navSections.map((section) => (
+              <div key={section.title}>
+                <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
+                  {section.title}
+                </p>
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        aria-current={isActive ? "page" : undefined}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                          isActive
+                            ? "bg-primary text-primary-content"
+                            : "text-muted-foreground hover:bg-base-200 hover:text-foreground"
+                        }`}
+                      >
+                        <Icon className="w-4.5 h-4.5 shrink-0" />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
 
           {/* User info + logout */}
@@ -113,14 +144,9 @@ export default function AppLayout({
               <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0">
                 {user?.firstName?.[0]?.toUpperCase() ?? "?"}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">
-                  {user?.firstName ?? "—"} {user?.lastName ?? ""}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {user?.email ?? ""}
-                </p>
-              </div>
+              <p className="flex-1 min-w-0 text-sm font-semibold text-foreground truncate">
+                {user?.firstName ?? "—"}
+              </p>
             </div>
             <button
               onClick={handleLogout}
@@ -157,26 +183,35 @@ export default function AppLayout({
               </div>
 
               {/* Nav items */}
-              <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-                {navItems.map((item) => {
-                  const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      aria-current={isActive ? "page" : undefined}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                        isActive
-                          ? "bg-primary text-primary-content"
-                          : "text-muted-foreground hover:bg-base-200 hover:text-foreground"
-                      }`}
-                    >
-                      <Icon className="w-4.5 h-4.5 shrink-0" />
-                      {item.label}
-                    </Link>
-                  );
-                })}
+              <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-4">
+                {navSections.map((section) => (
+                  <div key={section.title}>
+                    <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
+                      {section.title}
+                    </p>
+                    <div className="space-y-1">
+                      {section.items.map((item) => {
+                        const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            aria-current={isActive ? "page" : undefined}
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                              isActive
+                                ? "bg-primary text-primary-content"
+                                : "text-muted-foreground hover:bg-base-200 hover:text-foreground"
+                            }`}
+                          >
+                            <Icon className="w-4.5 h-4.5 shrink-0" />
+                            {item.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </nav>
 
               {/* User info + logout */}
@@ -185,14 +220,9 @@ export default function AppLayout({
                   <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0">
                     {user?.firstName?.[0]?.toUpperCase() ?? "?"}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">
-                      {user?.firstName ?? "—"} {user?.lastName ?? ""}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {user?.email ?? ""}
-                    </p>
-                  </div>
+                  <p className="flex-1 min-w-0 text-sm font-semibold text-foreground truncate">
+                    {user?.firstName ?? "—"}
+                  </p>
                 </div>
                 <button
                   onClick={handleLogout}
