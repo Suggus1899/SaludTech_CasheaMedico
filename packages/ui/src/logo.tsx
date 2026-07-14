@@ -19,8 +19,8 @@ const sizes = {
 export function Logo({ variant = "full", className = "", light = false, size = "md" }: LogoProps) {
   const [imgError, setImgError] = useState(false);
   const s = sizes[size];
-  const textColor = light ? "text-white" : "text-[#0A2535]";
-  const accentColor = light ? "text-[#1FC8A5]" : "text-[#1A6B8A]";
+  const textColor = light ? "text-white" : "text-[#0f172a]";
+  const accentColor = light ? "text-[#3b82f6]" : "text-[#2563eb]";
 
   if (!imgError) {
     return (
@@ -45,7 +45,7 @@ export function Logo({ variant = "full", className = "", light = false, size = "
     <div className={`flex items-center gap-2 ${className}`}>
       <div
         className={`${s.icon} rounded-xl flex items-center justify-center shrink-0`}
-        style={{ background: "linear-gradient(135deg, #1A6B8A, #17A589)" }}
+        style={{ background: "linear-gradient(135deg, #2563eb, #3b82f6)" }}
       >
         {/* Caduceus cross */}
         <svg viewBox="0 0 24 24" fill="none" className="w-4/6 h-4/6">

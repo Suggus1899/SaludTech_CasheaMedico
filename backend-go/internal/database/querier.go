@@ -113,6 +113,8 @@ type Querier interface {
 	GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
 	GetUserByIDAdmin(ctx context.Context, id pgtype.UUID) (GetUserByIDAdminRow, error)
 	GetUserByPhone(ctx context.Context, phone string) (User, error)
+	GetUserByVerificationToken(ctx context.Context, emailVerificationToken pgtype.Text) (User, error)
+	GetUserForTriageEmail(ctx context.Context, id pgtype.UUID) (GetUserForTriageEmailRow, error)
 	ListAllCreditLines(ctx context.Context, arg ListAllCreditLinesParams) ([]ListAllCreditLinesRow, error)
 	// ════════════════════════════════════════════════════════════
 	// Admin: All elder care subscriptions
@@ -155,7 +157,7 @@ type Querier interface {
 	ProcessInstallmentPayment(ctx context.Context, id pgtype.UUID) (Installment, error)
 	ReactivateUserCreditLines(ctx context.Context, userID pgtype.UUID) error
 	ReleaseCreditLineUsage(ctx context.Context, arg ReleaseCreditLineUsageParams) (CreditLine, error)
-	RespondTriage(ctx context.Context, arg RespondTriageParams) error
+	RespondTriage(ctx context.Context, arg RespondTriageParams) (RespondTriageRow, error)
 	SearchServices(ctx context.Context, arg SearchServicesParams) ([]SearchServicesRow, error)
 	SearchSupplies(ctx context.Context, arg SearchSuppliesParams) ([]SearchSuppliesRow, error)
 	SumMerchantRevenue(ctx context.Context, merchantID pgtype.UUID) (interface{}, error)
@@ -171,13 +173,14 @@ type Querier interface {
 	UpdateMedicalService(ctx context.Context, arg UpdateMedicalServiceParams) error
 	UpdateMedicalSupply(ctx context.Context, arg UpdateMedicalSupplyParams) error
 	UpdateMedicationReminder(ctx context.Context, arg UpdateMedicationReminderParams) error
-	UpdateMerchantStatus(ctx context.Context, arg UpdateMerchantStatusParams) error
+	UpdateMerchantStatus(ctx context.Context, arg UpdateMerchantStatusParams) (UpdateMerchantStatusRow, error)
 	UpdateQRTokenStatus(ctx context.Context, arg UpdateQRTokenStatusParams) error
 	UpdateUserGamification(ctx context.Context, arg UpdateUserGamificationParams) (User, error)
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error
 	UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) error
-	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) error
+	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error)
 	UpsertHealthProfile(ctx context.Context, arg UpsertHealthProfileParams) (HealthProfile, error)
+	VerifyEmail(ctx context.Context, id pgtype.UUID) error
 }
 
 var _ Querier = (*Queries)(nil)

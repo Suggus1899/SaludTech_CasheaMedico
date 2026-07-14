@@ -13,19 +13,20 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-    phone, email, password_hash, full_name, national_id, role
+    phone, email, password_hash, full_name, national_id, role, email_verification_token
 ) VALUES (
-    $1, $2, $3, $4, $5, $6
-) RETURNING id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives
+    $1, $2, $3, $4, $5, $6, $7
+) RETURNING id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, email_verification_token, email_verified_at
 `
 
 type CreateUserParams struct {
-	Phone        string      `json:"phone"`
-	Email        pgtype.Text `json:"email"`
-	PasswordHash string      `json:"password_hash"`
-	FullName     string      `json:"full_name"`
-	NationalID   pgtype.Text `json:"national_id"`
-	Role         string      `json:"role"`
+	Phone                  string      `json:"phone"`
+	Email                  pgtype.Text `json:"email"`
+	PasswordHash           string      `json:"password_hash"`
+	FullName               string      `json:"full_name"`
+	NationalID             pgtype.Text `json:"national_id"`
+	Role                   string      `json:"role"`
+	EmailVerificationToken pgtype.Text `json:"email_verification_token"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -36,6 +37,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.FullName,
 		arg.NationalID,
 		arg.Role,
+		arg.EmailVerificationToken,
 	)
 	var i User
 	err := row.Scan(
@@ -55,12 +57,15 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.UpdatedAt,
 		&i.IsPhoneVerified,
 		&i.IsCreditFrozenForElectives,
+		&i.IsEmailVerified,
+		&i.EmailVerificationToken,
+		&i.EmailVerifiedAt,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives FROM users WHERE email = $1
+SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, email_verification_token, email_verified_at FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email pgtype.Text) (User, error) {
@@ -83,12 +88,15 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email pgtype.Text) (User, 
 		&i.UpdatedAt,
 		&i.IsPhoneVerified,
 		&i.IsCreditFrozenForElectives,
+		&i.IsEmailVerified,
+		&i.EmailVerificationToken,
+		&i.EmailVerifiedAt,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives FROM users WHERE id = $1
+SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, email_verification_token, email_verified_at FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error) {
@@ -111,12 +119,15 @@ func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
 		&i.UpdatedAt,
 		&i.IsPhoneVerified,
 		&i.IsCreditFrozenForElectives,
+		&i.IsEmailVerified,
+		&i.EmailVerificationToken,
+		&i.EmailVerifiedAt,
 	)
 	return i, err
 }
 
 const getUserByPhone = `-- name: GetUserByPhone :one
-SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives FROM users WHERE phone = $1
+SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, email_verification_token, email_verified_at FROM users WHERE phone = $1
 `
 
 func (q *Queries) GetUserByPhone(ctx context.Context, phone string) (User, error) {
@@ -139,6 +150,40 @@ func (q *Queries) GetUserByPhone(ctx context.Context, phone string) (User, error
 		&i.UpdatedAt,
 		&i.IsPhoneVerified,
 		&i.IsCreditFrozenForElectives,
+		&i.IsEmailVerified,
+		&i.EmailVerificationToken,
+		&i.EmailVerifiedAt,
+	)
+	return i, err
+}
+
+const getUserByVerificationToken = `-- name: GetUserByVerificationToken :one
+SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, email_verification_token, email_verified_at FROM users WHERE email_verification_token = $1 AND email_verification_token IS NOT NULL
+`
+
+func (q *Queries) GetUserByVerificationToken(ctx context.Context, emailVerificationToken pgtype.Text) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByVerificationToken, emailVerificationToken)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Phone,
+		&i.Email,
+		&i.PasswordHash,
+		&i.FullName,
+		&i.NationalID,
+		&i.Role,
+		&i.Level,
+		&i.Points,
+		&i.TotalPaid,
+		&i.InstallmentsPaidCount,
+		&i.IsActive,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.IsPhoneVerified,
+		&i.IsCreditFrozenForElectives,
+		&i.IsEmailVerified,
+		&i.EmailVerificationToken,
+		&i.EmailVerifiedAt,
 	)
 	return i, err
 }
@@ -151,7 +196,7 @@ SET
     total_paid = total_paid + $4,
     installments_paid_count = installments_paid_count + $5
 WHERE id = $1
-RETURNING id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives
+RETURNING id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, email_verification_token, email_verified_at
 `
 
 type UpdateUserGamificationParams struct {
@@ -188,6 +233,9 @@ func (q *Queries) UpdateUserGamification(ctx context.Context, arg UpdateUserGami
 		&i.UpdatedAt,
 		&i.IsPhoneVerified,
 		&i.IsCreditFrozenForElectives,
+		&i.IsEmailVerified,
+		&i.EmailVerificationToken,
+		&i.EmailVerifiedAt,
 	)
 	return i, err
 }
@@ -205,5 +253,20 @@ type UpdateUserPasswordParams struct {
 
 func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
 	_, err := q.db.Exec(ctx, updateUserPassword, arg.ID, arg.PasswordHash)
+	return err
+}
+
+const verifyEmail = `-- name: VerifyEmail :exec
+UPDATE users
+SET
+    is_email_verified = TRUE,
+    email_verified_at = NOW(),
+    email_verification_token = NULL,
+    kyc_status = 'APPROVED'
+WHERE id = $1
+`
+
+func (q *Queries) VerifyEmail(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, verifyEmail, id)
 	return err
 }

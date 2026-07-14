@@ -52,13 +52,15 @@ func main() {
 
 	queries := database.New(pool)
 
-	authHandler := &auth.AuthHandler{DB: queries, Cfg: cfg}
+	// Email sender (Resend) — shared across handlers and workers
+	emailSender := email.New(cfg.ResendAPIKey, cfg.EmailFrom)
 
-	scanner := &worker.InstallmentScanner{Pool: pool}
+	authHandler := &auth.AuthHandler{DB: queries, Cfg: cfg, Email: emailSender}
+
+	scanner := &worker.InstallmentScanner{Pool: pool, Sender: emailSender}
 	scanner.Start()
 
 	// Email payment reminders (daily at 09:00)
-	emailSender := email.New(cfg.ResendAPIKey, cfg.EmailFrom)
 	reminder := &worker.PaymentReminder{Pool: pool, Sender: emailSender}
 	reminder.Start()
 
@@ -99,11 +101,12 @@ func main() {
 	r.With(authLimiter.Middleware).Post("/api/v1/auth/login", authHandler.Login)
 	r.With(authLimiter.Middleware).Post("/api/v1/auth/register", registerWithCreditLines(queries, authHandler, cfg))
 	r.Post("/api/v1/auth/logout", authHandler.Logout)
+	r.Get("/api/v1/auth/verify-email", authHandler.VerifyEmail)
 
 	// Patient routes (protected)
 	bcvClient := bcv.NewClient(cfg.DolarVZLAKey)
 	fakePayClient := fakepay.NewClient(cfg.FakePayKey)
-	patientHandler := &patient.PatientHandler{DB: queries, Pool: pool, BCVClient: bcvClient, FakePay: fakePayClient}
+	patientHandler := &patient.PatientHandler{DB: queries, Pool: pool, BCVClient: bcvClient, FakePay: fakePayClient, Email: emailSender}
 	r.Route("/api/v1/patient", patientHandler.Routes())
 
 	// Payment routes (protected — legacy endpoint) — rate limited
@@ -118,7 +121,7 @@ func main() {
 	})
 
 	// Admin routes (ADMIN only)
-	adminHandler := &admin.AdminHandler{DB: queries}
+	adminHandler := &admin.AdminHandler{DB: queries, Email: emailSender}
 	r.Group(func(mux chi.Router) {
 		mux.Use(auth.RequireAuth, auth.RequireRole("ADMIN"))
 		mux.Mount("/api/v1/admin", adminHandler.Routes())

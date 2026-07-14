@@ -111,6 +111,24 @@ func (q *Queries) GetQRToken(ctx context.Context, token string) (QrToken, error)
 	return i, err
 }
 
+const getUserForTriageEmail = `-- name: GetUserForTriageEmail :one
+SELECT u.email, u.full_name FROM users u
+JOIN triage t ON t.user_id = u.id
+WHERE t.id = $1
+`
+
+type GetUserForTriageEmailRow struct {
+	Email    pgtype.Text `json:"email"`
+	FullName string      `json:"full_name"`
+}
+
+func (q *Queries) GetUserForTriageEmail(ctx context.Context, id pgtype.UUID) (GetUserForTriageEmailRow, error) {
+	row := q.db.QueryRow(ctx, getUserForTriageEmail, id)
+	var i GetUserForTriageEmailRow
+	err := row.Scan(&i.Email, &i.FullName)
+	return i, err
+}
+
 const listAllElderCareSubs = `-- name: ListAllElderCareSubs :many
 
 SELECT
@@ -504,10 +522,11 @@ func (q *Queries) ListPendingTriage(ctx context.Context, arg ListPendingTriagePa
 	return items, nil
 }
 
-const respondTriage = `-- name: RespondTriage :exec
+const respondTriage = `-- name: RespondTriage :one
 UPDATE triage
 SET status = $3, recommendation = $4
 WHERE id = $1 AND id = $2
+RETURNING id, user_id, status, recommendation
 `
 
 type RespondTriageParams struct {
@@ -517,14 +536,28 @@ type RespondTriageParams struct {
 	Recommendation pgtype.Text `json:"recommendation"`
 }
 
-func (q *Queries) RespondTriage(ctx context.Context, arg RespondTriageParams) error {
-	_, err := q.db.Exec(ctx, respondTriage,
+type RespondTriageRow struct {
+	ID             pgtype.UUID `json:"id"`
+	UserID         pgtype.UUID `json:"user_id"`
+	Status         string      `json:"status"`
+	Recommendation pgtype.Text `json:"recommendation"`
+}
+
+func (q *Queries) RespondTriage(ctx context.Context, arg RespondTriageParams) (RespondTriageRow, error) {
+	row := q.db.QueryRow(ctx, respondTriage,
 		arg.ID,
 		arg.ID_2,
 		arg.Status,
 		arg.Recommendation,
 	)
-	return err
+	var i RespondTriageRow
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Status,
+		&i.Recommendation,
+	)
+	return i, err
 }
 
 const updateQRTokenStatus = `-- name: UpdateQRTokenStatus :exec

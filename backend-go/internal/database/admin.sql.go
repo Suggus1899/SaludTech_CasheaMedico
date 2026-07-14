@@ -1134,8 +1134,9 @@ func (q *Queries) UpdateMedicalSupply(ctx context.Context, arg UpdateMedicalSupp
 	return err
 }
 
-const updateMerchantStatus = `-- name: UpdateMerchantStatus :exec
+const updateMerchantStatus = `-- name: UpdateMerchantStatus :one
 UPDATE merchants SET is_active = $2 WHERE id = $1
+RETURNING id, legal_name, trade_name, is_active
 `
 
 type UpdateMerchantStatusParams struct {
@@ -1143,9 +1144,23 @@ type UpdateMerchantStatusParams struct {
 	IsActive bool        `json:"is_active"`
 }
 
-func (q *Queries) UpdateMerchantStatus(ctx context.Context, arg UpdateMerchantStatusParams) error {
-	_, err := q.db.Exec(ctx, updateMerchantStatus, arg.ID, arg.IsActive)
-	return err
+type UpdateMerchantStatusRow struct {
+	ID        pgtype.UUID `json:"id"`
+	LegalName string      `json:"legal_name"`
+	TradeName string      `json:"trade_name"`
+	IsActive  bool        `json:"is_active"`
+}
+
+func (q *Queries) UpdateMerchantStatus(ctx context.Context, arg UpdateMerchantStatusParams) (UpdateMerchantStatusRow, error) {
+	row := q.db.QueryRow(ctx, updateMerchantStatus, arg.ID, arg.IsActive)
+	var i UpdateMerchantStatusRow
+	err := row.Scan(
+		&i.ID,
+		&i.LegalName,
+		&i.TradeName,
+		&i.IsActive,
+	)
+	return i, err
 }
 
 const updateUserRole = `-- name: UpdateUserRole :exec
@@ -1162,8 +1177,9 @@ func (q *Queries) UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) 
 	return err
 }
 
-const updateUserStatus = `-- name: UpdateUserStatus :exec
+const updateUserStatus = `-- name: UpdateUserStatus :one
 UPDATE users SET is_active = $2 WHERE id = $1
+RETURNING id, email, full_name, is_active
 `
 
 type UpdateUserStatusParams struct {
@@ -1171,7 +1187,21 @@ type UpdateUserStatusParams struct {
 	IsActive bool        `json:"is_active"`
 }
 
-func (q *Queries) UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) error {
-	_, err := q.db.Exec(ctx, updateUserStatus, arg.ID, arg.IsActive)
-	return err
+type UpdateUserStatusRow struct {
+	ID       pgtype.UUID `json:"id"`
+	Email    pgtype.Text `json:"email"`
+	FullName string      `json:"full_name"`
+	IsActive bool        `json:"is_active"`
+}
+
+func (q *Queries) UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error) {
+	row := q.db.QueryRow(ctx, updateUserStatus, arg.ID, arg.IsActive)
+	var i UpdateUserStatusRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.FullName,
+		&i.IsActive,
+	)
+	return i, err
 }

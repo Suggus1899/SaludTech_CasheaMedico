@@ -18,8 +18,9 @@ SELECT id, phone, email, full_name, national_id, role,
        created_at, updated_at
 FROM users WHERE id = $1;
 
--- name: UpdateUserStatus :exec
-UPDATE users SET is_active = $2 WHERE id = $1;
+-- name: UpdateUserStatus :one
+UPDATE users SET is_active = $2 WHERE id = $1
+RETURNING id, email, full_name, is_active;
 
 -- name: UpdateUserRole :exec
 UPDATE users SET role = $2 WHERE id = $1;
@@ -33,8 +34,9 @@ SELECT COUNT(*) FROM merchants;
 -- name: CountActiveMerchants :one
 SELECT COUNT(*) FROM merchants WHERE is_active = true;
 
--- name: UpdateMerchantStatus :exec
-UPDATE merchants SET is_active = $2 WHERE id = $1;
+-- name: UpdateMerchantStatus :one
+UPDATE merchants SET is_active = $2 WHERE id = $1
+RETURNING id, legal_name, trade_name, is_active;
 
 -- name: CountTransactions :one
 SELECT COUNT(*) FROM transactions;

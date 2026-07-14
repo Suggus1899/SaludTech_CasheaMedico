@@ -20,10 +20,16 @@ LIMIT $1 OFFSET $2;
 -- name: CountPendingTriage :one
 SELECT COUNT(*) FROM triage WHERE status IN ('PENDING', 'REVIEWING');
 
--- name: RespondTriage :exec
+-- name: RespondTriage :one
 UPDATE triage
 SET status = $3, recommendation = $4
-WHERE id = $1 AND id = $2;
+WHERE id = $1 AND id = $2
+RETURNING id, user_id, status, recommendation;
+
+-- name: GetUserForTriageEmail :one
+SELECT u.email, u.full_name FROM users u
+JOIN triage t ON t.user_id = u.id
+WHERE t.id = $1;
 
 -- name: ListAllTriage :many
 SELECT t.*, u.full_name AS user_name

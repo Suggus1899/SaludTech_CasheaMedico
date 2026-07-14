@@ -25,6 +25,9 @@ type Config struct {
 	// From email address for outgoing emails
 	EmailFrom string `envconfig:"EMAIL_FROM" default:"onboarding@resend.dev"`
 
+	// Frontend URL for email links (verification, CTAs)
+	FrontendURL string `envconfig:"FRONTEND_URL" default:"https://salud-tech-cashea-medico-web-patien.vercel.app"`
+
 	// Comma-separated list of allowed CORS origins
 	CORSAllowedOrigins string `envconfig:"CORS_ALLOWED_ORIGINS" default:"http://localhost:3000,http://localhost:3001,http://localhost:3002"`
 
