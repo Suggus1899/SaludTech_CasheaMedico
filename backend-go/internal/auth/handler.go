@@ -268,6 +268,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		EmailVerificationToken:  pgtype.Text{String: verificationToken, Valid: true},
 	})
 	if err != nil {
+		log.Printf("Failed to create user (phone=%s, email=%s, national_id=%s): %v", req.Phone, req.Email, req.IdentityDocument, err)
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
 		return
 	}
