@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Store, Building2, Pill, CheckCircle2, XCircle } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
 import { getApiUrl, apiFetch } from "../../../lib/api";
+import { merchantFormSchema } from "../../../lib/validations";
 
 export default function ComerciosPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,6 +23,11 @@ export default function ComerciosPage() {
   const handleAddMerchant = async (e: React.FormEvent) => {
     e.preventDefault();
     setMerchantError(null);
+    const result = merchantFormSchema.safeParse(merchantForm);
+    if (!result.success) {
+      setMerchantError(result.error.issues[0].message);
+      return;
+    }
     setMerchantLoading(true);
     try {
       const res = await apiFetch(getApiUrl("admin/merchants"), {

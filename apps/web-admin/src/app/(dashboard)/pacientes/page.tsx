@@ -5,6 +5,7 @@ import { Users, CheckCircle2, XCircle } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { ExportButton } from "../../../components/shared/ExportButton";
+import { patientFormSchema } from "../../../lib/validations";
 
 export default function PacientesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,6 +24,11 @@ export default function PacientesPage() {
   const handleAddPatient = async (e: React.FormEvent) => {
     e.preventDefault();
     setPatientError(null);
+    const result = patientFormSchema.safeParse(patientForm);
+    if (!result.success) {
+      setPatientError(result.error.issues[0].message);
+      return;
+    }
     setPatientLoading(true);
     try {
       const res = await apiFetch(getApiUrl("admin/users"), {
