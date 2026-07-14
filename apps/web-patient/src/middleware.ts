@@ -23,7 +23,16 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    // Role-based access control: web-patient only allows PATIENT
+    const role = payload.role as string | undefined;
+    if (role && role !== "PATIENT") {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("error", "wrong_app");
+      const response = NextResponse.redirect(loginUrl);
+      response.cookies.delete("jwt_token");
+      return response;
+    }
     return NextResponse.next();
   } catch {
     const loginUrl = new URL("/login", request.url);
