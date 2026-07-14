@@ -135,6 +135,7 @@ func main() {
 
 	// User routes (protected)
 	userHandler := &user.UserHandler{DB: queries}
+	r.With(auth.RequireAuth).Get("/api/v1/auth/me", userHandler.GetProfile)
 	r.With(auth.RequireAuth).Get("/api/v1/users/profile", userHandler.GetProfile)
 	r.With(auth.RequireAuth).Patch("/api/v1/users/password", userHandler.ChangePassword)
 

@@ -140,6 +140,11 @@ export default function PagarPage() {
     e.preventDefault();
     const amt = Number.parseFloat(amount);
     if (!amt || amt <= 0 || !merchantId) return;
+    if (amt > 10000) {
+      setError("El monto no puede exceder $10,000");
+      return;
+    }
+    setError(null);
     const dummyToken = `${merchantId}:${amt}:${Date.now()}`;
     await fetchPreview(merchantId, amt, dummyToken, numInstallments);
   };

@@ -42,20 +42,56 @@ export function apiFetch(
   });
 }
 
-// ─── Session helpers (user object only — JWT is in httpOnly cookie) ────
+// ─── Session helpers (minimal display data only — JWT is in httpOnly cookie) ────
+
+/**
+ * Minimal user data stored in localStorage for UI display only.
+ * Sensitive fields (email, phone, national_id) are NOT stored here.
+ * Fetch the full user profile from GET /api/v1/auth/me when needed.
+ */
+export interface MinimalUser {
+  id: string;
+  firstName: string;
+  role: string;
+  level?: number;
+}
 
 /**
  * Creates a session helper bound to a specific localStorage key.
- * Each app (patient, admin, merchant) stores its user object under
- * a different key, but shares the same JWT cookie.
+ * Each app (patient, admin, merchant) stores its minimal user object
+ * under a different key, but shares the same JWT cookie.
  */
 export function createSessionHelpers(storageKey: string) {
   return {
+    /**
+     * Stores only minimal user data (id, firstName, role, level) in localStorage.
+     * Sensitive PII (email, phone, national_id) is NOT persisted.
+     */
     setSession(_token: string, user: unknown): void {
       try {
-        localStorage.setItem(storageKey, JSON.stringify(user));
+        const minimal: MinimalUser = {
+          id: (user as Record<string, string>)?.id ?? "",
+          firstName: (user as Record<string, string>)?.firstName ?? "",
+          role: (user as Record<string, string>)?.role ?? "",
+          level: (user as Record<string, number>)?.level,
+        };
+        localStorage.setItem(storageKey, JSON.stringify(minimal));
       } catch {
         // localStorage may be unavailable in private browsing
+      }
+    },
+
+    /**
+     * Fetches the full current user profile from GET /api/v1/auth/me.
+     * Use this instead of getStoredUser when you need sensitive fields.
+     */
+    async fetchCurrentUser<T>(): Promise<T | null> {
+      try {
+        const res = await apiFetch(getApiUrl("auth/me"));
+        if (!res.ok) return null;
+        return (await res.json()) as T;
+      } catch {
+        return null;
       }
     },
 
