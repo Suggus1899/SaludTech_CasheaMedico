@@ -1,15 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { DollarSign, Users, Store, AlertTriangle, TrendingUp, TrendingDown, Search, CreditCard } from "lucide-react";
+import { DollarSign, Users, Store, AlertTriangle, TrendingUp, TrendingDown, Search, CreditCard, BarChart3 } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
 import { getApiUrl } from "../../../lib/api";
-import { AdminUser, AdminUsersResponse, DashboardStats } from "../../../types/admin";
+import { AdminUser, AdminUsersResponse, DashboardStats, AnalyticsResponse } from "../../../types/admin";
+import {
+  RevenueLineChart,
+  TransactionStatusPie,
+  InstallmentStatusBar,
+  TopMerchantsChart,
+  CategoryDonut,
+  TriageFunnel,
+} from "../../../components/charts/AnalyticsCharts";
 
 export default function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: stats, loading: statsLoading } = useFetchData<DashboardStats>(getApiUrl("admin/dashboard"));
   const { data: usersData, loading: usersLoading } = useFetchData<AdminUsersResponse>(getApiUrl("admin/users?limit=5&offset=0"));
+  const { data: analytics, loading: analyticsLoading } = useFetchData<AnalyticsResponse>(getApiUrl("admin/analytics"));
 
   if (statsLoading || usersLoading) return <div className="p-8 text-center text-muted-foreground">Cargando dashboard...</div>;
 
@@ -86,6 +95,86 @@ export default function DashboardPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Analytics Charts */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-5 h-5 text-primary" />
+          <h2 className="text-xl font-bold font-(family-name:--font-syne)">Analytics</h2>
+        </div>
+
+        {/* Revenue + Transaction Status */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="card bg-base-100 border border-base-300 shadow-sm lg:col-span-2">
+            <div className="card-body">
+              <h3 className="card-title font-(family-name:--font-syne)">Revenue por Mes</h3>
+              {analyticsLoading ? (
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+              ) : (
+                <RevenueLineChart data={analytics?.revenueByMonth ?? []} />
+              )}
+            </div>
+          </div>
+          <div className="card bg-base-100 border border-base-300 shadow-sm">
+            <div className="card-body">
+              <h3 className="card-title font-(family-name:--font-syne)">Estado de Transacciones</h3>
+              {analyticsLoading ? (
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+              ) : (
+                <TransactionStatusPie data={analytics?.transactionStatus ?? []} />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Installments + Top Merchants */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="card bg-base-100 border border-base-300 shadow-sm">
+            <div className="card-body">
+              <h3 className="card-title font-(family-name:--font-syne)">Estado de Cuotas</h3>
+              {analyticsLoading ? (
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+              ) : (
+                <InstallmentStatusBar data={analytics?.installmentStatus ?? []} />
+              )}
+            </div>
+          </div>
+          <div className="card bg-base-100 border border-base-300 shadow-sm">
+            <div className="card-body">
+              <h3 className="card-title font-(family-name:--font-syne)">Top Comercios por Revenue</h3>
+              {analyticsLoading ? (
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+              ) : (
+                <TopMerchantsChart data={analytics?.topMerchants ?? []} />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Category Donut + Triage Funnel */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="card bg-base-100 border border-base-300 shadow-sm">
+            <div className="card-body">
+              <h3 className="card-title font-(family-name:--font-syne)">Comercios por Categoria</h3>
+              {analyticsLoading ? (
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+              ) : (
+                <CategoryDonut data={analytics?.categoryDistribution ?? []} />
+              )}
+            </div>
+          </div>
+          <div className="card bg-base-100 border border-base-300 shadow-sm">
+            <div className="card-body">
+              <h3 className="card-title font-(family-name:--font-syne)">Embudo de Triajes</h3>
+              {analyticsLoading ? (
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+              ) : (
+                <TriageFunnel data={analytics?.triageConversion ?? { pending_count: 0, reviewing_count: 0, resolved_count: 0, referred_count: 0, completed_count: 0 }} />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Tabla */}

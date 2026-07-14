@@ -222,6 +222,42 @@ func (q *Queries) DeleteMedicalSupply(ctx context.Context, arg DeleteMedicalSupp
 	return err
 }
 
+const getInstallmentStatusBreakdown = `-- name: GetInstallmentStatusBreakdown :many
+SELECT
+  status,
+  COUNT(*) AS count,
+  COALESCE(SUM(amount), 0) AS total_amount
+FROM installments
+GROUP BY status
+ORDER BY count DESC
+`
+
+type GetInstallmentStatusBreakdownRow struct {
+	Status      string      `json:"status"`
+	Count       int64       `json:"count"`
+	TotalAmount interface{} `json:"total_amount"`
+}
+
+func (q *Queries) GetInstallmentStatusBreakdown(ctx context.Context) ([]GetInstallmentStatusBreakdownRow, error) {
+	rows, err := q.db.Query(ctx, getInstallmentStatusBreakdown)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetInstallmentStatusBreakdownRow
+	for rows.Next() {
+		var i GetInstallmentStatusBreakdownRow
+		if err := rows.Scan(&i.Status, &i.Count, &i.TotalAmount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMerchantByUserID = `-- name: GetMerchantByUserID :one
 SELECT m.id, m.legal_name, m.trade_name, m.rif, m.category, m.address, m.city, m.phone, m.email, m.contact_name, m.mdr_rate, m.bank_account_bs, m.bank_account_usd, m.is_active, m.is_online, m.min_transaction, m.created_at, m.updated_at, m.subcategory FROM merchants m
 JOIN merchant_users mu ON m.id = mu.merchant_id
@@ -254,6 +290,41 @@ func (q *Queries) GetMerchantByUserID(ctx context.Context, userID pgtype.UUID) (
 		&i.Subcategory,
 	)
 	return i, err
+}
+
+const getMerchantCategoryDistribution = `-- name: GetMerchantCategoryDistribution :many
+SELECT
+  category,
+  COUNT(*) AS merchant_count
+FROM merchants
+WHERE is_active = true
+GROUP BY category
+ORDER BY merchant_count DESC
+`
+
+type GetMerchantCategoryDistributionRow struct {
+	Category      string `json:"category"`
+	MerchantCount int64  `json:"merchant_count"`
+}
+
+func (q *Queries) GetMerchantCategoryDistribution(ctx context.Context) ([]GetMerchantCategoryDistributionRow, error) {
+	rows, err := q.db.Query(ctx, getMerchantCategoryDistribution)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetMerchantCategoryDistributionRow
+	for rows.Next() {
+		var i GetMerchantCategoryDistributionRow
+		if err := rows.Scan(&i.Category, &i.MerchantCount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getMerchantDashboardStats = `-- name: GetMerchantDashboardStats :one
@@ -393,6 +464,158 @@ func (q *Queries) GetMerchantTransactions(ctx context.Context, arg GetMerchantTr
 		return nil, err
 	}
 	return items, nil
+}
+
+const getRevenueByMonth = `-- name: GetRevenueByMonth :many
+
+SELECT
+  TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') AS month,
+  COALESCE(SUM(total_amount), 0) AS revenue,
+  COUNT(*) AS transaction_count
+FROM transactions
+WHERE status != 'CANCELLED'
+GROUP BY DATE_TRUNC('month', created_at)
+ORDER BY month DESC
+LIMIT 12
+`
+
+type GetRevenueByMonthRow struct {
+	Month            string      `json:"month"`
+	Revenue          interface{} `json:"revenue"`
+	TransactionCount int64       `json:"transaction_count"`
+}
+
+// ─── Analytics queries ──────────────────────────────────────────────────────
+func (q *Queries) GetRevenueByMonth(ctx context.Context) ([]GetRevenueByMonthRow, error) {
+	rows, err := q.db.Query(ctx, getRevenueByMonth)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRevenueByMonthRow
+	for rows.Next() {
+		var i GetRevenueByMonthRow
+		if err := rows.Scan(&i.Month, &i.Revenue, &i.TransactionCount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTopMerchantsByRevenue = `-- name: GetTopMerchantsByRevenue :many
+SELECT
+  m.trade_name AS merchant_name,
+  m.category,
+  COALESCE(SUM(t.total_amount), 0) AS revenue,
+  COUNT(t.id) AS transaction_count
+FROM merchants m
+LEFT JOIN transactions t ON m.id = t.merchant_id AND t.status != 'CANCELLED'
+GROUP BY m.id, m.trade_name, m.category
+ORDER BY revenue DESC
+LIMIT 5
+`
+
+type GetTopMerchantsByRevenueRow struct {
+	MerchantName     string      `json:"merchant_name"`
+	Category         string      `json:"category"`
+	Revenue          interface{} `json:"revenue"`
+	TransactionCount int64       `json:"transaction_count"`
+}
+
+func (q *Queries) GetTopMerchantsByRevenue(ctx context.Context) ([]GetTopMerchantsByRevenueRow, error) {
+	rows, err := q.db.Query(ctx, getTopMerchantsByRevenue)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTopMerchantsByRevenueRow
+	for rows.Next() {
+		var i GetTopMerchantsByRevenueRow
+		if err := rows.Scan(
+			&i.MerchantName,
+			&i.Category,
+			&i.Revenue,
+			&i.TransactionCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTransactionStatusBreakdown = `-- name: GetTransactionStatusBreakdown :many
+SELECT
+  status,
+  COUNT(*) AS count,
+  COALESCE(SUM(total_amount), 0) AS total_amount
+FROM transactions
+GROUP BY status
+ORDER BY count DESC
+`
+
+type GetTransactionStatusBreakdownRow struct {
+	Status      string      `json:"status"`
+	Count       int64       `json:"count"`
+	TotalAmount interface{} `json:"total_amount"`
+}
+
+func (q *Queries) GetTransactionStatusBreakdown(ctx context.Context) ([]GetTransactionStatusBreakdownRow, error) {
+	rows, err := q.db.Query(ctx, getTransactionStatusBreakdown)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTransactionStatusBreakdownRow
+	for rows.Next() {
+		var i GetTransactionStatusBreakdownRow
+		if err := rows.Scan(&i.Status, &i.Count, &i.TotalAmount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTriageConversion = `-- name: GetTriageConversion :one
+SELECT
+  COUNT(DISTINCT CASE WHEN status = 'PENDING' THEN id END) AS pending_count,
+  COUNT(DISTINCT CASE WHEN status = 'REVIEWING' THEN id END) AS reviewing_count,
+  COUNT(DISTINCT CASE WHEN status = 'RESOLVED' THEN id END) AS resolved_count,
+  COUNT(DISTINCT CASE WHEN status = 'REFERRED' THEN id END) AS referred_count,
+  COUNT(DISTINCT CASE WHEN status = 'COMPLETED' THEN id END) AS completed_count
+FROM triage
+`
+
+type GetTriageConversionRow struct {
+	PendingCount   int64 `json:"pending_count"`
+	ReviewingCount int64 `json:"reviewing_count"`
+	ResolvedCount  int64 `json:"resolved_count"`
+	ReferredCount  int64 `json:"referred_count"`
+	CompletedCount int64 `json:"completed_count"`
+}
+
+func (q *Queries) GetTriageConversion(ctx context.Context) (GetTriageConversionRow, error) {
+	row := q.db.QueryRow(ctx, getTriageConversion)
+	var i GetTriageConversionRow
+	err := row.Scan(
+		&i.PendingCount,
+		&i.ReviewingCount,
+		&i.ResolvedCount,
+		&i.ReferredCount,
+		&i.CompletedCount,
+	)
+	return i, err
 }
 
 const getUserByIDAdmin = `-- name: GetUserByIDAdmin :one

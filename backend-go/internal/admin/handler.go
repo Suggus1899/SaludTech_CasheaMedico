@@ -26,6 +26,7 @@ type AdminHandler struct {
 func (h *AdminHandler) Routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /dashboard", h.GetDashboardStats)
+	mux.HandleFunc("GET /analytics", h.GetAnalytics)
 	mux.HandleFunc("GET /users", h.ListUsers)
 	mux.HandleFunc("GET /users/{id}", h.GetUser)
 	mux.HandleFunc("PATCH /users/{id}/status", h.UpdateUserStatus)
@@ -430,4 +431,32 @@ func (h *AdminHandler) ListAllElderCare(w http.ResponseWriter, r *http.Request) 
 		"offset":          offset,
 	})
 }
+// ─── Analytics ──────────────────────────────────────────────────────────────
+
+func (h *AdminHandler) GetAnalytics(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	revenueByMonth, _ := h.DB.GetRevenueByMonth(ctx)
+	txnStatus, _ := h.DB.GetTransactionStatusBreakdown(ctx)
+	installmentStatus, _ := h.DB.GetInstallmentStatusBreakdown(ctx)
+	topMerchants, _ := h.DB.GetTopMerchantsByRevenue(ctx)
+	categoryDist, _ := h.DB.GetMerchantCategoryDistribution(ctx)
+	triageConversion, _ := h.DB.GetTriageConversion(ctx)
+
+	// Reverse revenueByMonth so oldest is first (for line chart)
+	for i, j := 0, len(revenueByMonth)-1; i < j; i, j = i+1, j-1 {
+		revenueByMonth[i], revenueByMonth[j] = revenueByMonth[j], revenueByMonth[i]
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"revenueByMonth":       revenueByMonth,
+		"transactionStatus":    txnStatus,
+		"installmentStatus":    installmentStatus,
+		"topMerchants":         topMerchants,
+		"categoryDistribution": categoryDist,
+		"triageConversion":     triageConversion,
+	})
+}
+
 var _ = auth.GetRole

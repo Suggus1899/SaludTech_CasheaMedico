@@ -87,3 +87,46 @@ export interface CreditLinesResponse {
   limit: number;
   offset: number;
 }
+
+// ─── Analytics types (GET admin/analytics) ──────────────────────────────────
+
+export interface RevenueByMonth {
+  month: string;
+  revenue: string | number;
+  transaction_count: number;
+}
+
+export interface StatusBreakdown {
+  status: string;
+  count: number;
+  total_amount: string | number;
+}
+
+export interface TopMerchant {
+  merchant_name: string;
+  category: string;
+  revenue: string | number;
+  transaction_count: number;
+}
+
+export interface CategoryDistribution {
+  category: string;
+  merchant_count: number;
+}
+
+export interface TriageConversion {
+  pending_count: number;
+  reviewing_count: number;
+  resolved_count: number;
+  referred_count: number;
+  completed_count: number;
+}
+
+export interface AnalyticsResponse {
+  revenueByMonth: RevenueByMonth[];
+  transactionStatus: StatusBreakdown[];
+  installmentStatus: StatusBreakdown[];
+  topMerchants: TopMerchant[];
+  categoryDistribution: CategoryDistribution[];
+  triageConversion: TriageConversion;
+}

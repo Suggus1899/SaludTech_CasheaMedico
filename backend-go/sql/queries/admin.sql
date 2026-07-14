@@ -124,3 +124,64 @@ SELECT
   COALESCE(SUM(t.mdr_fee), 0) as total_mdr
 FROM transactions t
 WHERE t.merchant_id = $1 AND t.status != 'CANCELLED';
+
+-- ─── Analytics queries ──────────────────────────────────────────────────────
+
+-- name: GetRevenueByMonth :many
+SELECT
+  TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') AS month,
+  COALESCE(SUM(total_amount), 0) AS revenue,
+  COUNT(*) AS transaction_count
+FROM transactions
+WHERE status != 'CANCELLED'
+GROUP BY DATE_TRUNC('month', created_at)
+ORDER BY month DESC
+LIMIT 12;
+
+-- name: GetTransactionStatusBreakdown :many
+SELECT
+  status,
+  COUNT(*) AS count,
+  COALESCE(SUM(total_amount), 0) AS total_amount
+FROM transactions
+GROUP BY status
+ORDER BY count DESC;
+
+-- name: GetInstallmentStatusBreakdown :many
+SELECT
+  status,
+  COUNT(*) AS count,
+  COALESCE(SUM(amount), 0) AS total_amount
+FROM installments
+GROUP BY status
+ORDER BY count DESC;
+
+-- name: GetTopMerchantsByRevenue :many
+SELECT
+  m.trade_name AS merchant_name,
+  m.category,
+  COALESCE(SUM(t.total_amount), 0) AS revenue,
+  COUNT(t.id) AS transaction_count
+FROM merchants m
+LEFT JOIN transactions t ON m.id = t.merchant_id AND t.status != 'CANCELLED'
+GROUP BY m.id, m.trade_name, m.category
+ORDER BY revenue DESC
+LIMIT 5;
+
+-- name: GetMerchantCategoryDistribution :many
+SELECT
+  category,
+  COUNT(*) AS merchant_count
+FROM merchants
+WHERE is_active = true
+GROUP BY category
+ORDER BY merchant_count DESC;
+
+-- name: GetTriageConversion :one
+SELECT
+  COUNT(DISTINCT CASE WHEN status = 'PENDING' THEN id END) AS pending_count,
+  COUNT(DISTINCT CASE WHEN status = 'REVIEWING' THEN id END) AS reviewing_count,
+  COUNT(DISTINCT CASE WHEN status = 'RESOLVED' THEN id END) AS resolved_count,
+  COUNT(DISTINCT CASE WHEN status = 'REFERRED' THEN id END) AS referred_count,
+  COUNT(DISTINCT CASE WHEN status = 'COMPLETED' THEN id END) AS completed_count
+FROM triage;
