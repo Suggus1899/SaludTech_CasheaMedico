@@ -243,7 +243,7 @@ export default function PagarPage() {
               type="text"
               value={manualPayload}
               onChange={(e) => setManualPayload(e.target.value)}
-              placeholder="merchantId:amount:nonce:ts|signature"
+              placeholder="Pega aquí el código del QR"
               className="input input-bordered flex-1 text-sm"
             />
             <button type="submit" className="btn btn-primary btn-sm" disabled={isProcessing}>
