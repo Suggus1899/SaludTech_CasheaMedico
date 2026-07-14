@@ -7,6 +7,8 @@ import { getApiUrl, apiFetch } from "../../../lib/api";
 
 export default function ComerciosPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { data, loading } = useFetchData<any[]>(getApiUrl("admin/merchants"), [refreshTrigger]);
   
@@ -49,20 +51,48 @@ export default function ComerciosPage() {
   const merchants = data?.merchants || [];
   const filtered = merchants.filter(
     (c: any) =>
-      c.trade_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.category?.toLowerCase().includes(searchTerm.toLowerCase())
+      (c.trade_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.legal_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.rif?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.city?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (categoryFilter === "ALL" || c.category === categoryFilter) &&
+      (statusFilter === "ALL" || (statusFilter === "ACTIVE" && c.is_active) || (statusFilter === "INACTIVE" && !c.is_active))
   );
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="opacity-60 text-sm">{filtered.length} comercios encontrados</p>
-        <div className="relative hidden sm:block mr-2">
-          <input type="search" placeholder="Buscar comercios..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
+        <div className="flex items-center gap-2">
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="select select-sm select-bordered"
+          >
+            <option value="ALL">Todas las categorias</option>
+            <option value="CLINIC">Clinicas</option>
+            <option value="PHARMACY">Farmacias</option>
+            <option value="LABORATORY">Laboratorios</option>
+            <option value="DENTAL">Dental</option>
+            <option value="OPTICS">Opticas</option>
+            <option value="ELDER_CARE">Cuidado de adultos</option>
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="select select-sm select-bordered"
+          >
+            <option value="ALL">Todos</option>
+            <option value="ACTIVE">Activos</option>
+            <option value="INACTIVE">Inactivos</option>
+          </select>
+          <div className="relative hidden sm:block">
+            <input type="search" placeholder="Buscar por nombre, RIF, ciudad..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-64 transition-all" />
+          </div>
+          <button className="btn btn-primary btn-sm gap-2" onClick={() => setIsAddMerchantOpen(true)}>
+            <Store className="w-4 h-4" /> Agregar Comercio
+          </button>
         </div>
-        <button className="btn btn-primary btn-sm gap-2" onClick={() => setIsAddMerchantOpen(true)}>
-          <Store className="w-4 h-4" /> Agregar Comercio
-        </button>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.length === 0 ? (

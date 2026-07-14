@@ -60,6 +60,10 @@ type Querier interface {
 	DeleteMedicalService(ctx context.Context, arg DeleteMedicalServiceParams) error
 	DeleteMedicalSupply(ctx context.Context, arg DeleteMedicalSupplyParams) error
 	DeleteMedicationReminder(ctx context.Context, arg DeleteMedicationReminderParams) error
+	ExportAllInstallments(ctx context.Context) ([]ExportAllInstallmentsRow, error)
+	ExportAllTransactions(ctx context.Context) ([]ExportAllTransactionsRow, error)
+	// ─── Export queries (no pagination, for CSV) ────────────────────────────────
+	ExportAllUsers(ctx context.Context) ([]ExportAllUsersRow, error)
 	FindUserByPhoneOrEmail(ctx context.Context, phone string) (FindUserByPhoneOrEmailRow, error)
 	GetAllActiveMerchants(ctx context.Context) ([]GetAllActiveMerchantsRow, error)
 	GetAppointment(ctx context.Context, arg GetAppointmentParams) (GetAppointmentRow, error)
@@ -104,6 +108,7 @@ type Querier interface {
 	GetTriageByID(ctx context.Context, id pgtype.UUID) (Triage, error)
 	GetTriageByUser(ctx context.Context, userID pgtype.UUID) ([]Triage, error)
 	GetTriageConversion(ctx context.Context) (GetTriageConversionRow, error)
+	GetUpcomingInstallmentsForReminder(ctx context.Context) ([]GetUpcomingInstallmentsForReminderRow, error)
 	GetUserByEmail(ctx context.Context, email pgtype.Text) (User, error)
 	GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
 	GetUserByIDAdmin(ctx context.Context, id pgtype.UUID) (GetUserByIDAdminRow, error)

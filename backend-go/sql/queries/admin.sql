@@ -185,3 +185,32 @@ SELECT
   COUNT(DISTINCT CASE WHEN status = 'REFERRED' THEN id END) AS referred_count,
   COUNT(DISTINCT CASE WHEN status = 'COMPLETED' THEN id END) AS completed_count
 FROM triage;
+
+-- ─── Export queries (no pagination, for CSV) ────────────────────────────────
+
+-- name: ExportAllUsers :many
+SELECT id, phone, email, full_name, national_id, role,
+       level, points, total_paid, installments_paid_count, is_active,
+       created_at, updated_at
+FROM users
+ORDER BY created_at DESC;
+
+-- name: ExportAllTransactions :many
+SELECT
+  t.id, t.total_amount, t.down_payment, t.financed_amount,
+  t.num_installments, t.status, t.mdr_fee, t.description, t.created_at,
+  u.full_name AS user_name, u.email AS user_email,
+  m.trade_name AS merchant_name, m.category AS merchant_category
+FROM transactions t
+JOIN users u ON t.user_id = u.id
+JOIN merchants m ON t.merchant_id = m.id
+ORDER BY t.created_at DESC;
+
+-- name: ExportAllInstallments :many
+SELECT
+  i.id, i.installment_num, i.amount, i.due_date, i.paid_at,
+  i.status, i.reactivation_fee, i.days_overdue, i.created_at,
+  u.full_name AS user_name, u.email AS user_email
+FROM installments i
+JOIN users u ON i.user_id = u.id
+ORDER BY i.due_date DESC;

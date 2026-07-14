@@ -222,6 +222,184 @@ func (q *Queries) DeleteMedicalSupply(ctx context.Context, arg DeleteMedicalSupp
 	return err
 }
 
+const exportAllInstallments = `-- name: ExportAllInstallments :many
+SELECT
+  i.id, i.installment_num, i.amount, i.due_date, i.paid_at,
+  i.status, i.reactivation_fee, i.days_overdue, i.created_at,
+  u.full_name AS user_name, u.email AS user_email
+FROM installments i
+JOIN users u ON i.user_id = u.id
+ORDER BY i.due_date DESC
+`
+
+type ExportAllInstallmentsRow struct {
+	ID              pgtype.UUID        `json:"id"`
+	InstallmentNum  int16              `json:"installment_num"`
+	Amount          pgtype.Numeric     `json:"amount"`
+	DueDate         pgtype.Date        `json:"due_date"`
+	PaidAt          pgtype.Timestamptz `json:"paid_at"`
+	Status          string             `json:"status"`
+	ReactivationFee pgtype.Numeric     `json:"reactivation_fee"`
+	DaysOverdue     int32              `json:"days_overdue"`
+	CreatedAt       pgtype.Timestamptz `json:"created_at"`
+	UserName        string             `json:"user_name"`
+	UserEmail       pgtype.Text        `json:"user_email"`
+}
+
+func (q *Queries) ExportAllInstallments(ctx context.Context) ([]ExportAllInstallmentsRow, error) {
+	rows, err := q.db.Query(ctx, exportAllInstallments)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ExportAllInstallmentsRow
+	for rows.Next() {
+		var i ExportAllInstallmentsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.InstallmentNum,
+			&i.Amount,
+			&i.DueDate,
+			&i.PaidAt,
+			&i.Status,
+			&i.ReactivationFee,
+			&i.DaysOverdue,
+			&i.CreatedAt,
+			&i.UserName,
+			&i.UserEmail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const exportAllTransactions = `-- name: ExportAllTransactions :many
+SELECT
+  t.id, t.total_amount, t.down_payment, t.financed_amount,
+  t.num_installments, t.status, t.mdr_fee, t.description, t.created_at,
+  u.full_name AS user_name, u.email AS user_email,
+  m.trade_name AS merchant_name, m.category AS merchant_category
+FROM transactions t
+JOIN users u ON t.user_id = u.id
+JOIN merchants m ON t.merchant_id = m.id
+ORDER BY t.created_at DESC
+`
+
+type ExportAllTransactionsRow struct {
+	ID               pgtype.UUID        `json:"id"`
+	TotalAmount      pgtype.Numeric     `json:"total_amount"`
+	DownPayment      pgtype.Numeric     `json:"down_payment"`
+	FinancedAmount   pgtype.Numeric     `json:"financed_amount"`
+	NumInstallments  int16              `json:"num_installments"`
+	Status           string             `json:"status"`
+	MdrFee           pgtype.Numeric     `json:"mdr_fee"`
+	Description      pgtype.Text        `json:"description"`
+	CreatedAt        pgtype.Timestamptz `json:"created_at"`
+	UserName         string             `json:"user_name"`
+	UserEmail        pgtype.Text        `json:"user_email"`
+	MerchantName     string             `json:"merchant_name"`
+	MerchantCategory string             `json:"merchant_category"`
+}
+
+func (q *Queries) ExportAllTransactions(ctx context.Context) ([]ExportAllTransactionsRow, error) {
+	rows, err := q.db.Query(ctx, exportAllTransactions)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ExportAllTransactionsRow
+	for rows.Next() {
+		var i ExportAllTransactionsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.TotalAmount,
+			&i.DownPayment,
+			&i.FinancedAmount,
+			&i.NumInstallments,
+			&i.Status,
+			&i.MdrFee,
+			&i.Description,
+			&i.CreatedAt,
+			&i.UserName,
+			&i.UserEmail,
+			&i.MerchantName,
+			&i.MerchantCategory,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const exportAllUsers = `-- name: ExportAllUsers :many
+
+SELECT id, phone, email, full_name, national_id, role,
+       level, points, total_paid, installments_paid_count, is_active,
+       created_at, updated_at
+FROM users
+ORDER BY created_at DESC
+`
+
+type ExportAllUsersRow struct {
+	ID                    pgtype.UUID        `json:"id"`
+	Phone                 string             `json:"phone"`
+	Email                 pgtype.Text        `json:"email"`
+	FullName              string             `json:"full_name"`
+	NationalID            pgtype.Text        `json:"national_id"`
+	Role                  string             `json:"role"`
+	Level                 int16              `json:"level"`
+	Points                int32              `json:"points"`
+	TotalPaid             pgtype.Numeric     `json:"total_paid"`
+	InstallmentsPaidCount int32              `json:"installments_paid_count"`
+	IsActive              bool               `json:"is_active"`
+	CreatedAt             pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt             pgtype.Timestamptz `json:"updated_at"`
+}
+
+// ─── Export queries (no pagination, for CSV) ────────────────────────────────
+func (q *Queries) ExportAllUsers(ctx context.Context) ([]ExportAllUsersRow, error) {
+	rows, err := q.db.Query(ctx, exportAllUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ExportAllUsersRow
+	for rows.Next() {
+		var i ExportAllUsersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Phone,
+			&i.Email,
+			&i.FullName,
+			&i.NationalID,
+			&i.Role,
+			&i.Level,
+			&i.Points,
+			&i.TotalPaid,
+			&i.InstallmentsPaidCount,
+			&i.IsActive,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getInstallmentStatusBreakdown = `-- name: GetInstallmentStatusBreakdown :many
 SELECT
   status,

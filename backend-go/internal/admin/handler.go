@@ -39,6 +39,10 @@ func (h *AdminHandler) Routes() http.Handler {
 	mux.HandleFunc("PUT /triage/{id}/respond", h.RespondTriage)
 	mux.HandleFunc("GET /subscriptions/all", h.ListAllSubscriptions)
 	mux.HandleFunc("GET /elder-care", h.ListAllElderCare)
+	// CSV exports
+	mux.HandleFunc("GET /export/users", h.ExportUsersCSV)
+	mux.HandleFunc("GET /export/transactions", h.ExportTransactionsCSV)
+	mux.HandleFunc("GET /export/installments", h.ExportInstallmentsCSV)
 	return mux
 }
 

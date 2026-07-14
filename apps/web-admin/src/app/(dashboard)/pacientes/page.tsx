@@ -4,9 +4,12 @@ import { useState } from "react";
 import { Users, CheckCircle2, XCircle } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
 import { getApiUrl, apiFetch } from "../../../lib/api";
+import { ExportButton } from "../../../components/shared/ExportButton";
 
 export default function PacientesPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { data, loading } = useFetchData<any>(getApiUrl("admin/users?limit=50&offset=0"), [refreshTrigger]);
   
@@ -49,20 +52,46 @@ export default function PacientesPage() {
   const users = data?.users || [];
   const filtered = users.filter(
     (p: any) =>
-      p.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      (p.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.national_id?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (roleFilter === "ALL" || p.role === roleFilter) &&
+      (statusFilter === "ALL" || (statusFilter === "ACTIVE" && p.is_active) || (statusFilter === "INACTIVE" && !p.is_active))
   );
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="opacity-60 text-sm">{filtered.length} pacientes encontrados</p>
-        <div className="relative hidden sm:block mr-2">
-          <input type="search" placeholder="Buscar pacientes..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
+        <div className="flex items-center gap-2">
+          <ExportButton endpoint="admin/export/users" label="usuarios" />
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="select select-sm select-bordered"
+          >
+            <option value="ALL">Todos los roles</option>
+            <option value="PATIENT">Pacientes</option>
+            <option value="MERCHANT">Comercios</option>
+            <option value="ADMIN">Admins</option>
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="select select-sm select-bordered"
+          >
+            <option value="ALL">Todos</option>
+            <option value="ACTIVE">Activos</option>
+            <option value="INACTIVE">Inactivos</option>
+          </select>
+          <div className="relative hidden sm:block">
+            <input type="search" placeholder="Buscar por nombre, email, telefono, cedula..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-64 transition-all" />
+          </div>
+          <button className="btn btn-primary btn-sm gap-2" onClick={() => setIsAddPatientOpen(true)}>
+            <Users className="w-4 h-4" /> Agregar Paciente
+          </button>
         </div>
-        <button className="btn btn-primary btn-sm gap-2" onClick={() => setIsAddPatientOpen(true)}>
-          <Users className="w-4 h-4" /> Agregar Paciente
-        </button>
       </div>
       <div className="card bg-base-100 border border-base-300 shadow-sm">
         <div className="p-0">

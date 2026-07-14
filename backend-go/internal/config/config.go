@@ -19,6 +19,12 @@ type Config struct {
 	// fakePayment API key (test payment gateway)
 	FakePayKey string `envconfig:"FAKEPAY_API_KEY"`
 
+	// Resend API key for transactional emails
+	ResendAPIKey string `envconfig:"RESEND_API_KEY"`
+
+	// From email address for outgoing emails
+	EmailFrom string `envconfig:"EMAIL_FROM" default:"onboarding@resend.dev"`
+
 	// Comma-separated list of allowed CORS origins
 	CORSAllowedOrigins string `envconfig:"CORS_ALLOWED_ORIGINS" default:"http://localhost:3000,http://localhost:3001,http://localhost:3002"`
 

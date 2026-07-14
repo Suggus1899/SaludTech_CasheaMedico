@@ -23,6 +23,7 @@ import (
 	"github.com/saludtech/backend-go/internal/config"
 	"github.com/saludtech/backend-go/internal/database"
 	"github.com/saludtech/backend-go/internal/admin"
+	"github.com/saludtech/backend-go/internal/email"
 	"github.com/saludtech/backend-go/internal/fakepay"
 	appmw "github.com/saludtech/backend-go/internal/middleware"
 	"github.com/saludtech/backend-go/internal/merchant"
@@ -55,6 +56,11 @@ func main() {
 
 	scanner := &worker.InstallmentScanner{Pool: pool}
 	scanner.Start()
+
+	// Email payment reminders (daily at 09:00)
+	emailSender := email.New(cfg.ResendAPIKey, cfg.EmailFrom)
+	reminder := &worker.PaymentReminder{Pool: pool, Sender: emailSender}
+	reminder.Start()
 
 	// Parse CORS origins from config
 	allowedOrigins := strings.Split(cfg.CORSAllowedOrigins, ",")

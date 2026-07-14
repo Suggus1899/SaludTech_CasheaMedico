@@ -5,9 +5,12 @@ import { CreditCard, Pencil, X, AlertCircle, Check } from "lucide-react";
 import { useFetchData } from "../../../hooks/useFetchData";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { CreditLine, CreditLinesResponse } from "../../../types/admin";
+import { ExportButton } from "../../../components/shared/ExportButton";
 
 export default function FinanciamientosPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [typeFilter, setTypeFilter] = useState("ALL");
   const { data, loading, refetch } = useFetchData<CreditLinesResponse>(getApiUrl("admin/credit-lines?limit=50&offset=0"));
   const [editing, setEditing] = useState<CreditLine | null>(null);
   const [newLimit, setNewLimit] = useState("");
@@ -20,8 +23,11 @@ export default function FinanciamientosPage() {
   const lines: CreditLine[] = data?.creditLines || [];
   const filtered = lines.filter(
     (f) =>
-      f.user_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      f.type?.toLowerCase().includes(searchTerm.toLowerCase())
+      (f.user_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.user_phone?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (statusFilter === "ALL" || f.status === statusFilter) &&
+      (typeFilter === "ALL" || f.type === typeFilter)
   );
 
   const lineTypeLabels: Record<string, string> = {
@@ -72,8 +78,30 @@ export default function FinanciamientosPage() {
               <Check className="w-4 h-4" /> Límite actualizado
             </span>
           )}
+          <ExportButton endpoint="admin/export/transactions" label="transacciones" />
+          <ExportButton endpoint="admin/export/installments" label="cuotas" />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="select select-sm select-bordered"
+          >
+            <option value="ALL">Todos los estados</option>
+            <option value="ACTIVE">Activas</option>
+            <option value="PAUSED">Pausadas</option>
+            <option value="BLOCKED">Bloqueadas</option>
+          </select>
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="select select-sm select-bordered"
+          >
+            <option value="ALL">Todos los tipos</option>
+            <option value="ESPECIALIDAD_PRINCIPAL">Especialidad Principal</option>
+            <option value="SALUD_COTIDIANA">Salud Cotidiana</option>
+            <option value="MAYOR_CUIDADO">Mayor Cuidado</option>
+          </select>
           <div className="relative hidden sm:block">
-            <input type="search" placeholder="Buscar..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
+            <input type="search" placeholder="Buscar por nombre, tipo, telefono..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-64 transition-all" />
           </div>
         </div>
       </div>

@@ -79,6 +79,62 @@ func (q *Queries) GetOverdueInstallments(ctx context.Context) ([]Installment, er
 	return items, nil
 }
 
+const getUpcomingInstallmentsForReminder = `-- name: GetUpcomingInstallmentsForReminder :many
+SELECT
+    i.id,
+    i.user_id,
+    i.amount,
+    i.due_date,
+    i.installment_num,
+    u.email,
+    u.full_name
+FROM installments i
+JOIN users u ON i.user_id = u.id
+WHERE i.status = 'PENDING'
+  AND i.due_date >= CURRENT_DATE
+  AND i.due_date <= CURRENT_DATE + INTERVAL '3 days'
+  AND u.email IS NOT NULL
+  AND u.is_active = true
+`
+
+type GetUpcomingInstallmentsForReminderRow struct {
+	ID             pgtype.UUID    `json:"id"`
+	UserID         pgtype.UUID    `json:"user_id"`
+	Amount         pgtype.Numeric `json:"amount"`
+	DueDate        pgtype.Date    `json:"due_date"`
+	InstallmentNum int16          `json:"installment_num"`
+	Email          pgtype.Text    `json:"email"`
+	FullName       string         `json:"full_name"`
+}
+
+func (q *Queries) GetUpcomingInstallmentsForReminder(ctx context.Context) ([]GetUpcomingInstallmentsForReminderRow, error) {
+	rows, err := q.db.Query(ctx, getUpcomingInstallmentsForReminder)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUpcomingInstallmentsForReminderRow
+	for rows.Next() {
+		var i GetUpcomingInstallmentsForReminderRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Amount,
+			&i.DueDate,
+			&i.InstallmentNum,
+			&i.Email,
+			&i.FullName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const pauseUserCreditLines = `-- name: PauseUserCreditLines :exec
 UPDATE credit_lines
 SET
