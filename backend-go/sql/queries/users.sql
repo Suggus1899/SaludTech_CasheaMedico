@@ -9,20 +9,16 @@ SELECT * FROM users WHERE email = $1;
 
 -- name: CreateUser :one
 INSERT INTO users (
-    phone, email, password_hash, full_name, national_id, role, email_verification_token
+    phone, email, password_hash, full_name, national_id, role
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7
+    $1, $2, $3, $4, $5, $6
 ) RETURNING *;
-
--- name: GetUserByVerificationToken :one
-SELECT * FROM users WHERE email_verification_token = $1 AND email_verification_token IS NOT NULL;
 
 -- name: VerifyEmail :exec
 UPDATE users
 SET
     is_email_verified = TRUE,
     email_verified_at = NOW(),
-    email_verification_token = NULL,
     kyc_status = 'APPROVED'
 WHERE id = $1;
 

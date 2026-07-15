@@ -5,10 +5,10 @@ import (
 	"log"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/robfig/cron/v3"
 	"github.com/saludtech/backend-go/internal/database"
-	"github.com/saludtech/backend-go/internal/email"
 )
 
 // Advisory lock keys for the installment scanner.
@@ -19,9 +19,8 @@ const (
 )
 
 type InstallmentScanner struct {
-	Pool      *pgxpool.Pool
-	Sender    *email.Sender
-	Schedule  string
+	Pool     *pgxpool.Pool
+	Schedule string
 }
 
 func (s *InstallmentScanner) Start() {
@@ -83,28 +82,6 @@ func (s *InstallmentScanner) Start() {
 				log.Printf("Failed to pause credit lines for user %s: %v", inst.UserID, err)
 			}
 
-			// Send overdue notice email
-			if s.Sender != nil {
-				user, err := database.New(s.Pool).GetUserByID(ctx, inst.UserID)
-				if err == nil && user.Email.Valid {
-					amount := numericToFloat(inst.Amount)
-					dueDate := ""
-					if inst.DueDate.Valid {
-						dueDate = inst.DueDate.Time.Format("02/01/2006")
-					}
-					html := email.OverdueNoticeEmail(
-						user.FullName,
-						amount,
-						inst.ID.String(),
-						dueDate,
-						4.00, // reactivation fee
-					)
-					if err := s.Sender.Send(user.Email.String, "Cuota vencida - SaludTech", html); err != nil {
-						log.Printf("Failed to send overdue email to %s: %v", user.Email.String, err)
-					}
-				}
-			}
-
 			log.Printf("Processed overdue installment %s for user %s", inst.ID, inst.UserID)
 		}
 
@@ -123,4 +100,16 @@ func (s *InstallmentScanner) Start() {
 
 	c.Start()
 	log.Println("⏱️  Installment Scanner Cron Job started")
+}
+
+// numericToFloat converts a pgtype.Numeric to float64.
+func numericToFloat(n pgtype.Numeric) float64 {
+	if !n.Valid {
+		return 0
+	}
+	f, err := n.Float64Value()
+	if err != nil {
+		return 0
+	}
+	return f.Float64
 }

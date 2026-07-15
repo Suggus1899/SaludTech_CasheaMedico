@@ -113,7 +113,6 @@ type Querier interface {
 	GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
 	GetUserByIDAdmin(ctx context.Context, id pgtype.UUID) (GetUserByIDAdminRow, error)
 	GetUserByPhone(ctx context.Context, phone string) (User, error)
-	GetUserByVerificationToken(ctx context.Context, emailVerificationToken pgtype.Text) (User, error)
 	GetUserForTriageEmail(ctx context.Context, id pgtype.UUID) (GetUserForTriageEmailRow, error)
 	ListAllCreditLines(ctx context.Context, arg ListAllCreditLinesParams) ([]ListAllCreditLinesRow, error)
 	// ════════════════════════════════════════════════════════════

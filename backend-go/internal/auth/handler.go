@@ -1,19 +1,14 @@
 package auth
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/saludtech/backend-go/internal/config"
 	"github.com/saludtech/backend-go/internal/database"
-	"github.com/saludtech/backend-go/internal/email"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -63,9 +58,8 @@ func clearAuthCookie(w http.ResponseWriter, r *http.Request) {
 }
 
 type AuthHandler struct {
-	DB     database.Querier
-	Cfg    *config.Config
-	Email  *email.Sender
+	DB  database.Querier
+	Cfg *config.Config
 }
 
 type LoginRequest struct {
@@ -255,17 +249,13 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	fullName := strings.TrimSpace(req.FirstName + " " + req.LastName)
 	nationalID := pgtype.Text{String: req.IdentityDocument, Valid: req.IdentityDocument != ""}
 
-	// Generate email verification token
-	verificationToken := generateVerificationToken()
-
 	user, err := h.DB.CreateUser(ctx, database.CreateUserParams{
-		Phone:                   req.Phone,
-		Email:                   emailText,
-		PasswordHash:            string(hashedPassword),
-		FullName:                fullName,
-		NationalID:              nationalID,
-		Role:                    "PATIENT",
-		EmailVerificationToken:  pgtype.Text{String: verificationToken, Valid: true},
+		Phone:        req.Phone,
+		Email:        emailText,
+		PasswordHash: string(hashedPassword),
+		FullName:     fullName,
+		NationalID:   nationalID,
+		Role:         "PATIENT",
 	})
 	if err != nil {
 		log.Printf("Failed to create user (phone=%s, email=%s, national_id=%s): %v", req.Phone, req.Email, req.IdentityDocument, err)
@@ -273,15 +263,9 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Send verification email asynchronously (don't block the response)
-	if h.Email != nil && user.Email.Valid {
-		go func() {
-			verificationURL := fmt.Sprintf("%s/verificar?token=%s", h.Cfg.FrontendURL, verificationToken)
-			html := email.EmailVerificationEmail(fullName, verificationURL)
-			if err := h.Email.Send(user.Email.String, "Verifica tu correo - SaludTech", html); err != nil {
-				log.Printf("Failed to send verification email to %s: %v", user.Email.String, err)
-			}
-		}()
+	// Auto-verify email (no email verification flow)
+	if err := h.DB.VerifyEmail(ctx, user.ID); err != nil {
+		log.Printf("Failed to auto-verify email for user %s: %v", user.ID, err)
 	}
 
 	token, err := GenerateToken(user.ID.String(), string(user.Role), h.Cfg)
@@ -299,74 +283,4 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		"token":        token,
 		"user":         toUserResponse(user),
 	})
-}
-
-// generateVerificationToken creates a cryptographically secure random token.
-func generateVerificationToken() string {
-	b := make([]byte, 32)
-	if _, err := rand.Read(b); err != nil {
-		// Fallback — should never happen
-		return hex.EncodeToString([]byte(fmt.Sprintf("%d", time.Now().UnixNano())))
-	}
-	return hex.EncodeToString(b)
-}
-
-// VerifyEmail handles GET /api/v1/auth/verify-email?token=xxx
-// It validates the token, marks the user's email as verified, and sends a welcome email.
-func (h *AuthHandler) VerifyEmail(w http.ResponseWriter, r *http.Request) {
-	token := r.URL.Query().Get("token")
-	if token == "" {
-		http.Error(w, "Token is required", http.StatusBadRequest)
-		return
-	}
-
-	ctx := r.Context()
-	tokenText := pgtype.Text{String: token, Valid: true}
-	user, err := h.DB.GetUserByVerificationToken(ctx, tokenText)
-	if err != nil || !user.ID.Valid {
-		http.Error(w, "Invalid or expired verification token", http.StatusBadRequest)
-		return
-	}
-
-	if err := h.DB.VerifyEmail(ctx, user.ID); err != nil {
-		log.Printf("Failed to verify email for user %s: %v", user.ID, err)
-		http.Error(w, "Error verifying email", http.StatusInternalServerError)
-		return
-	}
-
-	// Send welcome email
-	if h.Email != nil && user.Email.Valid {
-		fullName := user.FullName
-		creditLimit := 0.0
-		// Try to get the main credit line limit
-		lines, _ := h.DB.GetCreditLinesByUser(ctx, user.ID)
-		for _, line := range lines {
-			if line.Type == "ESPECIALIDAD_PRINCIPAL" {
-				creditLimit = numericToFloat(line.LimitUsd)
-				break
-			}
-		}
-		html := email.WelcomeEmail(fullName, creditLimit)
-		if err := h.Email.Send(user.Email.String, "Bienvenido a SaludTech", html); err != nil {
-			log.Printf("Failed to send welcome email to %s: %v", user.Email.String, err)
-		}
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"message": "Email verified successfully",
-		"verified": true,
-	})
-}
-
-func numericToFloat(n pgtype.Numeric) float64 {
-	if !n.Valid {
-		return 0
-	}
-	f, err := n.Float64Value()
-	if err != nil {
-		return 0
-	}
-	return f.Float64
 }

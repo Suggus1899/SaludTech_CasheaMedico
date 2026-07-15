@@ -4,14 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/saludtech/backend-go/internal/auth"
 	"github.com/saludtech/backend-go/internal/database"
-	"github.com/saludtech/backend-go/internal/email"
 )
 
 // floatToNumeric converts a float64 to pgtype.Numeric via string scanning.
@@ -22,8 +20,7 @@ func floatToNumeric(f float64) pgtype.Numeric {
 }
 
 type AdminHandler struct {
-	DB    database.Querier
-	Email *email.Sender
+	DB database.Querier
 }
 
 func (h *AdminHandler) Routes() http.Handler {
@@ -150,18 +147,7 @@ func (h *AdminHandler) UpdateUserStatus(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, `{"error":"Failed to update user status"}`, http.StatusInternalServerError)
 		return
 	}
-
-	// Send account status email
-	if h.Email != nil && updated.Email.Valid {
-		html := email.AccountStatusEmail(updated.FullName, req.IsActive)
-		subject := "Cuenta activada - SaludTech"
-		if !req.IsActive {
-			subject = "Cuenta desactivada - SaludTech"
-		}
-		if err := h.Email.Send(updated.Email.String, subject, html); err != nil {
-			log.Printf("Failed to send account status email to %s: %v", updated.Email.String, err)
-		}
-	}
+	_ = updated
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"message": "User status updated"})
@@ -248,23 +234,7 @@ func (h *AdminHandler) UpdateMerchantStatus(w http.ResponseWriter, r *http.Reque
 		http.Error(w, `{"error":"Failed to update merchant status"}`, http.StatusInternalServerError)
 		return
 	}
-
-	// Send merchant status email
-	if h.Email != nil {
-		merchantName := updated.TradeName
-		if merchantName == "" {
-			merchantName = updated.LegalName
-		}
-		html := email.MerchantStatusEmail(merchantName, req.IsActive)
-		subject := "Comercio activado - SaludTech"
-		if !req.IsActive {
-			subject = "Comercio desactivado - SaludTech"
-		}
-		// Merchant email lookup not available yet — log for now
-		log.Printf("[email] Merchant %s status changed to %v (email pending merchant contact lookup)", merchantName, req.IsActive)
-		_ = html
-		_ = subject
-	}
+	_ = updated
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"message": "Merchant status updated"})
@@ -418,17 +388,7 @@ func (h *AdminHandler) RespondTriage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"Failed to respond to triage"}`, http.StatusInternalServerError)
 		return
 	}
-
-	// Send triage response email
-	if h.Email != nil {
-		userInfo, err := h.DB.GetUserForTriageEmail(ctx, updated.ID)
-		if err == nil && userInfo.Email.Valid {
-			html := email.TriageResponseEmail(userInfo.FullName, req.Status, req.Recommendation)
-			if err := h.Email.Send(userInfo.Email.String, "Respuesta de triaje - SaludTech", html); err != nil {
-				log.Printf("Failed to send triage response email to %s: %v", userInfo.Email.String, err)
-			}
-		}
-	}
+	_ = updated
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"message": "Triage updated"})

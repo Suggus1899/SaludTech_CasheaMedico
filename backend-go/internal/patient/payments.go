@@ -7,14 +7,12 @@ import (
 	"log"
 	"math"
 	"net/http"
-	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/saludtech/backend-go/internal/auth"
 	"github.com/saludtech/backend-go/internal/database"
-	"github.com/saludtech/backend-go/internal/email"
 	"github.com/saludtech/backend-go/internal/fakepay"
 )
 
@@ -252,33 +250,6 @@ func (h *PatientHandler) ProcessPayment(w http.ResponseWriter, r *http.Request) 
 	if err := tx.Commit(ctx); err != nil {
 		http.Error(w, "Failed to commit payment transaction", http.StatusInternalServerError)
 		return
-	}
-
-	// 5f. Send payment confirmation email
-	if h.Email != nil {
-		user, err := h.DB.GetUserByID(ctx, uid)
-		if err == nil && user.Email.Valid {
-			html := email.PaymentConfirmationEmail(
-				user.FullName,
-				amountUSD,
-				req.InstallmentID,
-				time.Now().Format("02/01/2006 15:04"),
-			)
-			if err := h.Email.Send(user.Email.String, "Pago confirmado - SaludTech", html); err != nil {
-				log.Printf("Failed to send payment confirmation email to %s: %v", user.Email.String, err)
-			}
-		}
-	}
-
-	// 5g. If credit was reactivated, send reactivation email
-	if creditReactivated && h.Email != nil {
-		user, err := h.DB.GetUserByID(ctx, uid)
-		if err == nil && user.Email.Valid {
-			html := email.CreditReactivationEmail(user.FullName)
-			if err := h.Email.Send(user.Email.String, "Credito reactivado - SaludTech", html); err != nil {
-				log.Printf("Failed to send credit reactivation email to %s: %v", user.Email.String, err)
-			}
-		}
 	}
 
 	bcvRate := h.getBCVRateCached(r)

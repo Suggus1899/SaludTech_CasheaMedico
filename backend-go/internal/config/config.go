@@ -19,21 +19,6 @@ type Config struct {
 	// fakePayment API key (test payment gateway)
 	FakePayKey string `envconfig:"FAKEPAY_API_KEY"`
 
-	// Resend API key for transactional emails (optional)
-	ResendAPIKey string `envconfig:"RESEND_API_KEY"`
-
-	// From email address for outgoing emails
-	EmailFrom string `envconfig:"EMAIL_FROM" default:"onboarding@resend.dev"`
-
-	// Gmail SMTP credentials (alternative to Resend)
-	// GmailUser is the Gmail address without @gmail.com (e.g. "gustavojose0819")
-	// GmailAppPassword is a 16-char App Password from Google (spaces optional)
-	GmailUser         string `envconfig:"GMAIL_USER"`
-	GmailAppPassword  string `envconfig:"GMAIL_APP_PASSWORD"`
-
-	// Frontend URL for email links (verification, CTAs)
-	FrontendURL string `envconfig:"FRONTEND_URL" default:"https://salud-tech-cashea-medico-web-patien.vercel.app"`
-
 	// Comma-separated list of allowed CORS origins
 	CORSAllowedOrigins string `envconfig:"CORS_ALLOWED_ORIGINS" default:"http://localhost:3000,http://localhost:3001,http://localhost:3002"`
 

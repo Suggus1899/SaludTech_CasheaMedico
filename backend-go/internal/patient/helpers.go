@@ -8,7 +8,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/saludtech/backend-go/internal/bcv"
 	"github.com/saludtech/backend-go/internal/database"
-	"github.com/saludtech/backend-go/internal/email"
 	"github.com/saludtech/backend-go/internal/fakepay"
 )
 
@@ -17,7 +16,6 @@ type PatientHandler struct {
 	Pool      *pgxpool.Pool
 	BCVClient *bcv.Client
 	FakePay   *fakepay.Client
-	Email     *email.Sender
 }
 
 func numericToFloat(n pgtype.Numeric) float64 {

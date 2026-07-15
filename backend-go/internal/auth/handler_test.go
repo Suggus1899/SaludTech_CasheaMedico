@@ -12,24 +12,6 @@ import (
 	"github.com/saludtech/backend-go/internal/database"
 )
 
-func TestGenerateVerificationToken(t *testing.T) {
-	token1 := generateVerificationToken()
-	token2 := generateVerificationToken()
-
-	if token1 == token2 {
-		t.Fatal("Two consecutive tokens should be different")
-	}
-	if len(token1) != 64 {
-		t.Errorf("Token length = %d, want 64 (32 bytes hex-encoded)", len(token1))
-	}
-	// Verify it's valid hex
-	for _, c := range token1 {
-		if !strings.ContainsRune("0123456789abcdef", c) {
-			t.Errorf("Token contains non-hex character: %c", c)
-		}
-	}
-}
-
 func TestToUserResponse(t *testing.T) {
 	userID := pgtype.UUID{}
 	_ = userID.Scan("123e4567-e89b-12d3-a456-426614174000")

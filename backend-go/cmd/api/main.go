@@ -23,7 +23,6 @@ import (
 	"github.com/saludtech/backend-go/internal/config"
 	"github.com/saludtech/backend-go/internal/database"
 	"github.com/saludtech/backend-go/internal/admin"
-	"github.com/saludtech/backend-go/internal/email"
 	"github.com/saludtech/backend-go/internal/fakepay"
 	appmw "github.com/saludtech/backend-go/internal/middleware"
 	"github.com/saludtech/backend-go/internal/merchant"
@@ -52,17 +51,10 @@ func main() {
 
 	queries := database.New(pool)
 
-	// Email sender — supports Resend (if RESEND_API_KEY set) or Gmail SMTP (if GMAIL_APP_PASSWORD set)
-	emailSender := email.NewWithGmail(cfg.ResendAPIKey, cfg.EmailFrom, cfg.GmailUser, cfg.GmailAppPassword)
+	authHandler := &auth.AuthHandler{DB: queries, Cfg: cfg}
 
-	authHandler := &auth.AuthHandler{DB: queries, Cfg: cfg, Email: emailSender}
-
-	scanner := &worker.InstallmentScanner{Pool: pool, Sender: emailSender, Schedule: cfg.ScannerCronSchedule}
+	scanner := &worker.InstallmentScanner{Pool: pool, Schedule: cfg.ScannerCronSchedule}
 	scanner.Start()
-
-	// Email payment reminders (daily at 09:00)
-	reminder := &worker.PaymentReminder{Pool: pool, Sender: emailSender}
-	reminder.Start()
 
 	// Parse CORS origins from config
 	allowedOrigins := strings.Split(cfg.CORSAllowedOrigins, ",")
@@ -107,12 +99,11 @@ func main() {
 	r.With(authLimiter.Middleware).Post("/api/v1/auth/login", authHandler.Login)
 	r.With(authLimiter.Middleware).Post("/api/v1/auth/register", registerWithCreditLines(queries, authHandler, cfg))
 	r.Post("/api/v1/auth/logout", authHandler.Logout)
-	r.Get("/api/v1/auth/verify-email", authHandler.VerifyEmail)
 
 	// Patient routes (protected)
 	bcvClient := bcv.NewClient(cfg.DolarVZLAKey)
 	fakePayClient := fakepay.NewClient(cfg.FakePayKey)
-	patientHandler := &patient.PatientHandler{DB: queries, Pool: pool, BCVClient: bcvClient, FakePay: fakePayClient, Email: emailSender}
+	patientHandler := &patient.PatientHandler{DB: queries, Pool: pool, BCVClient: bcvClient, FakePay: fakePayClient}
 	r.Route("/api/v1/patient", patientHandler.Routes())
 
 	// Payment routes (protected — legacy endpoint) — rate limited
@@ -127,7 +118,7 @@ func main() {
 	})
 
 	// Admin routes (ADMIN only)
-	adminHandler := &admin.AdminHandler{DB: queries, Email: emailSender}
+	adminHandler := &admin.AdminHandler{DB: queries}
 	r.Group(func(mux chi.Router) {
 		mux.Use(auth.RequireAuth, auth.RequireRole("ADMIN"))
 		mux.Mount("/api/v1/admin", adminHandler.Routes())

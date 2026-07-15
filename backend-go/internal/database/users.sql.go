@@ -13,20 +13,19 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-    phone, email, password_hash, full_name, national_id, role, email_verification_token
+    phone, email, password_hash, full_name, national_id, role
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7
+    $1, $2, $3, $4, $5, $6
 ) RETURNING id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, email_verification_token, email_verified_at
 `
 
 type CreateUserParams struct {
-	Phone                  string      `json:"phone"`
-	Email                  pgtype.Text `json:"email"`
-	PasswordHash           string      `json:"password_hash"`
-	FullName               string      `json:"full_name"`
-	NationalID             pgtype.Text `json:"national_id"`
-	Role                   string      `json:"role"`
-	EmailVerificationToken pgtype.Text `json:"email_verification_token"`
+	Phone        string      `json:"phone"`
+	Email        pgtype.Text `json:"email"`
+	PasswordHash string      `json:"password_hash"`
+	FullName     string      `json:"full_name"`
+	NationalID   pgtype.Text `json:"national_id"`
+	Role         string      `json:"role"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -37,7 +36,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.FullName,
 		arg.NationalID,
 		arg.Role,
-		arg.EmailVerificationToken,
 	)
 	var i User
 	err := row.Scan(
@@ -157,37 +155,6 @@ func (q *Queries) GetUserByPhone(ctx context.Context, phone string) (User, error
 	return i, err
 }
 
-const getUserByVerificationToken = `-- name: GetUserByVerificationToken :one
-SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, email_verification_token, email_verified_at FROM users WHERE email_verification_token = $1 AND email_verification_token IS NOT NULL
-`
-
-func (q *Queries) GetUserByVerificationToken(ctx context.Context, emailVerificationToken pgtype.Text) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByVerificationToken, emailVerificationToken)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Phone,
-		&i.Email,
-		&i.PasswordHash,
-		&i.FullName,
-		&i.NationalID,
-		&i.Role,
-		&i.Level,
-		&i.Points,
-		&i.TotalPaid,
-		&i.InstallmentsPaidCount,
-		&i.IsActive,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.IsPhoneVerified,
-		&i.IsCreditFrozenForElectives,
-		&i.IsEmailVerified,
-		&i.EmailVerificationToken,
-		&i.EmailVerifiedAt,
-	)
-	return i, err
-}
-
 const updateUserGamification = `-- name: UpdateUserGamification :one
 UPDATE users
 SET
@@ -261,7 +228,6 @@ UPDATE users
 SET
     is_email_verified = TRUE,
     email_verified_at = NOW(),
-    email_verification_token = NULL,
     kyc_status = 'APPROVED'
 WHERE id = $1
 `
