@@ -57,7 +57,7 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 <br><sub>Backend API</sub>
 </td>
 <td align="center" width="120">
-<a href="https://github.com/go-chi/chi" target="_blank"><img src="https://cdn.simpleicons.org/chi/000000" width="48" height="48" alt="go-chi" /></a>
+<a href="https://github.com/go-chi/chi" target="_blank"><img src="https://raw.githubusercontent.com/go-chi/docs/master/assets/chi.png" width="48" height="48" alt="go-chi" /></a>
 <br><sub><b><a href="https://github.com/go-chi/chi" target="_blank">go-chi v5</a></b></sub>
 <br><sub>HTTP router</sub>
 </td>
@@ -72,7 +72,7 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 <br><sub>HS256 · 24h</sub>
 </td>
 <td align="center" width="120">
-<a href="https://sqlc.dev/" target="_blank"><img src="https://cdn.simpleicons.org/sqlc/000000" width="48" height="48" alt="sqlc" /></a>
+<a href="https://sqlc.dev/" target="_blank"><img src="https://raw.githubusercontent.com/sqlc-dev/sqlc/main/docs/_static/logo.png" width="48" height="48" alt="sqlc" /></a>
 <br><sub><b><a href="https://sqlc.dev/" target="_blank">sqlc</a></b></sub>
 <br><sub>Type-safe SQL</sub>
 </td>
