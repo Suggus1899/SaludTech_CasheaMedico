@@ -1,6 +1,8 @@
 package patient
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -460,6 +462,9 @@ func (h *PatientHandler) Checkout(w http.ResponseWriter, r *http.Request) {
 	numFin.Scan(fmt.Sprintf("%.2f", financedAmount))
 	numMDR.Scan(fmt.Sprintf("%.2f", mdrFee))
 
+	// Generate a random QR token for checkout transactions
+	qrToken := generateCheckoutToken()
+
 	trx, err := txQueries.CreateTransaction(ctx, database.CreateTransactionParams{
 		UserID:          uid,
 		MerchantID:      merchantUUID,
@@ -468,6 +473,7 @@ func (h *PatientHandler) Checkout(w http.ResponseWriter, r *http.Request) {
 		DownPayment:     numDown,
 		FinancedAmount:  numFin,
 		NumInstallments: int16(numInst),
+		QrCodeToken:     pgtype.Text{String: qrToken, Valid: true},
 		MdrFee:          numMDR,
 		Description:     pgtype.Text{String: fmt.Sprintf("Compra de %d item(s)", len(items)), Valid: true},
 	})
@@ -592,4 +598,14 @@ func (h *PatientHandler) Checkout(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(resp)
+}
+
+// generateCheckoutToken creates a random hex token for checkout transactions
+// (the qr_code_token column has a NOT NULL constraint).
+func generateCheckoutToken() string {
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		return hex.EncodeToString([]byte(fmt.Sprintf("%d", 0)))
+	}
+	return "checkout_" + hex.EncodeToString(b)
 }
