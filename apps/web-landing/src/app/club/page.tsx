@@ -2,7 +2,7 @@
 
 import { Medal, TrendUp, Clock, Lightning, Shield, ArrowRight, UserPlus } from "@phosphor-icons/react";
 import Link from "next/link";
-import SharedLayout from "../components/SharedLayout";
+import SharedLayout from "../../components/SharedLayout";
 
 function ClubSaludTech() {
   const levels = [

@@ -22,7 +22,7 @@ import {
   Shield,
 } from "@phosphor-icons/react";
 import Link from "next/link";
-import SharedLayout from "../components/SharedLayout";
+import SharedLayout from "../../components/SharedLayout";
 
 // ─── Hero Comercios ────────────────────────────────────────────────────────────
 function Hero() {

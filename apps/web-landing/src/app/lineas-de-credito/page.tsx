@@ -25,8 +25,8 @@ import {
   Buildings,
 } from "@phosphor-icons/react";
 import Link from "next/link";
-import SimuladorCuotas from "../components/SimuladorCuotas";
-import SharedLayout from "../components/SharedLayout";
+import SimuladorCuotas from "../../components/SimuladorCuotas";
+import SharedLayout from "../../components/SharedLayout";
 
 function Hero() {
   return (

@@ -1,7 +1,7 @@
 "use client";
 
-import SharedLayout from "../components/SharedLayout";
-import FAQ from "../components/FAQ";
+import SharedLayout from "../../components/SharedLayout";
+import FAQ from "../../components/FAQ";
 
 export default function FAQPage() {
   return (

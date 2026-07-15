@@ -14,7 +14,7 @@ import {
   Person,
   Stethoscope,
 } from "@phosphor-icons/react";
-import SharedLayout from "../components/SharedLayout";
+import SharedLayout from "../../components/SharedLayout";
 
 // ─── Telemedicina & Triage ────────────────────────────────────────────────────
 function Telemedicina() {
