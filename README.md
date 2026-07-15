@@ -253,34 +253,6 @@ pnpm build
 cd apps/web-patient && pnpm build
 ```
 
-## 🔌 API Endpoints (backend-go)
-
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| `GET` | `/health` | Health check | — |
-| `POST` | `/api/v1/auth/login` | Login (phone + password) | — |
-| `POST` | `/api/v1/auth/register` | Registro de nuevo paciente | — |
-| `POST` | `/api/v1/credit/transaction` | Crear transacción BNPL | JWT |
-| `POST` | `/api/v1/payments` | Procesar pago de cuota | JWT |
-| `GET` | `/api/v1/merchant/payouts` | Payouts del merchant | JWT |
-| `GET` | `/api/v1/users/profile` | Perfil del usuario | JWT |
-
-### Auth Flow
-
-```
-Registro:  POST /api/v1/auth/register
-           Body: { firstName, lastName, email, phone, identityDocument, password }
-           Response: { access_token, token, user }
-
-Login:     POST /api/v1/auth/login
-           Body: { phone, password }
-           Response: { access_token, token, user }
-
-Token:     JWT HS256 · 24h expiry
-Claims:    { user_id, role }
-Secret:    SALUDTECH_JWT_SECRET env var
-```
-
 ## 🎮 Gamificación — Niveles de Usuario (1-6)
 
 | Nivel | Pago Inicial Mín. | Máx. Cuotas | Requisito | Beneficios |
@@ -322,21 +294,6 @@ Secret:    SALUDTECH_JWT_SECRET env var
 | **Triaje** | Formulario de síntomas + historial + merchants recomendados |
 | **Perfil** | Gamificación (nivel, puntos) + logout |
 | **PWA** | Manifest + Service Worker + offline + install prompt + update toast |
-
-## 🗄️ Modelo de Datos
-
-```
-users ──┬── credit_lines
-        ├── transactions ──┬── installments
-        │                  └── payments
-        ├── subscriptions
-        ├── elder_care_subscriptions
-        ├── user_gamification_history
-        └── user_level_history
-
-merchants ──┬── merchant_users
-            └── merchant_payouts
-```
 
 ## 🔧 Variables de Entorno
 
