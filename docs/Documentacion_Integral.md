@@ -2384,3 +2384,17 @@ curl -X POST https://saludtech-casheamedico.onrender.com/api/v1/auth/login \
 curl https://saludtech-casheamedico.onrender.com/api/v1/auth/me \
   -H "Authorization: Bearer <token>"
 ```
+
+---
+
+## 📜 Licencia
+
+**© 2026 Gustavo Colina (@Suggus1899). Todos los derechos reservados.**
+
+Este software y su código fuente son **propiedad exclusiva** de Gustavo Colina (@Suggus1899).
+
+- **No** está permitido copiar, modificar, distribuir, sublicenciar ni usar este código, total o parcialmente, sin autorización expresa y por escrito del autor.
+- **No** está permitido usar este código con fines comerciales ni privados sin una licencia válida.
+- Cualquier uso no autorizado constituye una violación de los derechos de autor y será perseguido conforme a la ley.
+
+**Este es un software propietario. No es código abierto (open source) ni software libre.**
