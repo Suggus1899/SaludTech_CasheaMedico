@@ -14,7 +14,7 @@
 2. [Requisitos previos](#2-requisitos-previos)
 3. [Clonar el repositorio](#3-clonar-el-repositorio)
 4. [Configurar PostgreSQL](#4-configurar-postgresql)
-5. [Esquema de base de datos (migraciones)](#5-esquema-de-base-de-datos-migraciones)
+5. [Esquema de base de datos (migraciones + esquema completo)](#5-esquema-de-base-de-datos-migraciones)
 6. [Variables de entorno](#6-variables-de-entorno)
 7. [Backend (Go)](#7-backend-go)
 8. [Frontend (Next.js monorepo)](#8-frontend-nextjs-monorepo)
@@ -261,6 +261,558 @@ cd backend-go
 psql -U saludtech_user -d saludtech -f sql/schema/V1__initial_schema.sql
 psql -U saludtech_user -d saludtech -f sql/schema/V2__seed_data.sql
 # ... continuar con V3, V4, etc.
+```
+
+### Esquema completo de la base de datos (estado final tras V1–V18)
+
+A continuación se documenta el esquema **final** de la base de datos, resultado de aplicar las 18 migraciones en orden. Cada tabla incluye sus columnas, tipos, constraints y relaciones.
+
+> **Nota:** Las columnas marcadas como `NOT NULL` fueron aplicadas en V17 con backfill de NULLs existentes. Las constraints `CHECK` provienen de V9 y V16.
+
+#### Extensiones habilitadas
+
+| Extensión | Migración | Uso |
+|-----------|-----------|-----|
+| `pgcrypto` | V1, V18 | `gen_random_uuid()` para PKs, futura encriptación PII |
+
+#### Types y ENUMs
+
+La plataforma almacena los enums como `VARCHAR` con `CHECK` constraints (no usa PG ENUMs nativos, excepto los eliminados en V7). Valores válidos:
+
+| Columna | Tabla | Valores permitidos |
+|---------|-------|---------------------|
+| `role` | users | `PATIENT`, `MERCHANT`, `ADMIN` |
+| `kyc_status` | users | `PENDING`, `APPROVED`, `REJECTED` |
+| `type` | credit_lines | `ESPECIALIDAD_PRINCIPAL`, `SALUD_COTIDIANA`, `MAYOR_CUIDADO` |
+| `status` | credit_lines | `ACTIVE`, `PAUSED`, `BLOCKED` |
+| `status` | transactions | `PENDING_PAYMENT`, `ACTIVE`, `COMPLETED`, `CANCELLED`, `REFUNDED` |
+| `status` | installments | `PENDING`, `PAID`, `OVERDUE`, `WAIVED` |
+| `category` | merchants | `CLINIC`, `PHARMACY`, `OPTICS`, `DENTAL`, `LABORATORY`, `AESTHETIC`, `MEDICAL_SUPPLIES`, `WELLNESS`, `EMERGENCY_TRIAGE`, `ELDER_CARE` |
+| `status` | subscriptions | `ACTIVE`, `CANCELLED`, `PAUSED` |
+| `status` | elder_care_subscriptions | `ACTIVE`, `CANCELLED`, `PAUSED` |
+| `service_type` | elder_care_subscriptions | `NURSE`, `CAREGIVER`, `PHYSIOTHERAPY`, `GERIATRIC_SPECIALIST` |
+| `status` | merchant_payouts | `PENDING`, `PAID`, `FAILED` |
+| `priority` | triage | `LOW`, `MEDIUM`, `HIGH`, `EMERGENCY` |
+| `status` | triage | `PENDING`, `REVIEWING`, `RESOLVED`, `REFERRED`, `COMPLETED` |
+| `category` | medical_services | `CONSULTATION`, `PROCEDURE`, `LAB_TEST`, `DENTAL`, `IMAGING`, `VACCINATION`, `TELEMEDICINE` |
+| `category` | medical_supplies | `MEDICATION`, `DEVICE`, `SUPPLY`, `OXYGEN`, `NUTRITION`, `PERSONAL_CARE` |
+| `record_type` | medical_records | `CONSULTATION`, `LAB_RESULT`, `PROCEDURE`, `DENTAL`, `VACCINATION`, `PRESCRIPTION`, `OTHER` |
+| `status` | appointments | `PENDING`, `CONFIRMED`, `COMPLETED`, `CANCELLED`, `NO_SHOW` |
+| `frequency` | medication_reminders | `DAILY`, `TWICE_DAILY`, `THREE_TIMES_DAY`, `WEEKLY`, `AS_NEEDED` |
+| `status` | family_members | `PENDING`, `ACTIVE`, `REVOKED` |
+| `status` | qr_tokens | `PENDING`, `SCANNED`, `COMPLETED`, `EXPIRED`, `CANCELLED` |
+
+#### Tabla: `users`
+
+Usuarios del sistema (pacientes, comerciantes, administradores).
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK, `DEFAULT gen_random_uuid()` |
+| `phone` | VARCHAR(20) | NOT NULL, UNIQUE |
+| `email` | VARCHAR(150) | NOT NULL, UNIQUE |
+| `password_hash` | VARCHAR(255) | NOT NULL |
+| `full_name` | VARCHAR(200) | NOT NULL |
+| `national_id` | VARCHAR(20) | UNIQUE |
+| `role` | VARCHAR(20) | NOT NULL, DEFAULT `'PATIENT'`, CHECK in (PATIENT, MERCHANT, ADMIN) |
+| `kyc_status` | VARCHAR(20) | NOT NULL, DEFAULT `'PENDING'` |
+| `kyc_doc_url` | VARCHAR(500) | — |
+| `level` | SMALLINT | NOT NULL, DEFAULT 1, CHECK (1–6) |
+| `points` | INTEGER | NOT NULL, DEFAULT 0, CHECK (>= 0) |
+| `total_paid` | NUMERIC(14,2) | NOT NULL, DEFAULT 0, CHECK (>= 0) |
+| `installments_paid_count` | INTEGER | NOT NULL, DEFAULT 0 |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT TRUE |
+| `is_phone_verified` | BOOLEAN | NOT NULL, DEFAULT FALSE (V4) |
+| `is_email_verified` | BOOLEAN | NOT NULL, DEFAULT FALSE (V8) |
+| `email_verification_token` | TEXT | — (V8, en desuso tras eliminación de emails) |
+| `email_verified_at` | TIMESTAMPTZ | — (V8) |
+| `is_credit_frozen_for_electives` | BOOLEAN | NOT NULL, DEFAULT FALSE (V5) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Indexes:** `idx_users_role`, `idx_users_kyc_status`, `idx_users_national_id`
+**Trigger:** `trg_users_updated_at` (auto-update `updated_at`)
+
+#### Tabla: `merchants`
+
+Comercios afiliados (farmacias, clínicas, laboratorios, etc.).
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK, `DEFAULT gen_random_uuid()` |
+| `legal_name` | VARCHAR(200) | NOT NULL |
+| `trade_name` | VARCHAR(200) | NOT NULL |
+| `rif` | VARCHAR(20) | NOT NULL, UNIQUE |
+| `category` | VARCHAR(30) | NOT NULL, CHECK (ver valores arriba) |
+| `subcategory` | VARCHAR(50) | — (V6) |
+| `address` | VARCHAR(500) | NOT NULL (V17) |
+| `city` | VARCHAR(100) | NOT NULL (V17) |
+| `phone` | VARCHAR(20) | NOT NULL (V17) |
+| `email` | VARCHAR(150) | NOT NULL, UNIQUE |
+| `contact_name` | VARCHAR(200) | NOT NULL (V17) |
+| `mdr_rate` | NUMERIC(5,4) | NOT NULL, DEFAULT 0.0350, CHECK (0–1) |
+| `bank_account_bs` | VARCHAR(30) | — |
+| `bank_account_usd` | VARCHAR(30) | — |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT FALSE |
+| `is_online` | BOOLEAN | NOT NULL, DEFAULT FALSE |
+| `min_transaction` | NUMERIC(10,2) | NOT NULL, DEFAULT 25.00 |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Indexes:** `idx_merchants_category`, `idx_merchants_is_active`
+**Trigger:** `trg_merchants_updated_at`
+
+#### Tabla: `merchant_users`
+
+Relación N:M entre usuarios y comercios (un comercio puede tener múltiples usuarios).
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `merchant_id` | UUID | NOT NULL, FK → merchants(id) ON DELETE CASCADE |
+| `user_id` | UUID | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `is_owner` | BOOLEAN | NOT NULL, DEFAULT FALSE |
+
+**Constraints:** UNIQUE (merchant_id, user_id)
+**Indexes:** `idx_merchant_users_merchant_id`, `idx_merchant_users_user_id`
+
+#### Tabla: `credit_lines`
+
+Líneas de crédito por usuario. Cada paciente tiene 3 líneas (ESPECIALIDAD_PRINCIPAL, SALUD_COTIDIANA, MAYOR_CUIDADO).
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `type` | VARCHAR(30) | NOT NULL, CHECK (ver valores arriba) |
+| `limit_usd` | NUMERIC(14,2) | NOT NULL, CHECK (>= 0) |
+| `used_usd` | NUMERIC(14,2) | NOT NULL, DEFAULT 0, CHECK (>= 0) |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'ACTIVE'`, CHECK |
+| `paused_at` | TIMESTAMPTZ | — |
+| `reactivated_at` | TIMESTAMPTZ | — |
+| `blocked_at` | TIMESTAMPTZ | — (V9) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Constraints:** UNIQUE (user_id, type)
+**Indexes:** `idx_credit_lines_user_id`, `idx_credit_lines_status`
+
+#### Tabla: `transactions`
+
+Transacciones BNPL (compras financiadas).
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | NOT NULL, FK → users(id) ON DELETE RESTRICT (V16) |
+| `merchant_id` | UUID | NOT NULL, FK → merchants(id) ON DELETE RESTRICT (V16) |
+| `credit_line_id` | UUID | NOT NULL, FK → credit_lines(id) |
+| `total_amount` | NUMERIC(14,2) | NOT NULL |
+| `down_payment` | NUMERIC(14,2) | NOT NULL, DEFAULT 0 (V17) |
+| `financed_amount` | NUMERIC(14,2) | NOT NULL |
+| `num_installments` | SMALLINT | NOT NULL |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'PENDING_PAYMENT'`, CHECK |
+| `qr_code_token` | VARCHAR(500) | NOT NULL, UNIQUE (V17) |
+| `qr_expires_at` | TIMESTAMPTZ | — |
+| `mdr_fee` | NUMERIC(14,2) | NOT NULL, DEFAULT 0 |
+| `description` | VARCHAR(500) | NOT NULL (V17) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Indexes:** `idx_transactions_user_id`, `idx_transactions_merchant_id`, `idx_transactions_status`, `idx_transactions_credit_line_id`, `idx_transactions_user_created` (composite), `idx_transactions_merchant_created` (composite)
+
+#### Tabla: `installments`
+
+Cuotas de cada transacción.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `transaction_id` | UUID | NOT NULL, FK → transactions(id) ON DELETE CASCADE |
+| `user_id` | UUID | NOT NULL, FK → users(id) |
+| `installment_num` | SMALLINT | NOT NULL, CHECK (> 0) |
+| `amount` | NUMERIC(14,2) | NOT NULL, CHECK (> 0) |
+| `due_date` | DATE | NOT NULL |
+| `paid_at` | TIMESTAMPTZ | — |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'PENDING'`, CHECK |
+| `reactivation_fee` | NUMERIC(14,2) | NOT NULL, DEFAULT 0 |
+| `days_overdue` | INTEGER | NOT NULL, DEFAULT 0, CHECK (>= 0) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Indexes:** `idx_installments_transaction_id`, `idx_installments_user_id`, `idx_installments_status`, `idx_installments_due_date`, `idx_installments_user_status` (composite), `idx_installments_user_status_due` (composite)
+
+#### Tabla: `payments`
+
+Pagos de cuotas.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `installment_id` | UUID | NOT NULL, FK → installments(id) ON DELETE CASCADE (V16) |
+| `user_id` | UUID | NOT NULL, FK → users(id) ON DELETE RESTRICT (V16) |
+| `amount_paid` | NUMERIC(14,2) | NOT NULL, CHECK (> 0) |
+| `payment_method` | VARCHAR(50) | NOT NULL |
+| `reference_code` | VARCHAR(100) | NOT NULL (V17), UNIQUE (V15) |
+| `verified` | BOOLEAN | NOT NULL, DEFAULT FALSE |
+| `verified_by` | UUID | FK → users(id) (V9), nullable |
+| `paid_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+
+**Indexes:** `idx_payments_installment_id`, `idx_payments_user_id`
+
+#### Tabla: `merchant_payouts`
+
+Liquidaciones a comercios.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `merchant_id` | UUID | NOT NULL, FK → merchants(id) |
+| `period_start` | DATE | NOT NULL |
+| `period_end` | DATE | NOT NULL |
+| `gross_amount` | NUMERIC(14,2) | NOT NULL |
+| `mdr_deducted` | NUMERIC(14,2) | NOT NULL |
+| `net_amount` | NUMERIC(14,2) | NOT NULL |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'PENDING'`, CHECK |
+| `paid_at` | TIMESTAMPTZ | — |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+
+**Constraints:** UNIQUE (merchant_id, period_start, period_end) (V9)
+**Indexes:** `idx_merchant_payouts_merchant_id`, `idx_merchant_payouts_status`
+
+#### Tabla: `user_level_history`
+
+Historial de cambios de nivel de usuario.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `from_level` | SMALLINT | — |
+| `to_level` | SMALLINT | NOT NULL |
+| `reason` | VARCHAR(500) | — |
+| `changed_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+
+**Indexes:** `idx_user_level_history_user_id`
+
+#### Tabla: `user_gamification_history`
+
+Historial de eventos de gamificación (puntos ganados).
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `event_type` | VARCHAR(50) | NOT NULL |
+| `points_awarded` | INT | NOT NULL |
+| `description` | TEXT | — |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
+
+**Indexes:** `idx_gamification_user_id`
+
+#### Tabla: `audit_log`
+
+Log de auditoría del sistema.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | BIGSERIAL | PK |
+| `user_id` | UUID | FK → users(id), nullable |
+| `action` | VARCHAR(100) | NOT NULL |
+| `entity` | VARCHAR(100) | NOT NULL |
+| `entity_id` | UUID | — |
+| `details` | TEXT | — |
+| `ip_address` | VARCHAR(45) | — |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+
+**Indexes:** `idx_audit_log_user_id`, `idx_audit_log_action`, `idx_audit_log_entity`, `idx_audit_log_entity_id` (composite), `idx_audit_log_created_at`
+
+#### Tabla: `subscriptions`
+
+Suscripciones recurrentes (medicamentos, servicios).
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `merchant_id` | UUID | NOT NULL, FK → merchants(id) |
+| `credit_line_id` | UUID | NOT NULL, FK → credit_lines(id) (V17) |
+| `amount` | NUMERIC(14,2) | NOT NULL |
+| `product_name` | VARCHAR(200) | NOT NULL |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'ACTIVE'`, CHECK |
+| `next_billing_date` | TIMESTAMPTZ | NOT NULL (V17) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Constraints:** UNIQUE (user_id, merchant_id) WHERE status = 'ACTIVE' (V9)
+**Indexes:** `idx_subscriptions_user_id`, `idx_subscriptions_status`, `idx_subscriptions_merchant`, `idx_subscriptions_next_billing` (partial, WHERE status = 'ACTIVE')
+
+#### Tabla: `subscription_items`
+
+Items de cada suscripción.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `subscription_id` | UUID | NOT NULL, FK → subscriptions(id) |
+| `supply_id` | UUID | FK → medical_supplies(id) |
+| `item_name` | VARCHAR(200) | NOT NULL |
+| `quantity` | SMALLINT | NOT NULL, DEFAULT 1 |
+| `unit_price_usd` | NUMERIC(10,2) | NOT NULL |
+
+**Indexes:** `idx_si_subscription`
+
+#### Tabla: `elder_care_subscriptions`
+
+Suscripciones de cuidado para adultos mayores.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `merchant_id` | UUID | NOT NULL, FK → merchants(id) |
+| `credit_line_id` | UUID | NOT NULL, FK → credit_lines(id) (V17) |
+| `service_type` | VARCHAR(30) | NOT NULL, CHECK (NURSE, CAREGIVER, PHYSIOTHERAPY, GERIATRIC_SPECIALIST) |
+| `monthly_amount` | NUMERIC(14,2) | NOT NULL |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'ACTIVE'`, CHECK |
+| `next_billing_date` | TIMESTAMPTZ | NOT NULL (V17) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Constraints:** UNIQUE (user_id, service_type) WHERE status = 'ACTIVE' (V9)
+**Indexes:** `idx_elder_care_subs_user_id`, `idx_elder_care_subs_status`, `idx_elder_care_subs_merchant`, `idx_elder_care_subs_next_billing` (partial)
+
+#### Tabla: `triage`
+
+Triaje médico guiado (auto-evaluación de síntomas).
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | NOT NULL, FK → users(id) |
+| `symptoms` | TEXT | NOT NULL |
+| `perceived_severity` | SMALLINT | NOT NULL, DEFAULT 5, CHECK (1–10) |
+| `priority` | VARCHAR(20) | NOT NULL, DEFAULT `'MEDIUM'`, CHECK |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'PENDING'`, CHECK |
+| `recommendation` | TEXT | — |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+
+**Indexes:** `idx_triage_user_created` (composite, user_id + created_at DESC)
+
+#### Tabla: `medical_services`
+
+Catálogo de servicios médicos por comercio.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `merchant_id` | UUID | NOT NULL, FK → merchants(id) |
+| `name` | VARCHAR(200) | NOT NULL |
+| `description` | TEXT | NOT NULL (V17) |
+| `category` | VARCHAR(50) | NOT NULL, CHECK |
+| `subcategory` | VARCHAR(100) | NOT NULL (V17) |
+| `price_usd` | NUMERIC(10,2) | NOT NULL, CHECK (> 0) |
+| `duration_min` | SMALLINT | NOT NULL, DEFAULT 30 (V17) |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT TRUE |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+
+**Indexes:** `idx_svc_merchant` (composite, merchant_id + is_active), `idx_svc_category` (composite)
+
+#### Tabla: `medical_supplies`
+
+Catálogo de insumos médicos por comercio.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `merchant_id` | UUID | NOT NULL, FK → merchants(id) |
+| `name` | VARCHAR(200) | NOT NULL |
+| `description` | TEXT | — |
+| `category` | VARCHAR(50) | NOT NULL, CHECK |
+| `subcategory` | VARCHAR(100) | — |
+| `price_usd` | NUMERIC(10,2) | NOT NULL, CHECK (> 0) |
+| `unit` | VARCHAR(50) | DEFAULT `'unidad'` |
+| `stock` | INTEGER | NOT NULL, DEFAULT 0, CHECK (>= 0) |
+| `min_stock` | INTEGER | DEFAULT 10 |
+| `requires_prescription` | BOOLEAN | NOT NULL, DEFAULT FALSE |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT TRUE |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+
+**Indexes:** `idx_sup_merchant` (composite), `idx_sup_category` (composite)
+
+#### Tabla: `transaction_items`
+
+Items de cada transacción (servicio o insumo).
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `transaction_id` | UUID | NOT NULL, FK → transactions(id) |
+| `service_id` | UUID | FK → medical_services(id) |
+| `supply_id` | UUID | FK → medical_supplies(id) |
+| `item_name` | VARCHAR(200) | NOT NULL |
+| `quantity` | SMALLINT | NOT NULL, DEFAULT 1 |
+| `unit_price_usd` | NUMERIC(10,2) | NOT NULL |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+
+**Constraints:** CHECK (service_id IS NOT NULL OR supply_id IS NOT NULL)
+**Indexes:** `idx_ti_transaction`
+
+#### Tabla: `qr_tokens`
+
+Tokens QR para flujo de pago en comercio.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `token` | VARCHAR(100) | NOT NULL, UNIQUE, DEFAULT `gen_random_uuid()` |
+| `merchant_id` | UUID | NOT NULL, FK → merchants(id) ON DELETE CASCADE |
+| `amount` | NUMERIC(14,2) | NOT NULL |
+| `description` | TEXT | — |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'PENDING'`, CHECK |
+| `transaction_id` | UUID | NOT NULL (V17), FK → transactions(id) ON DELETE SET NULL |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+| `expires_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() + 10 min |
+
+**Indexes:** `idx_qr_tokens_token`, `idx_qr_tokens_merchant_id`, `idx_qr_tokens_status`, `idx_qr_tokens_status_expires` (composite)
+
+#### Tabla: `health_profiles`
+
+Perfil de salud del paciente (1:1 con users).
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | NOT NULL, UNIQUE, FK → users(id) ON DELETE CASCADE |
+| `blood_type` | VARCHAR(10) | NOT NULL (V17) |
+| `height_cm` | SMALLINT | — |
+| `weight_kg` | NUMERIC(5,2) | — |
+| `allergies` | TEXT[] | — (array) |
+| `chronic_conditions` | TEXT[] | — (array) |
+| `current_medications` | TEXT[] | — (array) |
+| `emergency_contact_name` | VARCHAR(200) | NOT NULL (V17) |
+| `emergency_contact_phone` | VARCHAR(20) | NOT NULL (V17) |
+| `emergency_contact_relation` | VARCHAR(50) | — |
+| `notes` | TEXT | — |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Indexes:** `idx_health_profiles_user_id`
+
+#### Tabla: `medical_records`
+
+Registros médicos del paciente.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `transaction_id` | UUID | NOT NULL (V17), FK → transactions(id) ON DELETE SET NULL |
+| `merchant_id` | UUID | NOT NULL (V17), FK → merchants(id) ON DELETE SET NULL |
+| `service_id` | UUID | NOT NULL (V17), FK → medical_services(id) ON DELETE SET NULL |
+| `record_type` | VARCHAR(30) | NOT NULL, DEFAULT `'CONSULTATION'`, CHECK |
+| `diagnosis` | TEXT | NOT NULL (V17) |
+| `prescription` | TEXT | NOT NULL (V17) |
+| `doctor_name` | VARCHAR(200) | NOT NULL (V17) |
+| `notes` | TEXT | — |
+| `record_date` | DATE | NOT NULL, DEFAULT CURRENT_DATE |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Indexes:** `idx_medical_records_user_id`, `idx_medical_records_record_date`, `idx_medical_records_merchant_id`
+
+#### Tabla: `appointments`
+
+Citas médicas agendadas.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `merchant_id` | UUID | NOT NULL, FK → merchants(id) ON DELETE CASCADE |
+| `service_id` | UUID | NOT NULL (V17), FK → medical_services(id) ON DELETE SET NULL |
+| `appointment_date` | DATE | NOT NULL |
+| `appointment_time` | TIME | NOT NULL |
+| `duration_min` | SMALLINT | NOT NULL, DEFAULT 30, CHECK (> 0) |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'PENDING'`, CHECK |
+| `notes` | TEXT | — |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Indexes:** `idx_appointments_user_id`, `idx_appointments_merchant_id`, `idx_appointments_date` (composite), `idx_appointments_status`
+
+#### Tabla: `medication_reminders`
+
+Recordatorios de medicación crónica.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `user_id` | UUID | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `medication_name` | VARCHAR(200) | NOT NULL |
+| `dosage` | VARCHAR(100) | NOT NULL (V17) |
+| `frequency` | VARCHAR(50) | NOT NULL, DEFAULT `'DAILY'` |
+| `times` | TEXT[] | NOT NULL (array, e.g. `['08:00', '20:00']`) |
+| `start_date` | DATE | NOT NULL, DEFAULT CURRENT_DATE |
+| `end_date` | DATE | — (NULL = indefinido) |
+| `is_active` | BOOLEAN | NOT NULL, DEFAULT TRUE |
+| `notes` | TEXT | — |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Indexes:** `idx_medication_reminders_user_id`, `idx_medication_reminders_active`
+
+#### Tabla: `family_members`
+
+Relaciones familiares/cuidador-paciente.
+
+| Columna | Tipo | Constraints |
+|---------|------|-------------|
+| `id` | UUID | PK |
+| `caregiver_id` | UUID | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `patient_id` | UUID | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `relation` | VARCHAR(50) | NOT NULL (V17) |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'PENDING'`, CHECK |
+| `permissions` | TEXT[] | NOT NULL, DEFAULT `'{}'` (array) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() (auto-trigger) |
+
+**Constraints:** UNIQUE (caregiver_id, patient_id)
+**Indexes:** `idx_family_members_caregiver_id`, `idx_family_members_patient_id`, `idx_family_members_status`
+
+#### Diagrama de relaciones (ERD simplificado)
+
+```
+users (1) ──── (N) credit_lines
+users (1) ──── (N) transactions ──── (N) installments ──── (N) payments
+users (1) ──── (N) transactions ──── (N) transaction_items ──── (1) medical_services
+                                                          └── (1) medical_supplies
+merchants (1) ──── (N) transactions
+merchants (1) ──── (N) medical_services
+merchants (1) ──── (N) medical_supplies
+merchants (1) ──── (N) qr_tokens
+merchants (1) ──── (N) merchant_payouts
+merchants (1) ──── (N) merchant_users ──── (1) users
+
+users (1) ──── (1) health_profiles
+users (1) ──── (N) medical_records ──── (1) transactions
+                                └── (1) merchants
+                                └── (1) medical_services
+users (1) ──── (N) appointments ──── (1) merchants
+                             └── (1) medical_services
+users (1) ──── (N) medication_reminders
+users (1) ──── (N) triage
+users (1) ──── (N) subscriptions ──── (N) subscription_items ──── (1) medical_supplies
+users (1) ──── (N) elder_care_subscriptions
+users (1) ──── (N) family_members (as caregiver)
+users (1) ──── (N) family_members (as patient)
+users (1) ──── (N) user_level_history
+users (1) ──── (N) user_gamification_history
+users (1) ──── (N) audit_log
 ```
 
 ---
