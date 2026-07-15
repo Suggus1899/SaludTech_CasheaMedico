@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, Syne } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -41,14 +43,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="es" className={`${outfit.variable} ${syne.variable}`} suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+    <html lang={locale} className={`${outfit.variable} ${syne.variable}`} suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+      </body>
     </html>
   );
 }

@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Syne } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 import ServiceWorkerRegister from "../components/ServiceWorkerRegister";
 
@@ -36,14 +38,17 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
     <html
-      lang="es"
+      lang={locale}
       className={`${outfit.variable} ${syne.variable} font-sans h-full`}
       suppressHydrationWarning
     >
@@ -55,11 +60,13 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col antialiased">
-        <a href="#main-content" className="skip-link">
-          Saltar al contenido principal
-        </a>
-        <ServiceWorkerRegister />
-        {children}
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <a href="#main-content" className="skip-link">
+            Saltar al contenido principal
+          </a>
+          <ServiceWorkerRegister />
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

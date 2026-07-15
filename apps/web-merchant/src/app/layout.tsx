@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Syne } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 
 const inter = Inter({
@@ -18,14 +20,17 @@ export const metadata: Metadata = {
   description: "Portal de gestión para comercios afiliados a SaludTech",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
     <html
-      lang="es"
+      lang={locale}
       className={`${inter.variable} ${syne.variable} font-sans h-full`}
       suppressHydrationWarning
     >
@@ -38,10 +43,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col antialiased">
-        <a href="#main-content" className="skip-link">
-          Saltar al contenido principal
-        </a>
-        {children}
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <a href="#main-content" className="skip-link">
+            Saltar al contenido principal
+          </a>
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

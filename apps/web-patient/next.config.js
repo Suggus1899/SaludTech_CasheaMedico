@@ -1,6 +1,10 @@
+const createNextIntlPlugin = require("next-intl/plugin");
+
+const withNextIntl = createNextIntlPlugin();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@saludtech/ui", "@saludtech/shared"],
+  transpilePackages: ["@saludtech/ui", "@saludtech/shared", "@saludtech/i18n"],
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -34,4 +38,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withNextIntl(nextConfig);
