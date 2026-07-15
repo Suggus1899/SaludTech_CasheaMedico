@@ -36,3 +36,6 @@ docker-compose.override.yml
 
 # Vercel
 .vercel
+
+# Agent skills (local only)
+.agents/
