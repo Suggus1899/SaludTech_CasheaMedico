@@ -9,7 +9,7 @@ import {
   UserCheck,
   AlertCircle,
 } from "lucide-react";
-import { useFetchData } from "../../../hooks/useFetchData";
+import { useFetchData } from "@saludtech/shared";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { formatDate } from "../../../lib/utils";
 import type { Triage, RecommendedMerchant } from "../../../types/patient";

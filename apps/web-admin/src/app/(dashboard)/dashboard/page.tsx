@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { DollarSign, Users, Store, AlertTriangle, TrendingUp, TrendingDown, Search, CreditCard, BarChart3 } from "lucide-react";
-import { useFetchData } from "../../../hooks/useFetchData";
+import { useFetchData } from "@saludtech/shared";
 import { getApiUrl } from "../../../lib/api";
 import { AdminUser, AdminUsersResponse, DashboardStats, AnalyticsResponse } from "../../../types/admin";
 import {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Users, CheckCircle2, XCircle } from "lucide-react";
-import { useFetchData } from "../../../hooks/useFetchData";
+import { useFetchData } from "@saludtech/shared";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { ExportButton } from "../../../components/shared/ExportButton";
 import { patientFormSchema } from "../../../lib/validations";

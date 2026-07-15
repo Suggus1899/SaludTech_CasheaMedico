@@ -14,7 +14,7 @@ import {
   Lock,
   type LucideIcon,
 } from "lucide-react";
-import { useFetchData } from "../../../hooks/useFetchData";
+import { useFetchData } from "@saludtech/shared";
 import { getApiUrl, apiFetch, getStoredUser } from "../../../lib/api";
 import { formatCurrency, formatDate } from "../../../lib/utils";
 import {

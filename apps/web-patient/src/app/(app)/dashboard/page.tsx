@@ -16,7 +16,7 @@ import {
   Search,
   GraduationCap,
 } from "lucide-react";
-import { useFetchData } from "../../../hooks/useFetchData";
+import { useFetchData } from "@saludtech/shared";
 import { getApiUrl, getStoredUser } from "../../../lib/api";
 import { formatCurrency, formatWithVES, formatDate, daysUntil } from "../../../lib/utils";
 import {

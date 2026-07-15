@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Activity, Send } from "lucide-react";
-import { useFetchData } from "../../../hooks/useFetchData";
+import { useFetchData } from "@saludtech/shared";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 
 export default function TriajesPage() {

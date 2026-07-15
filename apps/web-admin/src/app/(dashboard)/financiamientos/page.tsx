@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CreditCard, Pencil, X, AlertCircle, Check } from "lucide-react";
-import { useFetchData } from "../../../hooks/useFetchData";
+import { useFetchData } from "@saludtech/shared";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { CreditLine, CreditLinesResponse } from "../../../types/admin";
 import { ExportButton } from "../../../components/shared/ExportButton";

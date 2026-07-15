@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   WifiOff,
 } from "lucide-react";
-import { useFetchData } from "../../../hooks/useFetchData";
+import { useFetchData } from "@saludtech/shared";
 import { getApiUrl } from "../../../lib/api";
 import { formatWithVES, formatDate } from "../../../lib/utils";
 import type { Installment } from "../../../types/patient";

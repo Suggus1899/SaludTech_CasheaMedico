@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Pill, RefreshCw, Store, Calendar, X, Plus, QrCode } from "lucide-react";
-import { useFetchData } from "../../../hooks/useFetchData";
+import { useFetchData } from "@saludtech/shared";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { formatCurrency, formatDate } from "../../../lib/utils";
 import type { Subscription } from "../../../types/patient";

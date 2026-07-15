@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Pill } from "lucide-react";
-import { useFetchData } from "../../../hooks/useFetchData";
+import { useFetchData } from "@saludtech/shared";
 import { getApiUrl } from "../../../lib/api";
 
 export default function SuscripcionesPage() {
