@@ -18,6 +18,9 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 
 <table align="center">
 <tr>
+<th colspan="5" align="center" width="600"><sub><b>Frontend</b></sub></th>
+</tr>
+<tr>
 <td align="center" width="120">
 <img src="https://cdn.simpleicons.org/nextdotjs/000000" width="48" height="48" alt="Next.js" />
 <br><sub><b>Next.js 16</b></sub>
@@ -45,6 +48,9 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 </td>
 </tr>
 <tr>
+<th colspan="5" align="center" width="600"><sub><b>Backend</b></sub></th>
+</tr>
+<tr>
 <td align="center" width="120">
 <img src="https://cdn.simpleicons.org/go/00ADD8" width="48" height="48" alt="Go" />
 <br><sub><b>Go 1.26</b></sub>
@@ -58,13 +64,21 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 <td align="center" width="120">
 <img src="https://cdn.simpleicons.org/postgresql/4169E1" width="48" height="48" alt="PostgreSQL" />
 <br><sub><b>PostgreSQL 16</b></sub>
-<br><sub>Primary DB · Advisory Locks</sub>
+<br><sub>Primary DB</sub>
 </td>
 <td align="center" width="120">
 <img src="https://cdn.simpleicons.org/jsonwebtokens/000000" width="48" height="48" alt="JWT" />
 <br><sub><b>JWT</b></sub>
 <br><sub>HS256 · 24h</sub>
 </td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/sqlc/000000" width="48" height="48" alt="sqlc" />
+<br><sub><b>sqlc</b></sub>
+<br><sub>Type-safe SQL</sub>
+</td>
+</tr>
+<tr>
+<th colspan="5" align="center" width="600"><sub><b>Tooling & Infra</b></sub></th>
 </tr>
 <tr>
 <td align="center" width="120">
@@ -78,11 +92,6 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 <br><sub>Build system</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/sqlc/000000" width="48" height="48" alt="sqlc" />
-<br><sub><b>sqlc</b></sub>
-<br><sub>Type-safe SQL</sub>
-</td>
-<td align="center" width="120">
 <img src="https://cdn.simpleicons.org/docker/2496ED" width="48" height="48" alt="Docker" />
 <br><sub><b>Docker</b></sub>
 <br><sub>Containerization</sub>
@@ -91,6 +100,11 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 <img src="https://cdn.simpleicons.org/nginx/009639" width="48" height="48" alt="nginx" />
 <br><sub><b>nginx</b></sub>
 <br><sub>Reverse proxy</sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/vercel/000000" width="48" height="48" alt="Vercel" />
+<br><sub><b>Vercel</b></sub>
+<br><sub>Frontend deploy</sub>
 </td>
 </tr>
 </table>
@@ -202,10 +216,7 @@ SALUDTECH_JWT_SECRET=tu-secreto-super-seguro-cambiar-en-produccion
 PORT=8081
 
 # Web Patient
-NEXT_PUBLIC_MOCK_API=true
-# Para conectar al backend real:
-# NEXT_PUBLIC_MOCK_API=false
-# NEXT_PUBLIC_API_BASE_URL=http://localhost:8081/api/v1
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8081/api/v1
 ```
 
 ### 3. Backend (Go)
@@ -312,16 +323,6 @@ Secret:    SALUDTECH_JWT_SECRET env var
 | **Perfil** | Gamificación (nivel, puntos) + logout |
 | **PWA** | Manifest + Service Worker + offline + install prompt + update toast |
 
-### Modo Mock
-
-Web Patient puede funcionar **sin backend** usando datos de prueba:
-
-```bash
-NEXT_PUBLIC_MOCK_API=true pnpm dev
-```
-
-Esto activa un router mock en `/api/mock/[...path]` que retorna datos para todos los endpoints del paciente.
-
 ## 🗄️ Modelo de Datos
 
 ```
@@ -351,8 +352,7 @@ merchants ──┬── merchant_users
 
 | Variable | Requerida | Default | Descripción |
 |----------|-----------|---------|-------------|
-| `NEXT_PUBLIC_MOCK_API` | ❌ | `false` | Activa el router mock |
-| `NEXT_PUBLIC_API_BASE_URL` | ❌ | — | URL base del backend Go |
+| `NEXT_PUBLIC_API_BASE_URL` | ✅ | — | URL base del backend Go |
 | `JWT_SECRET` | ✅ prod | `fallback-dev-only-change-me` | Secret para verificar JWT en middleware |
 
 ## 🧪 Testing & CI
