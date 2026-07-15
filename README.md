@@ -135,9 +135,9 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 | App | Descripción | Puerto | Rol |
 |-----|-------------|--------|-----|
 | **web-patient** | PWA instalable para pacientes — login, dashboard, cuotas, pagar (QR), suscripciones, triaje, cuidado mayor, perfil/gamificación | 3000 | PATIENT |
-| **web-admin** | Backoffice administrativo — gestión de usuarios, merchants, transacciones, payouts | 3000 | ADMIN |
-| **web-merchant** | Dashboard del comercio — QR dinámico, transacciones, payouts, suscripciones | 3001 | MERCHANT |
-| **web-landing** | Landing page pública — marketing y captación de usuarios | 3000 | PUBLIC |
+| **web-admin** | Backoffice administrativo — gestión de usuarios, merchants, transacciones, payouts | 3001 | ADMIN |
+| **web-merchant** | Dashboard del comercio — QR dinámico, transacciones, payouts, suscripciones | 3002 | MERCHANT |
+| **web-landing** | Landing page pública — marketing y captación de usuarios | 3003 | PUBLIC |
 
 ## 📦 Estructura del Monorepo
 
@@ -152,9 +152,10 @@ saludtech/
 │   │   ├── database/        ← sqlc generated code
 │   │   ├── merchant/        ← Merchant payouts
 │   │   ├── payment/         ← Installment payment processing
+│   │   ├── patient/         ← Patient handler (checkout, triage, health)
 │   │   ├── user/            ← User profile
 │   │   └── worker/          ← Cron installment scanner
-│   └── sql/                 ← sqlc queries + migrations (V1-V7)
+│   └── sql/                 ← sqlc queries + migrations (V1-V18)
 │
 ├── apps/
 │   ├── web-patient/         ← Next.js 16 PWA (paciente)
@@ -195,29 +196,16 @@ saludtech/
 # Crear base de datos
 createdb saludtech
 
-# Aplicar migraciones en orden
-psql -d saludtech -f backend-go/sql/V1__initial_schema.sql
-psql -d saludtech -f backend-go/sql/V2__seed_data.sql
-psql -d saludtech -f backend-go/sql/V3__remove_kyc.sql
-psql -d saludtech -f backend-go/sql/V4__add_phone_verified.sql
-psql -d saludtech -f backend-go/sql/V5__add_gamification_and_freeze.sql
-psql -d saludtech -f backend-go/sql/V6__sync_enums_and_new_tables.sql
-psql -d saludtech -f backend-go/sql/V7__cleanup_dead_types.sql
+# Las migraciones (V1-V18) se ejecutan automáticamente al iniciar el backend.
+# Si querés correrlas manualmente:
+psql -d saludtech -f backend-go/sql/schema/V1__initial_schema.sql
+psql -d saludtech -f backend-go/sql/schema/V2__seed_data.sql
+# ... continuar hasta V18__pgcrypto.sql
 ```
 
 ### 2. Variables de entorno
 
-Crear `.env` en la raíz del proyecto:
-
-```env
-# Backend Go
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/saludtech
-SALUDTECH_JWT_SECRET=tu-secreto-super-seguro-cambiar-en-produccion
-PORT=8081
-
-# Web Patient
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8081/api/v1
-```
+Ver sección [🔧 Variables de Entorno](#-variables-de-entorno) abajo.
 
 ### 3. Backend (Go)
 
@@ -225,6 +213,7 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8081/api/v1
 cd backend-go
 go run ./cmd/api
 # ✅ Servidor en http://localhost:8081
+# ✅ Migraciones se ejecutan automáticamente
 ```
 
 ### 4. Frontend (todas las apps)
@@ -253,7 +242,9 @@ pnpm build
 cd apps/web-patient && pnpm build
 ```
 
-## 🎮 Gamificación — Niveles de Usuario (1-6)
+## 📊 Reglas de Negocio
+
+### Niveles de Usuario (1-6)
 
 | Nivel | Pago Inicial Mín. | Máx. Cuotas | Requisito | Beneficios |
 |-------|-------------------|-------------|-----------|------------|
@@ -264,7 +255,7 @@ cd apps/web-patient && pnpm build
 | 5 | 40% | 12 | $2000 pagados o 40 cuotas | — |
 | 6 | 40% | 12 | $4000 pagados o 80 cuotas | Línea máxima |
 
-## 💳 Líneas de Crédito
+### Líneas de Crédito
 
 | Tipo | Descripción | Requisito |
 |------|-------------|-----------|
@@ -272,7 +263,7 @@ cd apps/web-patient && pnpm build
 | `SALUD_COTIDIANA` | Farmacia e insumos crónicos (1/3 de la principal) | Nivel 1+ |
 | `MAYOR_CUIDADO` | Cuidado de adultos mayores (enfermería, caregiver) | Nivel 4+ |
 
-## ⚠️ Mora
+### Mora
 
 - Cargo de reactivación: **$4** por cuota en mora
 - **2 días** de gracia después del vencimiento
@@ -292,6 +283,11 @@ cd apps/web-patient && pnpm build
 | **Suscripciones** | Farmacia mensual — activar/cancelar |
 | **Cuidado Mayor** | Servicios para adultos mayores — validación de nivel 4+ |
 | **Triaje** | Formulario de síntomas + historial + merchants recomendados |
+| **Perfil de Salud** | Historial médico, alergias, condiciones crónicas, medicamentos, contacto de emergencia |
+| **Citas Médicas** | Agendamiento con comercios afiliados |
+| **Registros Médicos** | Diagnósticos, recetas, resultados de laboratorio |
+| **Recordatorios** | Medicación crónica con horarios configurables |
+| **Familiares** | Cuidador-paciente con permisos granulares |
 | **Perfil** | Gamificación (nivel, puntos) + logout |
 | **PWA** | Manifest + Service Worker + offline + install prompt + update toast |
 
@@ -304,13 +300,27 @@ cd apps/web-patient && pnpm build
 | `DATABASE_URL` | ✅ | — | Connection string PostgreSQL |
 | `SALUDTECH_JWT_SECRET` | ✅ | — | Secret para firmar JWT |
 | `PORT` | ❌ | `8081` | Puerto del servidor |
+| `CORS_ALLOWED_ORIGINS` | ✅ prod | — | Origins permitidos (separados por coma) |
 
-### Web Patient
+### Web Apps (Next.js)
 
 | Variable | Requerida | Default | Descripción |
 |----------|-----------|---------|-------------|
 | `NEXT_PUBLIC_API_BASE_URL` | ✅ | — | URL base del backend Go |
 | `JWT_SECRET` | ✅ prod | `fallback-dev-only-change-me` | Secret para verificar JWT en middleware |
+
+### Ejemplo `.env`
+
+```env
+# Backend Go
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/saludtech
+SALUDTECH_JWT_SECRET=tu-secreto-super-seguro-cambiar-en-produccion
+PORT=8081
+
+# Web Apps
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8081/api/v1
+JWT_SECRET=tu-secreto-super-seguro-cambiar-en-produccion
+```
 
 ## 🧪 Testing & CI
 
