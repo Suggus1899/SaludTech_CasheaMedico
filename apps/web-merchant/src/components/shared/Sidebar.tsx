@@ -25,6 +25,8 @@ export function Sidebar() {
       credentials: "include",
       headers: { "Content-Type": "application/json" },
     }).catch(() => {});
+    // Also clear the client-side cookie for Next.js middleware
+    document.cookie = "jwt_token=; path=/; max-age=0";
     localStorage.removeItem("merchant_user");
     router.push("/login");
   }, [router]);

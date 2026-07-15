@@ -102,6 +102,7 @@ export default function PatientRegisterPage() {
       const data = await res.json();
       if (data.token && data.user) {
         setSession(data.token, data.user as UserResponse);
+        document.cookie = `jwt_token=${data.token}; path=/; max-age=${60 * 60 * 24}; samesite=lax`;
         router.push("/dashboard");
       } else {
         router.push("/login");

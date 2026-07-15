@@ -58,6 +58,8 @@ export function Topbar({
       credentials: "include",
       headers: { "Content-Type": "application/json" },
     }).catch(() => {});
+    // Also clear the client-side cookie for Next.js middleware
+    document.cookie = "jwt_token=; path=/; max-age=0";
     localStorage.removeItem("admin_user");
     router.push("/login");
   }, [router]);

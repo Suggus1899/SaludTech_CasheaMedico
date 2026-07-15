@@ -273,13 +273,15 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Send verification email
+	// Send verification email asynchronously (don't block the response)
 	if h.Email != nil && user.Email.Valid {
-		verificationURL := fmt.Sprintf("%s/verificar?token=%s", h.Cfg.FrontendURL, verificationToken)
-		html := email.EmailVerificationEmail(fullName, verificationURL)
-		if err := h.Email.Send(user.Email.String, "Verifica tu correo - SaludTech", html); err != nil {
-			log.Printf("Failed to send verification email to %s: %v", user.Email.String, err)
-		}
+		go func() {
+			verificationURL := fmt.Sprintf("%s/verificar?token=%s", h.Cfg.FrontendURL, verificationToken)
+			html := email.EmailVerificationEmail(fullName, verificationURL)
+			if err := h.Email.Send(user.Email.String, "Verifica tu correo - SaludTech", html); err != nil {
+				log.Printf("Failed to send verification email to %s: %v", user.Email.String, err)
+			}
+		}()
 	}
 
 	token, err := GenerateToken(user.ID.String(), string(user.Role), h.Cfg)

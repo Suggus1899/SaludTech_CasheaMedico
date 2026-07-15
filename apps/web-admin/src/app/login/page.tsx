@@ -45,6 +45,8 @@ export default function AdminLoginPage() {
       // JWT is now stored in an httpOnly cookie by the backend.
       // We only keep the user object in localStorage for UI display.
       localStorage.setItem("admin_user", JSON.stringify(data.user));
+      // Set a client-side cookie so Next.js middleware can read it on navigation
+      document.cookie = `jwt_token=${data.token}; path=/; max-age=${60 * 60 * 24}; samesite=lax`;
       router.push("/");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error al iniciar sesión");

@@ -106,6 +106,12 @@ export function createSessionHelpers(storageKey: string) {
       } catch {
         // fetch may be unavailable
       }
+      // Also clear the client-side cookie set for Next.js middleware
+      try {
+        document.cookie = "jwt_token=; path=/; max-age=0";
+      } catch {
+        // document may be unavailable
+      }
       try {
         localStorage.removeItem(storageKey);
       } catch {
