@@ -1,17 +1,7 @@
-# Java / Maven
-backend/target/
-backend/*.jar
-backend/*.war
-backend/.mvn/wrapper/maven-wrapper.jar
-*.class
-*.log
-
 # Go binaries
 backend-go/api.exe
 backend-go/bin/
-
-# Spring Boot
-backend/src/main/resources/application-local.yml
+*.log
 
 # Node.js & Monorepo
 node_modules/
@@ -44,11 +34,5 @@ Thumbs.db
 # Docker
 docker-compose.override.yml
 
-# managed
-**.data.json
-**.node-persist**
-**_IGNORE_**
-# end managed
-
+# Vercel
 .vercel
-.env*

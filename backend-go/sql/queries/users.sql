@@ -18,7 +18,6 @@ INSERT INTO users (
 UPDATE users
 SET
     is_email_verified = TRUE,
-    email_verified_at = NOW(),
     kyc_status = 'APPROVED'
 WHERE id = $1;
 

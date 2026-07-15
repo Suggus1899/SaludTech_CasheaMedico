@@ -313,8 +313,6 @@ type User struct {
 	IsPhoneVerified            bool               `json:"is_phone_verified"`
 	IsCreditFrozenForElectives bool               `json:"is_credit_frozen_for_electives"`
 	IsEmailVerified            bool               `json:"is_email_verified"`
-	EmailVerificationToken     pgtype.Text        `json:"email_verification_token"`
-	EmailVerifiedAt            pgtype.Timestamptz `json:"email_verified_at"`
 }
 
 type UserGamificationHistory struct {
