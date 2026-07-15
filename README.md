@@ -380,9 +380,9 @@ pnpm check-all
 
 ## 📜 Licencia
 
-**© 2026 Gustavo Colina. Todos los derechos reservados.**
+**© 2026 Gustavo Colina (@Suggus1899). Todos los derechos reservados.**
 
-Este software y su código fuente son **propiedad exclusiva** de Gustavo Colina. 
+Este software y su código fuente son **propiedad exclusiva** de Gustavo Colina (@Suggus1899). 
 
 - **No** está permitido copiar, modificar, distribuir, sublicenciar ni usar este código, total o parcialmente, sin autorización expresa y por escrito del autor.
 - **No** está permitido usar este código con fines comerciales ni privados sin una licencia válida.
