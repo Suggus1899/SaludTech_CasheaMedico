@@ -22,28 +22,28 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 </tr>
 <tr>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/nextdotjs/000000" width="48" height="48" alt="Next.js" />
-<br><sub><b>Next.js 16</b></sub>
+<a href="https://nextjs.org/" target="_blank"><img src="https://cdn.simpleicons.org/nextdotjs/000000" width="48" height="48" alt="Next.js" /></a>
+<br><sub><b><a href="https://nextjs.org/" target="_blank">Next.js 16</a></b></sub>
 <br><sub>App Router</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/react/61DAFB" width="48" height="48" alt="React" />
-<br><sub><b>React 19</b></sub>
+<a href="https://react.dev/" target="_blank"><img src="https://cdn.simpleicons.org/react/61DAFB" width="48" height="48" alt="React" /></a>
+<br><sub><b><a href="https://react.dev/" target="_blank">React 19</a></b></sub>
 <br><sub>Server Components</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/typescript/3178C6" width="48" height="48" alt="TypeScript" />
-<br><sub><b>TypeScript 5</b></sub>
+<a href="https://www.typescriptlang.org/" target="_blank"><img src="https://cdn.simpleicons.org/typescript/3178C6" width="48" height="48" alt="TypeScript" /></a>
+<br><sub><b><a href="https://www.typescriptlang.org/" target="_blank">TypeScript 5</a></b></sub>
 <br><sub>Type-safe</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" width="48" height="48" alt="Tailwind CSS" />
-<br><sub><b>Tailwind v4</b></sub>
+<a href="https://tailwindcss.com/" target="_blank"><img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" width="48" height="48" alt="Tailwind CSS" /></a>
+<br><sub><b><a href="https://tailwindcss.com/" target="_blank">Tailwind v4</a></b></sub>
 <br><sub>Utility-first</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/daisyui/7C3AED" width="48" height="48" alt="DaisyUI" />
-<br><sub><b>DaisyUI v5</b></sub>
+<a href="https://daisyui.com/" target="_blank"><img src="https://cdn.simpleicons.org/daisyui/7C3AED" width="48" height="48" alt="DaisyUI" /></a>
+<br><sub><b><a href="https://daisyui.com/" target="_blank">DaisyUI v5</a></b></sub>
 <br><sub>Component lib</sub>
 </td>
 </tr>
@@ -52,28 +52,28 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 </tr>
 <tr>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/go/00ADD8" width="48" height="48" alt="Go" />
-<br><sub><b>Go 1.26</b></sub>
+<a href="https://go.dev/" target="_blank"><img src="https://cdn.simpleicons.org/go/00ADD8" width="48" height="48" alt="Go" /></a>
+<br><sub><b><a href="https://go.dev/" target="_blank">Go 1.26</a></b></sub>
 <br><sub>Backend API</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/chi/000000" width="48" height="48" alt="go-chi" />
-<br><sub><b>go-chi v5</b></sub>
+<a href="https://github.com/go-chi/chi" target="_blank"><img src="https://cdn.simpleicons.org/chi/000000" width="48" height="48" alt="go-chi" /></a>
+<br><sub><b><a href="https://github.com/go-chi/chi" target="_blank">go-chi v5</a></b></sub>
 <br><sub>HTTP router</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/postgresql/4169E1" width="48" height="48" alt="PostgreSQL" />
-<br><sub><b>PostgreSQL 16</b></sub>
+<a href="https://www.postgresql.org/" target="_blank"><img src="https://cdn.simpleicons.org/postgresql/4169E1" width="48" height="48" alt="PostgreSQL" /></a>
+<br><sub><b><a href="https://www.postgresql.org/" target="_blank">PostgreSQL 16</a></b></sub>
 <br><sub>Primary DB</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/jsonwebtokens/000000" width="48" height="48" alt="JWT" />
-<br><sub><b>JWT</b></sub>
+<a href="https://jwt.io/" target="_blank"><img src="https://cdn.simpleicons.org/jsonwebtokens/000000" width="48" height="48" alt="JWT" /></a>
+<br><sub><b><a href="https://jwt.io/" target="_blank">JWT</a></b></sub>
 <br><sub>HS256 · 24h</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/sqlc/000000" width="48" height="48" alt="sqlc" />
-<br><sub><b>sqlc</b></sub>
+<a href="https://sqlc.dev/" target="_blank"><img src="https://cdn.simpleicons.org/sqlc/000000" width="48" height="48" alt="sqlc" /></a>
+<br><sub><b><a href="https://sqlc.dev/" target="_blank">sqlc</a></b></sub>
 <br><sub>Type-safe SQL</sub>
 </td>
 </tr>
@@ -82,28 +82,28 @@ Plataforma **Buy Now, Pay Later** de cero interés orientada exclusivamente al s
 </tr>
 <tr>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/pnpm/F69220" width="48" height="48" alt="pnpm" />
-<br><sub><b>pnpm 9</b></sub>
+<a href="https://pnpm.io/" target="_blank"><img src="https://cdn.simpleicons.org/pnpm/F69220" width="48" height="48" alt="pnpm" /></a>
+<br><sub><b><a href="https://pnpm.io/" target="_blank">pnpm 9</a></b></sub>
 <br><sub>Workspaces</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/turborepo/EF4444" width="48" height="48" alt="Turborepo" />
-<br><sub><b>Turborepo</b></sub>
+<a href="https://turbo.build/repo" target="_blank"><img src="https://cdn.simpleicons.org/turborepo/EF4444" width="48" height="48" alt="Turborepo" /></a>
+<br><sub><b><a href="https://turbo.build/repo" target="_blank">Turborepo</a></b></sub>
 <br><sub>Build system</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/docker/2496ED" width="48" height="48" alt="Docker" />
-<br><sub><b>Docker</b></sub>
+<a href="https://www.docker.com/" target="_blank"><img src="https://cdn.simpleicons.org/docker/2496ED" width="48" height="48" alt="Docker" /></a>
+<br><sub><b><a href="https://www.docker.com/" target="_blank">Docker</a></b></sub>
 <br><sub>Containerization</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/nginx/009639" width="48" height="48" alt="nginx" />
-<br><sub><b>nginx</b></sub>
+<a href="https://nginx.org/" target="_blank"><img src="https://cdn.simpleicons.org/nginx/009639" width="48" height="48" alt="nginx" /></a>
+<br><sub><b><a href="https://nginx.org/" target="_blank">nginx</a></b></sub>
 <br><sub>Reverse proxy</sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/vercel/000000" width="48" height="48" alt="Vercel" />
-<br><sub><b>Vercel</b></sub>
+<a href="https://vercel.com/" target="_blank"><img src="https://cdn.simpleicons.org/vercel/000000" width="48" height="48" alt="Vercel" /></a>
+<br><sub><b><a href="https://vercel.com/" target="_blank">Vercel</a></b></sub>
 <br><sub>Frontend deploy</sub>
 </td>
 </tr>
