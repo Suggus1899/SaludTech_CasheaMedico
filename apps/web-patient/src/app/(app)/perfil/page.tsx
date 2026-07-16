@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Award, LogOut, Mail, Phone, CreditCard, Shield, GraduationCap, RotateCcw, Settings } from "lucide-react";
-import { clearSession, getStoredUser } from "../../../lib/api";
+import { Award, LogOut, Mail, Phone, CreditCard, Shield, GraduationCap, RotateCcw, Settings, User, Hash, DollarSign, Activity } from "lucide-react";
+import { clearSession, getStoredUser, getApiUrl, apiFetch } from "../../../lib/api";
 import { profileGradient } from "../../../lib/creditLineStyles";
 import { useTour, tours } from "../../../lib/tours";
 import { useTranslations } from "next-intl";
@@ -26,7 +26,20 @@ export default function PerfilPage() {
   const { startTour, hasSeenTour, resetTours } = useTour();
 
   useEffect(() => {
-    setUser(getStoredUser<UserResponse>());
+    // Fetch fresh data from /auth/me, fall back to localStorage
+    (async () => {
+      try {
+        const res = await apiFetch(getApiUrl("auth/me"));
+        if (res.ok) {
+          const data = (await res.json()) as UserResponse;
+          setUser(data);
+          return;
+        }
+      } catch {
+        // ignore network errors
+      }
+      setUser(getStoredUser<UserResponse>());
+    })();
   }, []);
 
   const handleLogout = async () => {
@@ -38,6 +51,8 @@ export default function PerfilPage() {
   const points = user?.points ?? 0;
   const nextLevelPoints = levelThresholds[level] ?? levelThresholds[5];
   const progress = Math.min((points / nextLevelPoints) * 100, 100);
+  const fullName = user?.fullName ?? `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim();
+  const isActive = user?.isActive ?? user?.active ?? false;
 
   return (
     <div className="space-y-6">
@@ -93,24 +108,44 @@ export default function PerfilPage() {
         </h3>
 
         <InfoRow
+          icon={<User className="w-4 h-4" />}
+          label={t("fullName")}
+          value={fullName || "—"}
+        />
+        <InfoRow
+          icon={<Hash className="w-4 h-4" />}
+          label={t("userId")}
+          value={user?.id ? user.id.slice(0, 8) : "—"}
+        />
+        <InfoRow
           icon={<Mail className="w-4 h-4" />}
           label={t("email")}
-          value={user?.email ?? "—"}
+          value={user?.email || "—"}
         />
         <InfoRow
           icon={<Phone className="w-4 h-4" />}
           label={t("phone")}
-          value={user?.phone ?? "—"}
+          value={user?.phone || "—"}
         />
         <InfoRow
           icon={<CreditCard className="w-4 h-4" />}
           label={t("nationalId")}
-          value={user?.identityDocument ?? "—"}
+          value={user?.identityDocument || "—"}
+        />
+        <InfoRow
+          icon={<DollarSign className="w-4 h-4" />}
+          label={t("totalPaid")}
+          value={user?.totalPaid != null ? `$${user.totalPaid.toFixed(2)}` : "—"}
+        />
+        <InfoRow
+          icon={<Activity className="w-4 h-4" />}
+          label={t("status")}
+          value={isActive ? t("statusActive") : t("statusInactive")}
         />
         <InfoRow
           icon={<Shield className="w-4 h-4" />}
           label={t("kyc")}
-          value={user?.kycStatus ?? "—"}
+          value={user?.kycStatus || "—"}
         />
       </div>
 

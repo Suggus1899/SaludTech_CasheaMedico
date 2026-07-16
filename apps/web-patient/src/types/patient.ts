@@ -3,11 +3,14 @@ export interface UserResponse {
   email: string;
   firstName: string;
   lastName: string;
+  fullName?: string;
   phone: string;
   identityDocument?: string;
   level?: number;
   points?: number;
+  totalPaid?: number;
   kycStatus?: string;
+  isActive?: boolean;
   active?: boolean;
 }
 
