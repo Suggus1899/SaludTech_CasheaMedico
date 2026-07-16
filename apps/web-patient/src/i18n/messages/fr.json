@@ -814,5 +814,9 @@
     "done": "Terminé",
     "next": "Suivant",
     "skipTutorial": "Passer le tutoriel"
+  },
+  "Metadata": {
+    "title": "SaludTech - Patient",
+    "description": "Portail patient SaludTech"
   }
 }

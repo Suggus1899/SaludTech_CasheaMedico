@@ -7,7 +7,7 @@ if (!rawSecret) {
 }
 const JWT_SECRET = new TextEncoder().encode(rawSecret);
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = request.cookies.get("jwt_token")?.value;
   const { pathname } = request.nextUrl;
 

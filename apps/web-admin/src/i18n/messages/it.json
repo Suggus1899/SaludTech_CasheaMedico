@@ -301,5 +301,9 @@
     "passwordUppercase": "Deve contenere almeno una lettera maiuscola",
     "passwordLowercase": "Deve contenere almeno una lettera minuscola",
     "passwordNumber": "Deve contenere almeno un numero"
+  },
+  "Metadata": {
+    "title": "SaludTech - Admin",
+    "description": "Backoffice per l'amministrazione di SaludTech"
   }
 }

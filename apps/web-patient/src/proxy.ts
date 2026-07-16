@@ -7,11 +7,13 @@ if (!rawSecret) {
 }
 const JWT_SECRET = new TextEncoder().encode(rawSecret);
 
-export async function middleware(request: NextRequest) {
+const PUBLIC_ROUTES = ["/login", "/registro"];
+
+export async function proxy(request: NextRequest) {
   const token = request.cookies.get("jwt_token")?.value;
   const { pathname } = request.nextUrl;
 
-  if (pathname === "/login") {
+  if (PUBLIC_ROUTES.includes(pathname)) {
     return NextResponse.next();
   }
 
@@ -22,9 +24,9 @@ export async function middleware(request: NextRequest) {
 
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    // Role-based access control: web-merchant allows MERCHANT and ADMIN
+    // Role-based access control: web-patient only allows PATIENT
     const role = payload.role as string | undefined;
-    if (role && role !== "MERCHANT" && role !== "ADMIN") {
+    if (role && role !== "PATIENT") {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("error", "wrong_app");
       const response = NextResponse.redirect(loginUrl);
@@ -42,6 +44,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.svg|.*\\.webp|.*\\.ico).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.svg|.*\\.webp|.*\\.ico|sw.js|manifest.webmanifest|.*\\.webmanifest).*)",
   ],
 };

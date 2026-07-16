@@ -814,5 +814,9 @@
     "done": "Fatto",
     "next": "Avanti",
     "skipTutorial": "Salta tutorial"
+  },
+  "Metadata": {
+    "title": "SaludTech - Paziente",
+    "description": "Portale paziente SaludTech"
   }
 }

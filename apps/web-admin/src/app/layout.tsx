@@ -15,10 +15,13 @@ const syne = Syne({
   weight: ["600", "700", "800"],
 });
 
-export const metadata: Metadata = {
-  title: "SaludTech - Admin",
-  description: "Backoffice para administración de SaludTech",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default async function RootLayout({
   children,

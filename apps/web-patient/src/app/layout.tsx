@@ -19,16 +19,19 @@ const syne = Syne({
   weight: ["600", "700", "800"],
 });
 
-export const metadata: Metadata = {
-  title: "SaludTech - Paciente",
-  description: "Portal del paciente SaludTech",
-  manifest: "/manifest.webmanifest",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "SaludTech",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata");
+  return {
+    title: t("title"),
+    description: t("description"),
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "SaludTech",
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#1a6b8a",
