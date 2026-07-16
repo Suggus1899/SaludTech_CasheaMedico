@@ -7,7 +7,6 @@ import {
   Home,
   QrCode,
   CalendarDays,
-  User,
   Store,
   Search,
   Pill,
@@ -54,12 +53,6 @@ const navSections = [
       { href: "/citas", labelKey: "citas", icon: CalendarPlus },
       { href: "/recordatorios", labelKey: "recordatorios", icon: Bell },
       { href: "/familia", labelKey: "familia", icon: Users },
-    ],
-  },
-  {
-    titleKey: "cuenta",
-    items: [
-      { href: "/perfil", labelKey: "perfil", icon: User },
     ],
   },
 ];
@@ -142,14 +135,21 @@ export default function AppLayout({
 
           {/* User info + logout */}
           <div className="border-t border-border p-3 space-y-2">
-            <div className="flex items-center gap-3 px-3 py-2">
+            <Link
+              href="/perfil"
+              className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-colors ${
+                pathname === "/perfil" || pathname.startsWith("/perfil/")
+                  ? "bg-primary text-primary-content"
+                  : "hover:bg-base-200"
+              }`}
+            >
               <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0">
                 {user?.firstName?.[0]?.toUpperCase() ?? "?"}
               </div>
-              <p className="flex-1 min-w-0 text-sm font-semibold text-foreground truncate">
+              <p className="flex-1 min-w-0 text-sm font-semibold truncate">
                 {user?.firstName ?? "—"}
               </p>
-            </div>
+            </Link>
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-error hover:bg-error/10 transition-colors"
@@ -218,14 +218,21 @@ export default function AppLayout({
 
               {/* User info + logout */}
               <div className="border-t border-border p-3 space-y-2">
-                <div className="flex items-center gap-3 px-3 py-2">
+                <Link
+                  href="/perfil"
+                  className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-colors ${
+                    pathname === "/perfil" || pathname.startsWith("/perfil/")
+                      ? "bg-primary text-primary-content"
+                      : "hover:bg-base-200"
+                  }`}
+                >
                   <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0">
                     {user?.firstName?.[0]?.toUpperCase() ?? "?"}
                   </div>
-                  <p className="flex-1 min-w-0 text-sm font-semibold text-foreground truncate">
+                  <p className="flex-1 min-w-0 text-sm font-semibold truncate">
                     {user?.firstName ?? "—"}
                   </p>
-                </div>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-error hover:bg-error/10 transition-colors"

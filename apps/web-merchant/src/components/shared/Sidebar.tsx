@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Clock, QrCode, Wallet, Shield, Stethoscope, LogOut, Package, Store } from "lucide-react";
+import { Clock, QrCode, Wallet, Shield, Stethoscope, LogOut, Package } from "lucide-react";
 import { Logo } from "@saludtech/ui";
 import { useCallback, useEffect, useState } from "react";
 import { getApiUrl } from "../../lib/api";
@@ -41,7 +41,6 @@ export function Sidebar() {
     { href: "/liquidaciones", icon: Wallet, label: t("settlements") },
     { href: "/historial", icon: Clock, label: t("history") },
     { href: "/suscripciones-ec", icon: Shield, label: t("elderCare") },
-    { href: "/perfil", icon: Store, label: t("profile") },
   ];
 
   return (
@@ -70,15 +69,22 @@ export function Sidebar() {
         </nav>
       </div>
       <div className="p-4 border-t border-border">
-        <div className="flex items-center gap-3 px-3 py-2 mb-2">
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+        <Link
+          href="/perfil"
+          className={`flex items-center gap-3 px-3 py-2 mb-2 rounded-lg transition-all ${
+            pathname === "/perfil"
+              ? "bg-primary/10 text-primary"
+              : "hover:bg-muted"
+          }`}
+        >
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
             <Stethoscope className="w-4 h-4 text-primary-foreground" />
           </div>
-          <div>
-            <p className="text-sm font-semibold leading-none">{merchantUser?.firstName ?? t("merchant")}</p>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold leading-none truncate">{merchantUser?.firstName ?? t("merchant")}</p>
             <p className="text-xs text-muted-foreground mt-0.5">ID: {merchantUser?.id?.slice(0, 8) ?? "M-992"}</p>
           </div>
-        </div>
+        </Link>
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-all"
