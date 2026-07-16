@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Syne } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 
 const inter = Inter({
@@ -27,6 +27,7 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const tCommon = await getTranslations("Common");
 
   return (
     <html
@@ -45,7 +46,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <a href="#main-content" className="skip-link">
-            Saltar al contenido principal
+            {tCommon("skipToContent")}
           </a>
           {children}
         </NextIntlClientProvider>

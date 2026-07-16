@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, CheckCircle2, XCircle, RefreshCw, Activity, DollarSign, Clock } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost/api/v1";
@@ -15,6 +16,7 @@ interface PendingAuthorization {
 
 export default function CheckoutAuthorizationPage() {
   const router = useRouter();
+  const t = useTranslations("Checkout");
   const [pendingAuths, setPendingAuths] = useState<PendingAuthorization[]>([]);
   const [isPolling, setIsPolling] = useState(true);
 
@@ -43,7 +45,7 @@ export default function CheckoutAuthorizationPage() {
               hour: "2-digit",
               minute: "2-digit",
             }),
-            patientName: "Paciente Anonimo",
+            patientName: t("anonymousPatient"),
           }));
           
           if (mapped.length > 0) {
@@ -85,21 +87,21 @@ export default function CheckoutAuthorizationPage() {
           <button onClick={() => router.push("/")} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold font-(family-name:--font-syne)">Autorizaciones en Tiempo Real</h1>
+          <h1 className="text-lg font-semibold font-(family-name:--font-syne)">{t("title")}</h1>
         </div>
         <div className="flex items-center gap-3">
           <span className={`badge gap-1.5 px-3 py-1 text-xs ${isPolling ? "badge-primary" : "badge-ghost"}`}>
             {isPolling ? <Activity className="w-3.5 h-3.5 animate-pulse" /> : <Clock className="w-3.5 h-3.5" />}
-            {isPolling ? "Escuchando solicitudes..." : "Pausado"}
+            {isPolling ? t("listening") : t("paused")}
           </span>
         </div>
       </header>
 
       <main className="flex-1 p-6 md:p-8 max-w-4xl mx-auto w-full">
         <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold font-(family-name:--font-syne) mb-2">Caja / Recepción</h2>
+          <h2 className="text-3xl font-bold font-(family-name:--font-syne) mb-2">{t("receptionTitle")}</h2>
           <p className="text-muted-foreground">
-            Cuando un paciente escanee el QR de la clínica e ingrese el monto, la solicitud aparecerá aquí para tu aprobación.
+            {t("receptionDescription")}
           </p>
         </div>
 
@@ -109,9 +111,9 @@ export default function CheckoutAuthorizationPage() {
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <RefreshCw className="w-8 h-8 text-primary animate-spin" />
               </div>
-              <h3 className="text-xl font-bold mb-1">Esperando pacientes</h3>
+              <h3 className="text-xl font-bold mb-1">{t("waitingPatients")}</h3>
               <p className="text-muted-foreground max-w-sm">
-                Las solicitudes de financiamiento aparecerán en esta pantalla automáticamente.
+                {t("waitingDescription")}
               </p>
               
               {/* Development helper to inject a mock auth */}
@@ -124,7 +126,7 @@ export default function CheckoutAuthorizationPage() {
                   patientName: "Juan Pérez",
                 }])}
               >
-                Simular Solicitud (Dev)
+                {t("simulateRequest")}
               </button>
             </div>
           </div>
@@ -135,7 +137,7 @@ export default function CheckoutAuthorizationPage() {
                 <div className="card-body pb-3">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="card-title text-2xl font-bold mb-1">Nueva Solicitud</h3>
+                      <h3 className="card-title text-2xl font-bold mb-1">{t("newRequest")}</h3>
                       <p className="text-base text-base-content/60 flex items-center gap-2">
                         <span>ID: {auth.id}</span>
                         <span>•</span>
@@ -143,19 +145,19 @@ export default function CheckoutAuthorizationPage() {
                       </p>
                     </div>
                     <span className="badge badge-info badge-lg font-semibold">
-                      Pendiente
+                      {t("pending")}
                     </span>
                   </div>
                   <div className="bg-muted rounded-xl p-5 mb-6 flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground font-medium mb-1">Monto Solicitado</p>
+                      <p className="text-sm text-muted-foreground font-medium mb-1">{t("requestedAmount")}</p>
                       <p className="text-4xl font-bold font-(family-name:--font-syne) text-primary flex items-center">
                         <DollarSign className="w-8 h-8" />
                         {auth.amount.toFixed(2)}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-muted-foreground font-medium mb-1">Paciente</p>
+                      <p className="text-sm text-muted-foreground font-medium mb-1">{t("patient")}</p>
                       <p className="text-lg font-semibold">{auth.patientName}</p>
                     </div>
                   </div>
@@ -166,14 +168,14 @@ export default function CheckoutAuthorizationPage() {
                       onClick={() => handleReject(auth.id)}
                     >
                       <XCircle className="w-5 h-5" />
-                      Rechazar
+                      {t("reject")}
                     </button>
                     <button
                       className="btn btn-success flex-1 text-white"
                       onClick={() => handleApprove(auth.id)}
                     >
                       <CheckCircle2 className="w-5 h-5" />
-                      Autorizar Transacción
+                      {t("authorize")}
                     </button>
                   </div>
                 </div>

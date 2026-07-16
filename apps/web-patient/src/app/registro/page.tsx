@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   ShieldCheck,
   User,
@@ -21,6 +22,8 @@ import type { UserResponse } from "../../types/patient";
 
 export default function PatientRegisterPage() {
   const router = useRouter();
+  const t = useTranslations("Register");
+  const tVal = useTranslations("Validations");
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -71,7 +74,7 @@ export default function PatientRegisterPage() {
     });
     const result = registerSchema.safeParse(form);
     if (!result.success) {
-      setError(result.error.issues[0].message);
+      setError(tVal(result.error.issues[0].message as any));
       return;
     }
     setIsLoading(true);
@@ -93,10 +96,10 @@ export default function PatientRegisterPage() {
         const data = await res.json().catch(() => ({}));
         const msg =
           data.error === "Phone already registered"
-            ? "Este teléfono ya está registrado"
+            ? t("phoneAlreadyRegistered")
             : data.error === "Email already registered"
-              ? "Este correo ya está registrado"
-              : data.message ?? data.error ?? "No se pudo registrar";
+              ? t("emailAlreadyRegistered")
+              : data.message ?? data.error ?? t("registerFailed");
         throw new Error(msg);
       }
       const data = await res.json();
@@ -108,7 +111,7 @@ export default function PatientRegisterPage() {
         router.push("/login");
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error al registrar");
+      setError(err instanceof Error ? err.message : t("registerError"));
     } finally {
       setIsLoading(false);
     }
@@ -121,13 +124,13 @@ export default function PatientRegisterPage() {
         <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-3">
           <button
             onClick={() => router.back()}
-            aria-label="Volver"
+            aria-label={t("back")}
             className="p-2 -ml-2 rounded-lg hover:bg-muted transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="font-bold text-foreground font-display">
-            Crear Cuenta
+            {t("title")}
           </h1>
         </div>
       </header>
@@ -137,84 +140,84 @@ export default function PatientRegisterPage() {
         <div className="flex items-start gap-3 p-4 rounded-2xl bg-primary/8 mb-7">
           <ShieldCheck className="w-7 h-7 text-primary shrink-0" />
           <p className="text-sm text-primary">
-            Tus datos están protegidos y se usan únicamente para verificar tu identidad.
+            {t("trustBanner")}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Field
             id="firstName"
-            label="Nombre"
+            label={t("firstName")}
             icon={<User className="w-4 h-4" />}
             value={form.firstName}
             onChange={(v) => update("firstName", v)}
             onBlur={() => markTouched("firstName")}
-            error={getFieldError("firstName")}
+            error={getFieldError("firstName") ? tVal(getFieldError("firstName") as any) : undefined}
             required
           />
           <Field
             id="lastName"
-            label="Apellido"
+            label={t("lastName")}
             icon={<User className="w-4 h-4" />}
             value={form.lastName}
             onChange={(v) => update("lastName", v)}
             onBlur={() => markTouched("lastName")}
-            error={getFieldError("lastName")}
+            error={getFieldError("lastName") ? tVal(getFieldError("lastName") as any) : undefined}
             required
           />
           <Field
             id="email"
-            label="Correo electrónico"
+            label={t("email")}
             type="email"
             icon={<Mail className="w-4 h-4" />}
             value={form.email}
             onChange={(v) => update("email", v)}
             onBlur={() => markTouched("email")}
-            error={getFieldError("email")}
+            error={getFieldError("email") ? tVal(getFieldError("email") as any) : undefined}
             required
           />
           <Field
             id="phone"
-            label="Teléfono (Ej. +584141234567)"
+            label={t("phone")}
             type="tel"
             icon={<Phone className="w-4 h-4" />}
             value={form.phone}
             onChange={(v) => update("phone", v)}
             onBlur={() => markTouched("phone")}
-            error={getFieldError("phone")}
+            error={getFieldError("phone") ? tVal(getFieldError("phone") as any) : undefined}
             required
           />
           <Field
             id="nationalId"
-            label="Cédula (Ej. V-12345678)"
+            label={t("nationalId")}
             icon={<CreditCard className="w-4 h-4" />}
             value={form.nationalId}
             onChange={(v) => update("nationalId", v)}
             onBlur={() => markTouched("nationalId")}
-            error={getFieldError("nationalId")}
+            error={getFieldError("nationalId") ? tVal(getFieldError("nationalId") as any) : undefined}
             required
           />
 
           <PasswordField
             id="password"
-            label="Contraseña"
+            label={t("password")}
             value={form.password}
             obscure={obscure}
             onToggle={() => setObscure((v) => !v)}
             onChange={(v) => update("password", v)}
             onBlur={() => markTouched("password")}
-            error={getFieldError("password")}
+            error={getFieldError("password") ? tVal(getFieldError("password") as any) : undefined}
           />
 
           <PasswordField
             id="confirmPassword"
-            label="Confirmar Contraseña"
+            label={t("confirmPassword")}
             value={form.confirmPassword}
             obscure={obscureConfirm}
             onToggle={() => setObscureConfirm((v) => !v)}
             onChange={(v) => update("confirmPassword", v)}
             onBlur={() => markTouched("confirmPassword")}
-            error={getFieldError("confirmPassword")}
+            error={getFieldError("confirmPassword") ? tVal(getFieldError("confirmPassword") as any) : undefined}
           />
 
           {/* Password strength indicator */}
@@ -240,7 +243,7 @@ export default function PatientRegisterPage() {
             {isLoading ? (
               <span className="loading loading-spinner loading-sm" />
             ) : null}
-            {isLoading ? "Creando cuenta..." : "Crear Cuenta"}
+            {isLoading ? t("creatingAccount") : t("createAccount")}
           </button>
         </form>
       </main>
@@ -251,14 +254,22 @@ export default function PatientRegisterPage() {
 // ─── Password strength indicator ──────────────────────────────
 
 function PasswordStrength({ password }: { password: string }) {
+  const t = useTranslations("Register");
   const checks = [
-    { label: "Mínimo 8 caracteres", ok: password.length >= 8 },
-    { label: "Una mayúscula", ok: /[A-Z]/.test(password) },
-    { label: "Una minúscula", ok: /[a-z]/.test(password) },
-    { label: "Un número", ok: /[0-9]/.test(password) },
+    { label: t("passwordMinLength"), ok: password.length >= 8 },
+    { label: t("passwordUppercase"), ok: /[A-Z]/.test(password) },
+    { label: t("passwordLowercase"), ok: /[a-z]/.test(password) },
+    { label: t("passwordNumber"), ok: /[0-9]/.test(password) },
   ];
   const passed = checks.filter((c) => c.ok).length;
-  const strengthLabel = ["Muy débil", "Débil", "Regular", "Buena", "Fuerte"][passed];
+  const strengthLabels = [
+    t("strengthVeryWeak"),
+    t("strengthWeak"),
+    t("strengthFair"),
+    t("strengthGood"),
+    t("strengthStrong"),
+  ];
+  const strengthLabel = strengthLabels[passed];
   const strengthColor = ["bg-red-500", "bg-red-500", "bg-yellow-500", "bg-blue-500", "bg-green-500"][passed];
 
   return (
@@ -343,6 +354,7 @@ interface PasswordFieldProps {
 }
 
 function PasswordField({ id, label, value, obscure, onToggle, onChange, onBlur, error }: PasswordFieldProps) {
+  const t = useTranslations("Register");
   return (
     <div className="form-control gap-1">
       <label htmlFor={id} className="label pb-0">
@@ -364,7 +376,7 @@ function PasswordField({ id, label, value, obscure, onToggle, onChange, onBlur, 
         <button
           type="button"
           onClick={onToggle}
-          aria-label={obscure ? "Mostrar contraseña" : "Ocultar contraseña"}
+          aria-label={obscure ? t("showPassword") : t("hidePassword")}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
         >
           {obscure ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}

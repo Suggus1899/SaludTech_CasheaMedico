@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, Syne } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -17,31 +17,24 @@ const syne = Syne({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "SaludTech — Tu salud, en cuotas sin interés",
-  description:
-    "Accede a farmacias, clínicas, especialistas y cuidado para adultos mayores con financiamiento sin interés. Paga en cuotas cada 14 días con SaludTech.",
-  keywords: [
-    "BNPL salud Venezuela",
-    "cuotas médicas sin interés",
-    "farmacia cuotas",
-    "telemedicina Venezuela",
-    "elder care",
-    "financiamiento salud",
-  ],
-  openGraph: {
-    title: "SaludTech — Tu salud, en cuotas sin interés",
-    description:
-      "Accede a servicios médicos y paga en cuotas sin interés. Farmacias, clínicas, especialistas y Elder Care.",
-    type: "website",
-    locale: "es_VE",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "SaludTech — Tu salud, en cuotas sin interés",
-    description: "Financiamiento médico sin interés para ti y tu familia.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata");
+  return {
+    title: t("title"),
+    description: t("description"),
+    keywords: t("keywords").split(", ").map((k) => k.trim()),
+    openGraph: {
+      title: t("ogTitle"),
+      description: t("ogDescription"),
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("twitterTitle"),
+      description: t("twitterDescription"),
+    },
+  };
+}
 
 export default async function RootLayout({
   children,

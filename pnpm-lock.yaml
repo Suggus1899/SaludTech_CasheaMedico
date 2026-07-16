@@ -351,12 +351,19 @@ importers:
 
   packages/i18n:
     dependencies:
+      next:
+        specifier: ^16.0.0
+        version: 16.2.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next-intl:
         specifier: ^4.13.2
         version: 4.13.2(next@16.2.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)(typescript@5.9.3)
       react:
         specifier: ^19.0.0
         version: 19.2.6
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.15
 
   packages/shared:
     dependencies:

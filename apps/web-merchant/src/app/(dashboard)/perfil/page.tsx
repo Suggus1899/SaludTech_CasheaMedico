@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Store, Save, Check, AlertCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { ArrowLeft, Store, Save, Check, AlertCircle, Globe } from "lucide-react";
+import { LanguageSwitcher } from "@saludtech/i18n";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 
 const merchantCategories = [
@@ -10,20 +12,21 @@ const merchantCategories = [
   "AESTHETIC", "MEDICAL_SUPPLIES", "WELLNESS", "EMERGENCY_TRIAGE", "ELDER_CARE",
 ];
 
-const categoryLabels: Record<string, string> = {
-  CLINIC: "Clínica",
-  PHARMACY: "Farmacia",
-  OPTICS: "Óptica",
-  DENTAL: "Dental",
-  LABORATORY: "Laboratorio",
-  AESTHETIC: "Estética",
-  MEDICAL_SUPPLIES: "Insumos Médicos",
-  WELLNESS: "Bienestar",
-  EMERGENCY_TRIAGE: "Triaje de Emergencia",
-  ELDER_CARE: "Cuidado Mayor",
+const categoryKeyMap: Record<string, string> = {
+  CLINIC: "catClinic",
+  PHARMACY: "catPharmacy",
+  OPTICS: "catOptics",
+  DENTAL: "catDental",
+  LABORATORY: "catLaboratory",
+  AESTHETIC: "catAesthetic",
+  MEDICAL_SUPPLIES: "catMedicalSupplies",
+  WELLNESS: "catWellness",
+  EMERGENCY_TRIAGE: "catEmergencyTriage",
+  ELDER_CARE: "catElderCare",
 };
 
 export default function MerchantProfilePage() {
+  const t = useTranslations("Profile");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -78,12 +81,12 @@ export default function MerchantProfilePage() {
         body: JSON.stringify(form),
       });
       if (!res.ok && res.status !== 404) {
-        throw new Error("Error al guardar");
+        throw new Error(t("errorSave"));
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error");
+      setError(err instanceof Error ? err.message : t("errorSave"));
     } finally {
       setSaving(false);
     }
@@ -100,15 +103,15 @@ export default function MerchantProfilePage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <Link href="/dashboard" className="btn btn-ghost btn-sm -ml-2">
-        <ArrowLeft className="w-4 h-4" /> Volver
+        <ArrowLeft className="w-4 h-4" /> {t("back")}
       </Link>
 
       <div>
         <h1 className="text-xl font-bold font-(family-name:--font-syne) flex items-center gap-2">
-          <Store className="w-5 h-5 text-primary" /> Mi Perfil
+          <Store className="w-5 h-5 text-primary" /> {t("title")}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Información de tu comercio
+          {t("subtitle")}
         </p>
       </div>
 
@@ -116,51 +119,51 @@ export default function MerchantProfilePage() {
         <div className="card-body space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium">Nombre Comercial</span></label>
+              <label className="label pb-0"><span className="label-text font-medium">{t("tradeName")}</span></label>
               <input value={form.tradeName} onChange={(e) => setForm({ ...form, tradeName: e.target.value })} className="input input-bordered w-full text-sm" />
             </div>
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium">Razón Social</span></label>
+              <label className="label pb-0"><span className="label-text font-medium">{t("legalName")}</span></label>
               <input value={form.legalName} onChange={(e) => setForm({ ...form, legalName: e.target.value })} className="input input-bordered w-full text-sm" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium">RIF / Tax ID</span></label>
+              <label className="label pb-0"><span className="label-text font-medium">{t("taxId")}</span></label>
               <input value={form.taxId} onChange={(e) => setForm({ ...form, taxId: e.target.value })} className="input input-bordered w-full text-sm" />
             </div>
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium">Categoría</span></label>
+              <label className="label pb-0"><span className="label-text font-medium">{t("category")}</span></label>
               <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="select select-bordered w-full text-sm">
-                {merchantCategories.map((c) => <option key={c} value={c}>{categoryLabels[c]}</option>)}
+                {merchantCategories.map((c) => <option key={c} value={c}>{t(categoryKeyMap[c] as any)}</option>)}
               </select>
             </div>
           </div>
 
           <div className="form-control gap-1">
-            <label className="label pb-0"><span className="label-text font-medium">Subcategoría</span></label>
-            <input value={form.subcategory} onChange={(e) => setForm({ ...form, subcategory: e.target.value })} placeholder="Ej. Cardiología, Pediatría..." className="input input-bordered w-full text-sm" />
+            <label className="label pb-0"><span className="label-text font-medium">{t("subcategory")}</span></label>
+            <input value={form.subcategory} onChange={(e) => setForm({ ...form, subcategory: e.target.value })} placeholder={t("subcategoryPlaceholder")} className="input input-bordered w-full text-sm" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium">Teléfono</span></label>
-              <input type="tel" value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder="+58 212..." className="input input-bordered w-full text-sm" />
+              <label className="label pb-0"><span className="label-text font-medium">{t("phone")}</span></label>
+              <input type="tel" value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder={t("phonePlaceholder")} className="input input-bordered w-full text-sm" />
             </div>
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium">Email</span></label>
-              <input type="email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} placeholder="contacto@..." className="input input-bordered w-full text-sm" />
+              <label className="label pb-0"><span className="label-text font-medium">{t("email")}</span></label>
+              <input type="email" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} placeholder={t("emailPlaceholder")} className="input input-bordered w-full text-sm" />
             </div>
           </div>
 
           <div className="form-control gap-1">
-            <label className="label pb-0"><span className="label-text font-medium">Dirección</span></label>
+            <label className="label pb-0"><span className="label-text font-medium">{t("address")}</span></label>
             <textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} rows={2} className="textarea textarea-bordered w-full text-sm" />
           </div>
 
           <div className="form-control gap-1">
-            <label className="label pb-0"><span className="label-text font-medium">Descripción</span></label>
+            <label className="label pb-0"><span className="label-text font-medium">{t("description")}</span></label>
             <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} className="textarea textarea-bordered w-full text-sm" />
           </div>
 
@@ -173,16 +176,31 @@ export default function MerchantProfilePage() {
           <div className="flex justify-end gap-2 pt-2 border-t border-base-300">
             {saved && (
               <span className="text-success text-sm flex items-center gap-1">
-                <Check className="w-4 h-4" /> Guardado
+                <Check className="w-4 h-4" /> {t("saved")}
               </span>
             )}
             <button type="submit" disabled={saving} className="btn btn-primary btn-sm gap-2">
               {saving ? <span className="loading loading-spinner loading-xs" /> : <Save className="w-4 h-4" />}
-              Guardar
+              {t("save")}
             </button>
           </div>
         </div>
       </form>
+
+      <div className="card bg-base-100 border border-base-300 shadow-sm">
+        <div className="card-body">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Globe className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-semibold">{t("language")}</h2>
+              <p className="text-sm text-muted-foreground">{t("languageDescription")}</p>
+            </div>
+          </div>
+          <LanguageSwitcher className="inline-block" />
+        </div>
+      </div>
     </div>
   );
 }

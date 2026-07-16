@@ -10,47 +10,47 @@ export const registerSchema = z
   .object({
     firstName: z
       .string()
-      .min(2, "El nombre debe tener al menos 2 caracteres")
-      .max(50, "El nombre no puede exceder 50 caracteres"),
+      .min(2, "firstNameMin")
+      .max(50, "firstNameMax"),
     lastName: z
       .string()
-      .min(2, "El apellido debe tener al menos 2 caracteres")
-      .max(50, "El apellido no puede exceder 50 caracteres"),
+      .min(2, "lastNameMin")
+      .max(50, "lastNameMax"),
     email: z
       .string()
-      .min(1, "El email es requerido")
-      .email("Email inválido"),
+      .min(1, "emailRequired")
+      .email("emailInvalid"),
     phone: z
       .string()
-      .min(1, "El teléfono es requerido")
-      .regex(phoneRegex, "Formato inválido. Ej: +584121234567 o 04121234567"),
+      .min(1, "phoneRequired")
+      .regex(phoneRegex, "phoneInvalid"),
     nationalId: z
       .string()
-      .min(1, "La cédula es requerida")
-      .regex(nationalIdRegex, "Formato inválido. Ej: V12345678 o 12345678"),
+      .min(1, "nationalIdRequired")
+      .regex(nationalIdRegex, "nationalIdInvalid"),
     password: z
       .string()
-      .min(8, "La contraseña debe tener mínimo 8 caracteres")
-      .max(100, "La contraseña no puede exceder 100 caracteres")
-      .regex(/[A-Z]/, "Debe incluir al menos una mayúscula")
-      .regex(/[a-z]/, "Debe incluir al menos una minúscula")
-      .regex(/[0-9]/, "Debe incluir al menos un número"),
-    confirmPassword: z.string().min(1, "Confirma tu contraseña"),
+      .min(8, "passwordMin")
+      .max(100, "passwordMax")
+      .regex(/[A-Z]/, "passwordUppercase")
+      .regex(/[a-z]/, "passwordLowercase")
+      .regex(/[0-9]/, "passwordNumber"),
+    confirmPassword: z.string().min(1, "confirmRequired"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contraseñas no coinciden",
+    message: "passwordsNoMatch",
     path: ["confirmPassword"],
   });
 
 export const loginSchema = z.object({
   email: z
     .string()
-    .min(1, "El email es requerido")
-    .email("Email inválido"),
+    .min(1, "emailRequired")
+    .email("emailInvalid"),
   password: z
     .string()
-    .min(1, "La contraseña es requerida")
-    .min(8, "La contraseña debe tener mínimo 8 caracteres"),
+    .min(1, "loginPasswordRequired")
+    .min(8, "passwordMin"),
 });
 
 export type RegisterForm = z.infer<typeof registerSchema>;

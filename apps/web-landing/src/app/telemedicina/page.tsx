@@ -15,15 +15,20 @@ import {
   Stethoscope,
 } from "@phosphor-icons/react";
 import SharedLayout from "../../components/SharedLayout";
+import { useTranslations } from "next-intl";
 
 // ─── Telemedicina & Triage ────────────────────────────────────────────────────
 function Telemedicina() {
+  const t = useTranslations("Telemedicine.triage");
+
   const steps = [
-    { icon: ClipboardText, title: "Describe tus síntomas", desc: "Desde la página, indica qué sientes, el nivel de severidad y desde cuándo." },
-    { icon: Lightning, title: "Análisis IA en segundos", desc: "Nuestro sistema clasifica urgencia y te sugiere la especialidad correcta." },
-    { icon: UserCheck, title: "Responde un médico real", desc: "Un doctor revisa tu caso y confirma o ajusta la recomendación." },
-    { icon: Buildings, title: "Te referimos al especialista", desc: "Con financiamiento ya aprobado para que no pierdas tiempo buscando cómo pagar." },
+    { icon: ClipboardText, title: t("step1Title"), desc: t("step1Desc") },
+    { icon: Lightning, title: t("step2Title"), desc: t("step2Desc") },
+    { icon: UserCheck, title: t("step3Title"), desc: t("step3Desc") },
+    { icon: Buildings, title: t("step4Title"), desc: t("step4Desc") },
   ];
+
+  const symptoms = [t("symptom1"), t("symptom2"), t("symptom3")];
 
   return (
     <section id="triage" className="py-24 bg-white overflow-hidden">
@@ -39,29 +44,29 @@ function Telemedicina() {
                     <Waveform className="w-5 h-5 text-red-400" weight="duotone" />
                   </div>
                   <div>
-                    <p className="text-white font-semibold text-sm">Triaje Inteligente</p>
-                    <p className="text-white/50 text-xs">Análisis en tiempo real</p>
+                    <p className="text-white font-semibold text-sm">{t("cardTitle")}</p>
+                    <p className="text-white/50 text-xs">{t("cardSubtitle")}</p>
                   </div>
                   <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/20">
                     <div className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-                    <span className="text-red-300 text-xs font-semibold">URGENCIA ALTA</span>
+                    <span className="text-red-300 text-xs font-semibold">{t("highUrgency")}</span>
                   </div>
                 </div>
 
                 <div className="bg-white/8 rounded-2xl p-4 mb-4 space-y-3">
-                  <p className="text-white/70 text-xs uppercase tracking-wider font-semibold">Síntomas reportados</p>
+                  <p className="text-white/70 text-xs uppercase tracking-wider font-semibold">{t("reportedSymptoms")}</p>
                   <div className="flex flex-wrap gap-2">
-                    {["Dolor pecho", "Dificultad respirar", "Mareos"].map((s) => (
+                    {symptoms.map((s) => (
                       <span key={s} className="px-2.5 py-1 rounded-full bg-white/10 text-white/80 text-xs">{s}</span>
                     ))}
                   </div>
                 </div>
 
                 <div className="bg-white/8 rounded-2xl p-4 mb-4">
-                  <p className="text-white/70 text-xs uppercase tracking-wider font-semibold mb-2">Especialidad recomendada</p>
+                  <p className="text-white/70 text-xs uppercase tracking-wider font-semibold mb-2">{t("recommendedSpecialty")}</p>
                   <div className="flex items-center gap-2">
                     <Heart className="w-5 h-5 text-red-400" />
-                    <span className="text-white font-semibold">Cardiología</span>
+                    <span className="text-white font-semibold">{t("cardiology")}</span>
                   </div>
                 </div>
 
@@ -69,8 +74,8 @@ function Telemedicina() {
                   <div className="flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 text-secondary shrink-0 mt-0.5" weight="duotone" />
                     <div>
-                      <p className="text-white text-sm font-semibold">Línea Especialidad disponible</p>
-                      <p className="text-white/60 text-xs mt-1">$180 disponibles · Cardiólogo más cercano a 2.1km</p>
+                      <p className="text-white text-sm font-semibold">{t("lineAvailable")}</p>
+                      <p className="text-white/60 text-xs mt-1">{t("lineAvailableDesc")}</p>
                     </div>
                   </div>
                 </div>
@@ -83,8 +88,8 @@ function Telemedicina() {
                     <UserCheck className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500">Médico revisó tu caso</p>
-                    <p className="text-sm font-bold text-dark">Hace 2 minutos</p>
+                    <p className="text-xs text-slate-500">{t("doctorReviewed")}</p>
+                    <p className="text-sm font-bold text-dark">{t("reviewedTime")}</p>
                   </div>
                 </div>
               </div>
@@ -95,17 +100,15 @@ function Telemedicina() {
           <div className="order-1 lg:order-2 space-y-8">
             <div>
               <div className="section-tag bg-red-50 text-red-600 mb-4">
-                <Heartbeat className="w-3.5 h-3.5" /> Exclusivo SaludTech
+                <Heartbeat className="w-3.5 h-3.5" /> {t("tag")}
               </div>
               <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
-                Telemedicina y
+                {t("titleLine1")}
                 <br />
-                <span className="text-gradient-primary">Triage inteligente</span>
+                <span className="text-gradient-primary">{t("titleLine2")}</span>
               </h2>
               <p className="text-slate-500 text-lg leading-relaxed">
-                Antes de ir a la clínica, consulta online. Nuestro sistema combina IA y
-                médicos reales para darte la orientación correcta — y ya llegas con el
-                financiamiento listo.
+                {t("subtitle")}
               </p>
             </div>
 
@@ -124,7 +127,7 @@ function Telemedicina() {
             </div>
 
             <a href="/#descarga" className="btn-primary inline-flex">
-              Probar ahora gratis
+              {t("tryNowFree")}
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
@@ -136,11 +139,18 @@ function Telemedicina() {
 
 // ─── Elder Care ────────────────────────────────────────────────────────────────
 function ElderCare() {
+  const t = useTranslations("Telemedicine.elderCare");
+
   const services = [
-    { icon: UserCheck, title: "Enfermera a domicilio", desc: "Cuidado y control médico en casa, sin desplazamientos." },
-    { icon: Heart, title: "Cuidador/a profesional", desc: "Acompañamiento diario certificado para adultos mayores." },
-    { icon: Person, title: "Fisioterapia en casa", desc: "Rehabilitación y movilidad sin salir del hogar." },
-    { icon: Stethoscope, title: "Especialista en geriatría", desc: "Seguimiento médico especializado para la tercera edad." },
+    { icon: UserCheck, title: t("service1Title"), desc: t("service1Desc") },
+    { icon: Heart, title: t("service2Title"), desc: t("service2Desc") },
+    { icon: Person, title: t("service3Title"), desc: t("service3Desc") },
+    { icon: Stethoscope, title: t("service4Title"), desc: t("service4Desc") },
+  ];
+
+  const subscriptionItems = [
+    { service: t("service1Label"), amount: t("service1Amount") },
+    { service: t("service2Label"), amount: t("service2Amount") },
   ];
 
   return (
@@ -150,17 +160,17 @@ function ElderCare() {
           <div className="space-y-8">
             <div>
               <div className="section-tag bg-accent-50 text-accent mb-4">
-                <Shield className="w-3.5 h-3.5" /> Elder Care · Nivel 4+
+                <Shield className="w-3.5 h-3.5" /> {t("tag")}
               </div>
               <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
-                Cuidado especial para
+                {t("titleLine1")}
                 <br />
-                <span className="text-gradient-accent">tus adultos mayores</span>
+                <span className="text-gradient-accent">{t("titleLine2")}</span>
               </h2>
               <p className="text-slate-500 text-lg leading-relaxed">
-                La línea <strong className="text-dark">Mayor Cuidado</strong> te permite contratar servicios de
-                salud a domicilio para adultos mayores mediante una suscripción mensual sin
-                intereses. Disponible para usuarios nivel 4+.
+                {t.rich("subtitle", {
+                  strong: (chunks) => <strong className="text-dark">{chunks}</strong>
+                })}
               </p>
             </div>
 
@@ -179,7 +189,9 @@ function ElderCare() {
             <div className="flex items-center gap-3 p-4 rounded-2xl bg-accent/8 border border-accent/20">
               <CheckCircle className="w-5 h-5 text-accent shrink-0" weight="duotone" />
               <p className="text-sm text-slate-700">
-                <strong>Suscripción flexible:</strong> cancela cuando quieras, sin penalizaciones.
+                {t.rich("flexibleSubscription", {
+                  strong: (chunks) => <strong>{chunks}</strong>
+                })}
               </p>
             </div>
           </div>
@@ -193,16 +205,13 @@ function ElderCare() {
                     <Shield className="w-6 h-6 text-accent-light" />
                   </div>
                   <div>
-                    <p className="text-white font-bold">Mayor Cuidado</p>
-                    <p className="text-white/50 text-xs">Suscripción activa</p>
+                    <p className="text-white font-bold">{t("cardTitle")}</p>
+                    <p className="text-white/50 text-xs">{t("cardSubtitle")}</p>
                   </div>
-                  <div className="ml-auto px-2.5 py-1 rounded-full bg-secondary/20 text-secondary text-xs font-bold">ACTIVA</div>
+                  <div className="ml-auto px-2.5 py-1 rounded-full bg-secondary/20 text-secondary text-xs font-bold">{t("active")}</div>
                 </div>
 
-                {[
-                  { service: "Enfermera · 3 días/sem", amount: "$45/mes" },
-                  { service: "Fisioterapia · 2 días/sem", amount: "$30/mes" },
-                ].map((item) => (
+                {subscriptionItems.map((item) => (
                   <div key={item.service} className="flex items-center justify-between p-3 rounded-xl bg-white/8 mb-3">
                     <span className="text-white/70 text-sm">{item.service}</span>
                     <span className="text-white font-semibold text-sm">{item.amount}</span>
@@ -211,10 +220,10 @@ function ElderCare() {
 
                 <div className="mt-2 p-3 rounded-xl border border-accent/30 bg-accent/10">
                   <div className="flex items-center justify-between">
-                    <span className="text-white/60 text-xs">Total mensual</span>
-                    <span className="text-white font-bold">$75/mes</span>
+                    <span className="text-white/60 text-xs">{t("monthlyTotal")}</span>
+                    <span className="text-white font-bold">{t("monthlyTotalAmount")}</span>
                   </div>
-                  <div className="text-white/40 text-xs mt-1">Debitado de línea Mayor Cuidado</div>
+                  <div className="text-white/40 text-xs mt-1">{t("debitedFrom")}</div>
                 </div>
               </div>
 
@@ -224,8 +233,8 @@ function ElderCare() {
                     <Shield className="w-5 h-5 text-amber-500" />
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500">Requisito</p>
-                    <p className="text-sm font-bold text-dark">Nivel 4 en Club SaludTech</p>
+                    <p className="text-xs text-slate-500">{t("requirementLabel")}</p>
+                    <p className="text-sm font-bold text-dark">{t("requirementValue")}</p>
                   </div>
                 </div>
               </div>

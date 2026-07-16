@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, Package, Plus, Trash2, Pencil, X, AlertCircle, Check, Pill } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 
@@ -9,16 +10,17 @@ const supplyCategories = [
   "MEDICATION", "MEDICAL_DEVICE", "PPE", "CONSUMABLE", "EQUIPMENT", "OTHER",
 ];
 
-const categoryLabels: Record<string, string> = {
-  MEDICATION: "Medicamento",
-  MEDICAL_DEVICE: "Dispositivo",
-  PPE: "Protección",
-  CONSUMABLE: "Consumible",
-  EQUIPMENT: "Equipo",
-  OTHER: "Otro",
+const categoryKeyMap: Record<string, string> = {
+  MEDICATION: "catMedication",
+  MEDICAL_DEVICE: "catMedicalDevice",
+  PPE: "catPpe",
+  CONSUMABLE: "catConsumable",
+  EQUIPMENT: "catEquipment",
+  OTHER: "catOther",
 };
 
 export default function MerchantSuppliesPage() {
+  const t = useTranslations("Supplies");
   const [supplies, setSupplies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -81,7 +83,7 @@ export default function MerchantSuppliesPage() {
     e.preventDefault();
     setError(null);
     if (!form.name || !form.priceUSD) {
-      setError("Nombre y precio son obligatorios");
+      setError(t("errorNamePrice"));
       return;
     }
     setSaving(true);
@@ -106,18 +108,18 @@ export default function MerchantSuppliesPage() {
         method,
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error("Error al guardar");
+      if (!res.ok) throw new Error(t("errorSave"));
       resetForm();
       fetchSupplies();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error");
+      setError(err instanceof Error ? err.message : t("errorSave"));
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("¿Eliminar este insumo?")) return;
+    if (!confirm(t("confirmDelete"))) return;
     try {
       await apiFetch(getApiUrl(`merchant/supplies/${id}`), {
         method: "DELETE",
@@ -133,20 +135,20 @@ export default function MerchantSuppliesPage() {
   return (
     <div className="space-y-6">
       <Link href="/dashboard" className="btn btn-ghost btn-sm -ml-2">
-        <ArrowLeft className="w-4 h-4" /> Volver
+        <ArrowLeft className="w-4 h-4" /> {t("back")}
       </Link>
 
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold font-(family-name:--font-syne) flex items-center gap-2">
-            <Package className="w-5 h-5 text-primary" /> Insumos
+            <Package className="w-5 h-5 text-primary" /> {t("title")}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Gestiona tu inventario de insumos médicos
+            {t("subtitle")}
           </p>
         </div>
         <button onClick={() => { resetForm(); setShowForm(true); }} className="btn btn-primary btn-sm gap-2">
-          <Plus className="w-4 h-4" /> Nuevo
+          <Plus className="w-4 h-4" /> {t("new")}
         </button>
       </div>
 
@@ -157,19 +159,19 @@ export default function MerchantSuppliesPage() {
       ) : supplies.length === 0 && !showForm ? (
         <div className="text-center py-16 text-muted-foreground">
           <Package className="w-12 h-12 mx-auto mb-3 opacity-40" />
-          <p className="font-medium">No tienes insumos registrados</p>
-          <p className="text-xs mt-1">Agrega tu primer insumo médico</p>
+          <p className="font-medium">{t("empty")}</p>
+          <p className="text-xs mt-1">{t("emptyHint")}</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="table table-sm w-full">
             <thead>
               <tr className="border-base-300">
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th className="text-right">Precio</th>
-                <th className="text-center">Stock</th>
-                <th>Receta</th>
+                <th>{t("colName")}</th>
+                <th>{t("colCategory")}</th>
+                <th className="text-right">{t("colPrice")}</th>
+                <th className="text-center">{t("colStock")}</th>
+                <th>{t("colPrescription")}</th>
                 <th></th>
               </tr>
             </thead>
@@ -177,7 +179,7 @@ export default function MerchantSuppliesPage() {
               {supplies.map((s) => (
                 <tr key={s.id} className="hover:bg-base-200/40 border-base-300/60">
                   <td className="font-medium">{s.name}</td>
-                  <td><span className="badge badge-xs badge-ghost">{categoryLabels[s.category] || s.category}</span></td>
+                  <td><span className="badge badge-xs badge-ghost">{categoryKeyMap[s.category] ? t(categoryKeyMap[s.category] as any) : s.category}</span></td>
                   <td className="text-right font-semibold">${Number(s.price_usd || 0).toFixed(2)}</td>
                   <td className="text-center">
                     <span className={`badge badge-sm ${lowStock(s) ? "badge-error" : "badge-ghost"}`}>
@@ -207,52 +209,52 @@ export default function MerchantSuppliesPage() {
         <div className="modal modal-open">
           <div className="modal-box max-w-md">
             <h3 className="text-lg font-bold font-(family-name:--font-syne)">
-              {editingId ? "Editar Insumo" : "Nuevo Insumo"}
+              {editingId ? t("editTitle") : t("newTitle")}
             </h3>
             <form onSubmit={handleSave} className="space-y-4 mt-4">
               <div className="form-control gap-1">
-                <label className="label pb-0"><span className="label-text font-medium">Nombre</span></label>
-                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ej. Acetaminofén 500mg" className="input input-bordered w-full text-sm" required />
+                <label className="label pb-0"><span className="label-text font-medium">{t("fieldName")}</span></label>
+                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t("fieldNamePlaceholder")} className="input input-bordered w-full text-sm" required />
               </div>
               <div className="form-control gap-1">
-                <label className="label pb-0"><span className="label-text font-medium">Descripción</span></label>
+                <label className="label pb-0"><span className="label-text font-medium">{t("fieldDescription")}</span></label>
                 <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className="textarea textarea-bordered w-full text-sm" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="form-control gap-1">
-                  <label className="label pb-0"><span className="label-text font-medium">Categoría</span></label>
+                  <label className="label pb-0"><span className="label-text font-medium">{t("fieldCategory")}</span></label>
                   <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="select select-bordered w-full text-sm">
-                    {supplyCategories.map((c) => <option key={c} value={c}>{categoryLabels[c]}</option>)}
+                    {supplyCategories.map((c) => <option key={c} value={c}>{t(categoryKeyMap[c] as any)}</option>)}
                   </select>
                 </div>
                 <div className="form-control gap-1">
-                  <label className="label pb-0"><span className="label-text font-medium">Subcategoría</span></label>
-                  <input value={form.subcategory} onChange={(e) => setForm({ ...form, subcategory: e.target.value })} placeholder="Opcional" className="input input-bordered w-full text-sm" />
+                  <label className="label pb-0"><span className="label-text font-medium">{t("fieldSubcategory")}</span></label>
+                  <input value={form.subcategory} onChange={(e) => setForm({ ...form, subcategory: e.target.value })} placeholder={t("fieldSubcategoryPlaceholder")} className="input input-bordered w-full text-sm" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="form-control gap-1">
-                  <label className="label pb-0"><span className="label-text font-medium">Precio (USD)</span></label>
+                  <label className="label pb-0"><span className="label-text font-medium">{t("fieldPrice")}</span></label>
                   <input type="number" step="0.01" min="0" value={form.priceUSD} onChange={(e) => setForm({ ...form, priceUSD: e.target.value })} placeholder="5.00" className="input input-bordered w-full text-sm" required />
                 </div>
                 <div className="form-control gap-1">
-                  <label className="label pb-0"><span className="label-text font-medium">Unidad</span></label>
-                  <input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} placeholder="unidad, caja..." className="input input-bordered w-full text-sm" />
+                  <label className="label pb-0"><span className="label-text font-medium">{t("fieldUnit")}</span></label>
+                  <input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} placeholder={t("fieldUnitPlaceholder")} className="input input-bordered w-full text-sm" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="form-control gap-1">
-                  <label className="label pb-0"><span className="label-text font-medium">Stock</span></label>
+                  <label className="label pb-0"><span className="label-text font-medium">{t("fieldStock")}</span></label>
                   <input type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className="input input-bordered w-full text-sm" />
                 </div>
                 <div className="form-control gap-1">
-                  <label className="label pb-0"><span className="label-text font-medium">Stock mínimo</span></label>
+                  <label className="label pb-0"><span className="label-text font-medium">{t("fieldMinStock")}</span></label>
                   <input type="number" min="0" value={form.minStock} onChange={(e) => setForm({ ...form, minStock: e.target.value })} className="input input-bordered w-full text-sm" />
                 </div>
               </div>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={form.requiresPrescription} onChange={(e) => setForm({ ...form, requiresPrescription: e.target.checked })} className="checkbox checkbox-sm checkbox-primary" />
-                <span className="text-sm">Requiere receta médica</span>
+                <span className="text-sm">{t("requiresPrescription")}</span>
               </label>
               {error && (
                 <div className="alert alert-error text-sm py-2">
@@ -260,10 +262,10 @@ export default function MerchantSuppliesPage() {
                 </div>
               )}
               <div className="flex justify-end gap-2 pt-2 border-t border-base-300">
-                <button type="button" onClick={resetForm} className="btn btn-ghost btn-sm">Cancelar</button>
+                <button type="button" onClick={resetForm} className="btn btn-ghost btn-sm">{t("cancel")}</button>
                 <button type="submit" disabled={saving} className="btn btn-primary btn-sm gap-1">
                   {saving ? <span className="loading loading-spinner loading-xs" /> : <Check className="w-4 h-4" />}
-                  {editingId ? "Actualizar" : "Crear"}
+                  {editingId ? t("update") : t("create")}
                 </button>
               </div>
             </form>

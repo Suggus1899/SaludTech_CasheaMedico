@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Clock, QrCode, Wallet, Shield, Stethoscope, LogOut, Package, Store } from "lucide-react";
 import { Logo } from "@saludtech/ui";
 import { useCallback, useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import { getApiUrl } from "../../lib/api";
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations("Nav");
   const [merchantUser, setMerchantUser] = useState<any>(null);
 
   useEffect(() => {
@@ -32,14 +34,14 @@ export function Sidebar() {
   }, [router]);
 
   const navItems = [
-    { href: "/checkout", icon: Clock, label: "Autorizaciones (Caja)" },
-    { href: "/dashboard", icon: QrCode, label: "Generar QR" },
-    { href: "/servicios", icon: Stethoscope, label: "Servicios" },
-    { href: "/insumos", icon: Package, label: "Insumos" },
-    { href: "/liquidaciones", icon: Wallet, label: "Liquidaciones" },
-    { href: "/historial", icon: Clock, label: "Historial de Transacciones" },
-    { href: "/suscripciones-ec", icon: Shield, label: "Elder Care" },
-    { href: "/perfil", icon: Store, label: "Mi Perfil" },
+    { href: "/checkout", icon: Clock, label: t("authorizations") },
+    { href: "/dashboard", icon: QrCode, label: t("generateQr") },
+    { href: "/servicios", icon: Stethoscope, label: t("services") },
+    { href: "/insumos", icon: Package, label: t("supplies") },
+    { href: "/liquidaciones", icon: Wallet, label: t("settlements") },
+    { href: "/historial", icon: Clock, label: t("history") },
+    { href: "/suscripciones-ec", icon: Shield, label: t("elderCare") },
+    { href: "/perfil", icon: Store, label: t("profile") },
   ];
 
   return (
@@ -48,7 +50,7 @@ export function Sidebar() {
         <div className="mb-10">
           <Logo size="md" />
         </div>
-        <nav className="space-y-1" aria-label="Navegación del portal">
+        <nav className="space-y-1" aria-label={t("navAriaLabel")}>
           {navItems.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
@@ -73,7 +75,7 @@ export function Sidebar() {
             <Stethoscope className="w-4 h-4 text-primary-foreground" />
           </div>
           <div>
-            <p className="text-sm font-semibold leading-none">{merchantUser?.firstName ?? "Comercio"}</p>
+            <p className="text-sm font-semibold leading-none">{merchantUser?.firstName ?? t("merchant")}</p>
             <p className="text-xs text-muted-foreground mt-0.5">ID: {merchantUser?.id?.slice(0, 8) ?? "M-992"}</p>
           </div>
         </div>
@@ -81,7 +83,7 @@ export function Sidebar() {
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-all"
         >
-          <LogOut className="w-4 h-4" /> Cerrar Sesión
+          <LogOut className="w-4 h-4" /> {t("logout")}
         </button>
       </div>
     </>

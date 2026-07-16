@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Wallet, Calendar, RefreshCw } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 
@@ -16,6 +17,7 @@ interface Payout {
 }
 
 export default function LiquidacionesPage() {
+  const t = useTranslations("Settlements");
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [payoutsLoading, setPayoutsLoading] = useState(false);
   const [selectedPayout, setSelectedPayout] = useState<Payout | null>(null);
@@ -40,31 +42,31 @@ export default function LiquidacionesPage() {
     <>
       <div className="max-w-5xl space-y-6">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">{payouts.length} liquidaciones encontradas</p>
+          <p className="text-sm text-muted-foreground">{t("count", { count: payouts.length })}</p>
         </div>
         <div className="card bg-base-100 border border-base-300 shadow-sm">
           <div className="p-0">
             {payoutsLoading ? (
               <div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
-                <RefreshCw className="w-5 h-5 animate-spin" /> Cargando liquidaciones...
+                <RefreshCw className="w-5 h-5 animate-spin" /> {t("loading")}
               </div>
             ) : payouts.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
                 <Wallet className="w-10 h-10 mx-auto mb-3 opacity-40" />
-                <p className="font-medium">Sin liquidaciones aún</p>
-                <p className="text-sm mt-1">Las liquidaciones aparecerán aquí una vez procesadas.</p>
+                <p className="font-medium">{t("empty")}</p>
+                <p className="text-sm mt-1">{t("emptyHint")}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border text-muted-foreground">
-                      <th className="text-left px-4 py-3 font-medium">Período</th>
-                      <th className="text-right px-4 py-3 font-medium">Monto Bruto</th>
-                      <th className="text-right px-4 py-3 font-medium">Comisión MDR</th>
-                      <th className="text-right px-4 py-3 font-medium">Neto</th>
-                      <th className="text-center px-4 py-3 font-medium">Estado</th>
-                      <th className="text-center px-4 py-3 font-medium">Acción</th>
+                      <th className="text-left px-4 py-3 font-medium">{t("colPeriod")}</th>
+                      <th className="text-right px-4 py-3 font-medium">{t("colGross")}</th>
+                      <th className="text-right px-4 py-3 font-medium">{t("colMdr")}</th>
+                      <th className="text-right px-4 py-3 font-medium">{t("colNet")}</th>
+                      <th className="text-center px-4 py-3 font-medium">{t("colStatus")}</th>
+                      <th className="text-center px-4 py-3 font-medium">{t("colAction")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -81,12 +83,12 @@ export default function LiquidacionesPage() {
                         <td className="px-4 py-3 text-right font-semibold text-primary">${Number(p.net_amount || 0).toFixed(2)}</td>
                         <td className="px-4 py-3 text-center">
                           <span className={`badge ${p.status === "PAID" ? "badge-primary" : "badge-ghost"}`}>
-                            {p.status === "PAID" ? "Liquidado" : "Pendiente"}
+                            {p.status === "PAID" ? t("settled") : t("pending")}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">
                           <button onClick={() => setSelectedPayout(p)} className="text-xs text-primary hover:underline font-medium">
-                            Ver detalle
+                            {t("viewDetail")}
                           </button>
                         </td>
                       </tr>
@@ -103,16 +105,16 @@ export default function LiquidacionesPage() {
       {!!selectedPayout && (
         <div className="modal modal-open">
           <div className="modal-box max-w-md p-6">
-            <h3 className="font-bold text-lg font-(family-name:--font-syne)">Detalle de Liquidación</h3>
-            <p className="text-sm opacity-60 mb-4">Período: {selectedPayout?.period_start} — {selectedPayout?.period_end}</p>
+            <h3 className="font-bold text-lg font-(family-name:--font-syne)">{t("detailTitle")}</h3>
+            <p className="text-sm opacity-60 mb-4">{t("detailPeriod", { start: selectedPayout?.period_start, end: selectedPayout?.period_end })}</p>
             {selectedPayout && (
               <div className="space-y-3">
                 {[
-                  { label: "Monto Bruto", value: `$${Number(selectedPayout.gross_amount || 0).toFixed(2)}` },
-                  { label: "Comisión MDR (3.5%)", value: `-$${Number(selectedPayout.mdr_deducted || 0).toFixed(2)}`, red: true },
-                  { label: "Monto Neto", value: `$${Number(selectedPayout.net_amount || 0).toFixed(2)}`, bold: true },
-                  { label: "Estado", value: selectedPayout.status === "PAID" ? "Liquidado" : "Pendiente" },
-                  { label: "Fecha de pago", value: selectedPayout.paid_at ? new Date(selectedPayout.paid_at).toLocaleDateString("es-VE") : "—" },
+                  { label: t("detailGross"), value: `$${Number(selectedPayout.gross_amount || 0).toFixed(2)}` },
+                  { label: t("detailMdr"), value: `-$${Number(selectedPayout.mdr_deducted || 0).toFixed(2)}`, red: true },
+                  { label: t("detailNet"), value: `$${Number(selectedPayout.net_amount || 0).toFixed(2)}`, bold: true },
+                  { label: t("detailStatus"), value: selectedPayout.status === "PAID" ? t("settled") : t("pending") },
+                  { label: t("detailPaidAt"), value: selectedPayout.paid_at ? new Date(selectedPayout.paid_at).toLocaleDateString("es-VE") : "—" },
                 ].map((row) => (
                   <div key={row.label} className="flex justify-between text-sm border-b border-base-300 pb-2 last:border-0">
                     <span className="opacity-60">{row.label}</span>
@@ -122,7 +124,7 @@ export default function LiquidacionesPage() {
               </div>
             )}
             <div className="modal-action">
-              <button className="btn btn-sm" onClick={() => setSelectedPayout(null)}>Cerrar</button>
+              <button className="btn btn-sm" onClick={() => setSelectedPayout(null)}>{t("close")}</button>
             </div>
           </div>
           <div className="modal-backdrop" onClick={() => setSelectedPayout(null)} />

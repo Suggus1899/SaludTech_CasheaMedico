@@ -12,32 +12,40 @@ import {
 import { useFetchData } from "@saludtech/shared";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { formatDate } from "../../../lib/utils";
+import { useTranslations } from "next-intl";
 import type { Triage, RecommendedMerchant } from "../../../types/patient";
 
-const categories = ["Dental", "Visión", "Cardíaco", "Fiebre", "Dolor pecho", "General"];
+const categories = [
+  { key: "catDental", label: "Dental" },
+  { key: "catVision", label: "Visión" },
+  { key: "catCardiac", label: "Cardíaco" },
+  { key: "catFever", label: "Fiebre" },
+  { key: "catChestPain", label: "Dolor pecho" },
+  { key: "catGeneral", label: "General" },
+];
 
-const specialtyLabels: Record<string, string> = {
-  GENERAL_PRACTICE: "Medicina General",
-  CARDIOLOGY: "Cardiología",
-  DENTISTRY: "Odontología",
-  OPHTHALMOLOGY: "Oftalmología",
-  INTERNAL_MEDICINE: "Medicina Interna",
-  EMERGENCY_MEDICINE: "Emergencias",
+const specialtyLabelKeys: Record<string, string> = {
+  GENERAL_PRACTICE: "specGeneralPractice",
+  CARDIOLOGY: "specCardiology",
+  DENTISTRY: "specDentistry",
+  OPHTHALMOLOGY: "specOphthalmology",
+  INTERNAL_MEDICINE: "specInternalMedicine",
+  EMERGENCY_MEDICINE: "specEmergencyMedicine",
 };
 
-const statusLabels: Record<string, { label: string; className: string }> = {
-  PENDING: { label: "Pendiente", className: "badge-warning" },
-  REVIEWING: { label: "En Revisión", className: "badge-info" },
-  RESOLVED: { label: "Resuelto", className: "badge-success" },
-  REFERRED: { label: "Derivado", className: "badge-primary" },
-  COMPLETED: { label: "Completado", className: "badge-success" },
+const statusLabelKeys: Record<string, { key: string; className: string }> = {
+  PENDING: { key: "statusPending", className: "badge-warning" },
+  REVIEWING: { key: "statusReviewing", className: "badge-info" },
+  RESOLVED: { key: "statusResolved", className: "badge-success" },
+  REFERRED: { key: "statusReferred", className: "badge-primary" },
+  COMPLETED: { key: "statusCompleted", className: "badge-success" },
 };
 
-const urgencyLabels: Record<string, { label: string; className: string }> = {
-  LOW: { label: "Baja", className: "badge-success" },
-  MEDIUM: { label: "🔶 Media", className: "badge-warning" },
-  HIGH: { label: "⚠️ Alta", className: "badge-error" },
-  EMERGENCY: { label: "🚨 EMERGENCIA", className: "badge-error" },
+const urgencyLabelKeys: Record<string, { key: string; className: string }> = {
+  LOW: { key: "urgencyLow", className: "badge-success" },
+  MEDIUM: { key: "urgencyMedium", className: "badge-warning" },
+  HIGH: { key: "urgencyHigh", className: "badge-error" },
+  EMERGENCY: { key: "urgencyEmergency", className: "badge-error" },
 };
 
 function severityColor(s: number): string {
@@ -47,6 +55,8 @@ function severityColor(s: number): string {
 }
 
 export default function TriajePage() {
+  const t = useTranslations("Triage");
+  const tCommon = useTranslations("Common");
   const { data: triages, loading, refetch } = useFetchData<Triage[]>(
     getApiUrl("patient/triage")
   );
@@ -95,7 +105,7 @@ export default function TriajePage() {
       refetch();
       setTimeout(() => setSuccess(false), 3000);
     } catch {
-      setError("Error al enviar la solicitud.");
+      setError(t("submitError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -121,7 +131,7 @@ export default function TriajePage() {
   return (
     <div className="space-y-7">
       <h1 className="text-xl font-bold text-foreground">
-        Triaje Médico
+        {t("title")}
       </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -133,28 +143,28 @@ export default function TriajePage() {
         <div className="flex items-center gap-2">
           <Stethoscope className="w-5 h-5 text-primary" />
           <h2 className="text-base font-bold text-foreground font-display">
-            Nueva Consulta
+            {t("newConsult")}
           </h2>
         </div>
 
         {/* Categories */}
         <div>
           <p className="text-xs font-semibold text-muted-foreground mb-2">
-            Tipo de síntoma
+            {t("symptomType")}
           </p>
           <div className="flex flex-wrap gap-2">
             {categories.map((cat) => {
-              const isSelected = selectedCats.has(cat);
+              const isSelected = selectedCats.has(cat.label);
               return (
                 <button
-                  key={cat}
+                  key={cat.key}
                   type="button"
-                  onClick={() => toggleCat(cat)}
+                  onClick={() => toggleCat(cat.label)}
                   className={`badge cursor-pointer transition-colors ${
                     isSelected ? "badge-primary" : "badge-ghost"
                   }`}
                 >
-                  {cat}
+                  {t(cat.key as any)}
                 </button>
               );
             })}
@@ -166,7 +176,7 @@ export default function TriajePage() {
           <textarea
             value={symptoms}
             onChange={(e) => setSymptoms(e.target.value)}
-            placeholder="Describe tus síntomas con detalle..."
+            placeholder={t("symptomsPlaceholder")}
             rows={3}
             className="textarea textarea-bordered w-full"
           />
@@ -176,7 +186,7 @@ export default function TriajePage() {
         <div>
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium text-foreground">
-              Nivel de malestar
+              {t("discomfortLevel")}
             </span>
             <span
               className={`badge badge-sm font-bold ${severityColor(severity)}`}
@@ -208,7 +218,7 @@ export default function TriajePage() {
         {success && (
           <div className="flex items-center gap-2 text-sm text-success bg-success/10 p-3 rounded-lg">
             <UserCheck className="w-4 h-4" />
-            <span>Solicitud enviada. Un especialista la revisará pronto.</span>
+            <span>{t("successMsg")}</span>
           </div>
         )}
 
@@ -218,14 +228,14 @@ export default function TriajePage() {
           className="btn btn-primary w-full font-semibold"
         >
           {isSubmitting ? <span className="loading loading-spinner loading-sm" /> : null}
-          Enviar Síntomas
+          {t("submitSymptoms")}
         </button>
       </form>
 
       {/* Right: History */}
       <section>
         <h2 className="text-lg font-bold text-foreground mb-4 font-display">
-          Historial de Consultas
+          {t("consultHistory")}
         </h2>
 
         {loading ? (
@@ -234,54 +244,54 @@ export default function TriajePage() {
           </div>
         ) : !triages || triages.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">
-            No tienes consultas de triaje previas.
+            {t("noHistory")}
           </p>
         ) : (
           <ul className="space-y-3">
-            {triages.map((t) => {
-              const status = statusLabels[t.status ?? ""] ?? {
-                label: t.status ?? "—",
+            {triages.map((triage) => {
+              const status = statusLabelKeys[triage.status ?? ""] ?? {
+                key: triage.status ?? "—",
                 className: "badge-ghost",
               };
-              const urgency = urgencyLabels[t.priority ?? ""] ?? {
-                label: t.priority ?? "Baja",
+              const urgency = urgencyLabelKeys[triage.priority ?? ""] ?? {
+                key: "urgencyLow",
                 className: "badge-success",
               };
               return (
                 <li
-                  key={t.id}
+                  key={triage.id}
                   className="p-4 rounded-2xl border border-border bg-base-100 space-y-3"
                 >
                   <div className="flex justify-between">
                     <span className={`badge badge-sm ${urgency.className}`}>
-                      {urgency.label}
+                      {urgencyLabelKeys[triage.priority ?? ""] ? t(urgency.key as any) : triage.priority ?? "—"}
                     </span>
                     <span className={`badge badge-sm ${status.className}`}>
-                      {status.label}
+                      {statusLabelKeys[triage.status ?? ""] ? t(status.key as any) : triage.status ?? "—"}
                     </span>
                   </div>
 
                   <p className="text-sm text-muted-foreground line-clamp-2">
-                    {t.symptoms}
+                    {triage.symptoms}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {formatDate(t.createdAt)}
+                    {formatDate(triage.createdAt)}
                   </p>
 
-                  {t.recommendation && (
+                  {triage.recommendation && (
                     <div className="flex items-start gap-1.5 p-2.5 rounded-lg bg-primary/8">
                       <Bot className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-                      <p className="text-xs text-primary">{t.recommendation}</p>
+                      <p className="text-xs text-primary">{triage.recommendation}</p>
                     </div>
                   )}
 
                   <button
-                    onClick={() => loadMerchants(t.id)}
+                    onClick={() => loadMerchants(triage.id)}
                     disabled={merchantsLoading}
                     className="btn btn-outline btn-sm w-full gap-2"
                   >
                     <MapPin className="w-3.5 h-3.5" />
-                    Ver especialistas
+                    {t("viewSpecialists")}
                   </button>
                 </li>
               );
@@ -295,7 +305,7 @@ export default function TriajePage() {
         <div className="modal modal-open" role="dialog" aria-modal="true">
           <div className="modal-box">
             <h3 className="text-lg font-bold mb-4 font-display">
-              Especialistas Disponibles
+              {t("specialistsTitle")}
             </h3>
             {merchantsLoading ? (
               <div className="flex justify-center py-8">
@@ -303,7 +313,7 @@ export default function TriajePage() {
               </div>
             ) : merchants.length === 0 ? (
               <p className="text-center text-muted-foreground py-6">
-                No hay especialistas disponibles en tu área.
+                {t("noSpecialists")}
               </p>
             ) : (
               <ul className="space-y-2.5">
@@ -327,13 +337,13 @@ export default function TriajePage() {
             )}
             <div className="modal-action">
               <button onClick={() => setMerchants(null)} className="btn btn-ghost btn-sm">
-                Cerrar
+                {t("close")}
               </button>
             </div>
           </div>
           <button
             className="modal-backdrop"
-            aria-label="Cerrar"
+            aria-label={t("close")}
             onClick={() => setMerchants(null)}
           />
         </div>

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Syne } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 import ServiceWorkerRegister from "../components/ServiceWorkerRegister";
 
@@ -45,6 +45,7 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const t = await getTranslations("RootLayout");
 
   return (
     <html
@@ -62,7 +63,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <a href="#main-content" className="skip-link">
-            Saltar al contenido principal
+            {t("skipToContent")}
           </a>
           <ServiceWorkerRegister />
           {children}

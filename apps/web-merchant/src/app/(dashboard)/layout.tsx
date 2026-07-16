@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Sidebar } from "../../components/shared/Sidebar";
 import { Topbar } from "../../components/shared/Topbar";
 import { Logo } from "@saludtech/ui";
 import { X } from "lucide-react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("Nav");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -30,11 +32,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border flex flex-col transform transition-transform duration-300 md:hidden ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
-        aria-label="Menú lateral"
+        aria-label={t("sidebarAriaLabel")}
       >
         <div className="flex items-center justify-between p-4 border-b border-border">
           <Logo size="sm" />
-          <button onClick={() => setSidebarOpen(false)} aria-label="Cerrar menú" className="p-2 rounded-lg hover:bg-muted">
+          <button onClick={() => setSidebarOpen(false)} aria-label={t("closeMenu")} className="p-2 rounded-lg hover:bg-muted">
             <X className="w-5 h-5" />
           </button>
         </div>

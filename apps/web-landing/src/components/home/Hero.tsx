@@ -1,8 +1,11 @@
 "use client";
 
 import { Globe, CaretRight, CreditCard, Waveform, QrCode, CheckCircle } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
 export default function Hero() {
+  const t = useTranslations("Home.hero");
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-hero-gradient pt-16">
       {/* Background decoration */}
@@ -19,33 +22,33 @@ export default function Hero() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/15 border border-primary/30">
               <div className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
               <span className="text-primary text-xs font-semibold tracking-widest uppercase">
-                BNPL Médico · Sin intereses
+                {t("badge")}
               </span>
             </div>
 
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight">
-              Tu salud,
+              {t("titleLine1")}
               <br />
               <span className="text-gradient-primary bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
-                sin esperar
+                {t("titleLine2")}
               </span>
               <br />
-              ni endeudarte
+              {t("titleLine3")}
             </h1>
 
             <p className="text-slate-300 text-lg sm:text-xl leading-relaxed max-w-lg">
-              Accede a farmacias, clínicas, especialistas y cuidado para adultos
-              mayores. Paga solo la inicial y el resto en cuotas cada 14 días,{" "}
-              <strong className="text-white">con 0% de interés.</strong>
+              {t.rich("subtitle", {
+                strong: (chunks) => <strong className="text-white">{chunks}</strong>,
+              })}
             </p>
 
             <div className="flex flex-wrap gap-4">
               <a href="/login" className="btn btn-primary gap-2 px-7 py-4 text-base h-auto">
                 <Globe className="w-5 h-5" />
-                Regístrate gratis
+                {t("registerFree")}
               </a>
               <a href="#como-funciona" className="btn btn-ghost text-white border-white/30 hover:bg-white/10 gap-2 px-7 py-4 text-base h-auto">
-                Cómo funciona
+                {t("howItWorks")}
                 <CaretRight className="w-5 h-5" />
               </a>
             </div>
@@ -53,9 +56,9 @@ export default function Hero() {
             {/* Stats */}
             <div className="flex flex-wrap gap-6 sm:gap-8 pt-4">
               {[
-                { value: "0%", label: "Interés siempre" },
-                { value: "3 min", label: "Aprobación" },
-                { value: "14 días", label: "Entre cuotas" },
+                { value: t("stat1Value"), label: t("stat1Label") },
+                { value: t("stat2Value"), label: t("stat2Label") },
+                { value: t("stat3Value"), label: t("stat3Label") },
               ].map((s) => (
                 <div key={s.label}>
                   <div className="text-3xl font-display font-bold text-white">{s.value}</div>
@@ -72,7 +75,7 @@ export default function Hero() {
               <div className="w-64 md:w-72 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-5">
                   <div>
-                    <p className="text-white/60 text-xs">Línea disponible</p>
+                    <p className="text-white/60 text-xs">{t("availableLine")}</p>
                     <p className="text-white font-display font-bold text-2xl">$240.00</p>
                   </div>
                   <div className="w-12 h-12 rounded-2xl bg-primary/30 flex items-center justify-center">
@@ -81,9 +84,9 @@ export default function Hero() {
                 </div>
                 <div className="space-y-3">
                   {[
-                    { label: "Salud Cotidiana", amount: "$80", color: "bg-secondary" },
-                    { label: "Especialidad", amount: "$120", color: "bg-primary" },
-                    { label: "Mayor Cuidado", amount: "$40", color: "bg-accent" },
+                    { label: t("lineDaily"), amount: "$80", color: "bg-secondary" },
+                    { label: t("lineSpecialty"), amount: "$120", color: "bg-primary" },
+                    { label: t("lineElderCare"), amount: "$40", color: "bg-accent" },
                   ].map((line) => (
                     <div key={line.label} className="flex items-center justify-between p-3 rounded-xl bg-white/5">
                       <div className="flex items-center gap-2">
@@ -97,7 +100,7 @@ export default function Hero() {
                 <div className="mt-5 p-3 rounded-xl bg-linear-to-r from-secondary/20 to-primary/20 border border-secondary/30">
                   <div className="flex items-center gap-2">
                     <Waveform className="w-4 h-4 text-secondary" weight="duotone" />
-                    <span className="text-white/80 text-xs font-medium">Nivel 2 · 45/50 pts al siguiente</span>
+                    <span className="text-white/80 text-xs font-medium">{t("clubProgress")}</span>
                   </div>
                 </div>
               </div>
@@ -109,8 +112,8 @@ export default function Hero() {
                     <QrCode className="w-5 h-5 text-primary" weight="duotone" />
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500">Pago en clínica</p>
-                    <p className="text-sm font-bold text-dark">Escanea y listo</p>
+                    <p className="text-xs text-slate-500">{t("clinicPayment")}</p>
+                    <p className="text-sm font-bold text-dark">{t("scanAndDone")}</p>
                   </div>
                 </div>
               </div>
@@ -119,9 +122,9 @@ export default function Hero() {
               <div className="absolute -top-4 -right-8 bg-white rounded-2xl px-4 py-3 shadow-2xl border border-slate-100">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-secondary" weight="duotone" />
-                  <span className="text-sm font-bold text-dark">¡Aprobado!</span>
+                  <span className="text-sm font-bold text-dark">{t("approved")}</span>
                 </div>
-                <p className="text-xs text-slate-400 mt-0.5">en 3 minutos</p>
+                <p className="text-xs text-slate-400 mt-0.5">{t("in3Minutes")}</p>
               </div>
             </div>
           </div>

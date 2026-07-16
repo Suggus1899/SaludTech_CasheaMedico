@@ -27,8 +27,10 @@ import {
 import Link from "next/link";
 import SimuladorCuotas from "../../components/SimuladorCuotas";
 import SharedLayout from "../../components/SharedLayout";
+import { useTranslations } from "next-intl";
 
 function Hero() {
+  const t = useTranslations("CreditLines.hero");
   return (
     <section className="pt-32 pb-20 bg-hero-gradient relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
@@ -38,20 +40,20 @@ function Hero() {
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/15 border border-primary/30 mb-6">
           <Medal className="w-4 h-4 text-primary" weight="duotone" />
-          <span className="text-primary text-xs font-semibold tracking-widest uppercase">Líneas de Crédito Médico</span>
+          <span className="text-primary text-xs font-semibold tracking-widest uppercase">{t("badge")}</span>
         </div>
         <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-          Tres líneas para
+          {t("titleLine1")}
           <br />
           <span className="bg-clip-text text-transparent bg-linear-to-r from-primary to-secondary">
-            cada necesidad de salud
+            {t("titleLine2")}
           </span>
         </h1>
         <p className="text-slate-300 text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
-          Desde medicamentos del día a día hasta servicios de Elder Care — SaludTech tiene la línea correcta para cada momento.
+          {t("subtitle")}
         </p>
         <a href="#simulador" className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-secondary text-white font-bold text-base hover:bg-secondary-dark transition-colors">
-          Calcular mis cuotas
+          {t("calculateInstallments")}
           <ArrowRight className="w-5 h-5" />
         </a>
       </div>
@@ -61,61 +63,63 @@ function Hero() {
 
 // ─── Líneas de crédito ────────────────────────────────────────────────────────
 function LineasDeCredito() {
+  const t = useTranslations("CreditLines.lines");
+
   const lines = [
     {
-      name: "Salud Cotidiana",
+      name: t("dailyName"),
       icon: Pill,
       color: "text-secondary",
       bg: "bg-secondary",
       lightBg: "bg-secondary-50",
       border: "border-secondary/20",
       tagBg: "bg-secondary/10 text-secondary",
-      limit: "Hasta $80",
-      desc: "Para el día a día: farmacias, medicamentos, consultas generales y supermercados de salud.",
+      limit: t("dailyLimit"),
+      desc: t("dailyDesc"),
       features: [
-        "Farmacias y droguerías",
-        "Medicamentos recurrentes",
-        "Consultas medicina general",
-        "Pago inicial + 1 cuota (14 días)",
+        t("dailyFeature1"),
+        t("dailyFeature2"),
+        t("dailyFeature3"),
+        t("dailyFeature4"),
       ],
-      badge: "Lo más usado",
+      badge: t("dailyBadge"),
     },
     {
-      name: "Especialidad Principal",
+      name: t("specialtyName"),
       icon: Stethoscope,
       color: "text-primary",
       bg: "bg-primary",
       lightBg: "bg-primary-50",
       border: "border-primary/30",
       tagBg: "bg-primary/10 text-primary",
-      limit: "Hasta $250",
-      desc: "Para procedimientos, especialistas, imagenología, laboratorios y cirugías electivas.",
+      limit: t("specialtyLimit"),
+      desc: t("specialtyDesc"),
       features: [
-        "Clínicas y hospitales privados",
-        "Especialistas (cardiólogo, traumatólogo…)",
-        "Laboratorios e imagenología",
-        "Hasta 9 cuotas (nivel 3+)",
+        t("specialtyFeature1"),
+        t("specialtyFeature2"),
+        t("specialtyFeature3"),
+        t("specialtyFeature4"),
       ],
-      badge: "Más popular",
+      badge: t("specialtyBadge"),
       featured: true,
     },
     {
-      name: "Mayor Cuidado",
+      name: t("elderCareName"),
       icon: Shield,
       color: "text-accent",
       bg: "bg-accent",
       lightBg: "bg-accent-50",
       border: "border-accent/20",
       tagBg: "bg-accent/10 text-accent",
-      limit: "Hasta $150/mes",
-      desc: "Suscripción mensual para el cuidado integral de adultos mayores. Nivel 4+ requerido.",
+      limit: t("elderCareLimit"),
+      desc: t("elderCareDesc"),
       features: [
-        "Enfermera a domicilio",
-        "Cuidador/a profesional",
-        "Fisioterapia en casa",
-        "Especialista en geriatría",
+        t("elderCareFeature1"),
+        t("elderCareFeature2"),
+        t("elderCareFeature3"),
+        t("elderCareFeature4"),
       ],
-      badge: "Elder Care",
+      badge: t("elderCareBadge"),
     },
   ];
 
@@ -124,13 +128,13 @@ function LineasDeCredito() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <div className="section-tag bg-accent-50 text-accent mb-4">
-            <CreditCard className="w-3.5 h-3.5" weight="duotone" /> Líneas de crédito
+            <CreditCard className="w-3.5 h-3.5" weight="duotone" /> {t("tag")}
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
-            Una línea para cada necesidad
+            {t("title")}
           </h2>
           <p className="text-slate-500 text-lg">
-            Tres líneas especializadas que crecen contigo a medida que subes de nivel.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -187,19 +191,21 @@ function LineasDeCredito() {
 
 // ─── Especialidades ───────────────────────────────────────────────────────────
 function Especialidades() {
+  const t = useTranslations("CreditLines.specialties");
+
   const categories = [
-    { icon: Pill, label: "Farmacia", color: "text-secondary", bg: "bg-secondary-50" },
-    { icon: Heart, label: "Cardiología", color: "text-red-500", bg: "bg-red-50" },
-    { icon: Stethoscope, label: "Medicina General", color: "text-primary", bg: "bg-primary-50" },
-    { icon: Baby, label: "Pediatría", color: "text-amber-500", bg: "bg-amber-50" },
-    { icon: TestTube, label: "Laboratorios", color: "text-purple-500", bg: "bg-purple-50" },
-    { icon: Scan, label: "Imagenología", color: "text-blue-600", bg: "bg-blue-50" },
-    { icon: Bone, label: "Traumatología", color: "text-orange-500", bg: "bg-orange-50" },
-    { icon: HandHeart, label: "Elder Care", color: "text-accent", bg: "bg-accent-50" },
-    { icon: PersonSimpleCircle, label: "Dermatología", color: "text-pink-500", bg: "bg-pink-50" },
-    { icon: Eye, label: "Oftalmología", color: "text-indigo-500", bg: "bg-indigo-50" },
-    { icon: Person, label: "Fisioterapia", color: "text-teal-500", bg: "bg-teal-50" },
-    { icon: FirstAidKit, label: "Urgencias / Triage", color: "text-red-600", bg: "bg-red-50" },
+    { icon: Pill, label: t("pharmacy"), color: "text-secondary", bg: "bg-secondary-50" },
+    { icon: Heart, label: t("cardiology"), color: "text-red-500", bg: "bg-red-50" },
+    { icon: Stethoscope, label: t("generalMedicine"), color: "text-primary", bg: "bg-primary-50" },
+    { icon: Baby, label: t("pediatrics"), color: "text-amber-500", bg: "bg-amber-50" },
+    { icon: TestTube, label: t("laboratories"), color: "text-purple-500", bg: "bg-purple-50" },
+    { icon: Scan, label: t("imaging"), color: "text-blue-600", bg: "bg-blue-50" },
+    { icon: Bone, label: t("traumatology"), color: "text-orange-500", bg: "bg-orange-50" },
+    { icon: HandHeart, label: t("elderCare"), color: "text-accent", bg: "bg-accent-50" },
+    { icon: PersonSimpleCircle, label: t("dermatology"), color: "text-pink-500", bg: "bg-pink-50" },
+    { icon: Eye, label: t("ophthalmology"), color: "text-indigo-500", bg: "bg-indigo-50" },
+    { icon: Person, label: t("physiotherapy"), color: "text-teal-500", bg: "bg-teal-50" },
+    { icon: FirstAidKit, label: t("emergencies"), color: "text-red-600", bg: "bg-red-50" },
   ];
 
   return (
@@ -207,13 +213,13 @@ function Especialidades() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-12">
           <div className="section-tag bg-primary-100 text-primary mb-4">
-            <Buildings className="w-3.5 h-3.5" /> Red de comercios
+            <Buildings className="w-3.5 h-3.5" /> {t("tag")}
           </div>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-dark mb-3">
-            Especialidades médicas que aceptan SaludTech
+            {t("title")}
           </h2>
           <p className="text-slate-500">
-            Más de 12 especialidades en nuestra red de comercios aliados.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -236,64 +242,66 @@ function Especialidades() {
 }
 
 function LineasDetalle() {
+  const t = useTranslations("CreditLines.detail");
+
   const lineas = [
     {
-      nombre: "Salud Cotidiana",
+      nombre: t("dailyName"),
       icon: Pill,
       color: "text-secondary",
       bg: "bg-secondary",
       lightBg: "bg-secondary-50",
       border: "border-secondary/20",
-      limite: "$80",
-      inicial: "50%",
-      cuotas: "3 cuotas · c/14 días",
-      desc: "Para el gasto médico recurrente: medicamentos, consultas de medicina general y supermercados de salud. Renueva su disponible conforme pagas.",
+      limite: t("dailyLimit"),
+      inicial: t("dailyInitial"),
+      cuotas: t("dailyInstallments"),
+      desc: t("dailyDesc"),
       usoCases: [
-        "Medicamentos para hipertensión, diabetes, etc.",
-        "Consulta médica general",
-        "Farmacia y droguerías",
-        "Exámenes de rutina (hemograma, glucosa...)",
+        t("dailyUse1"),
+        t("dailyUse2"),
+        t("dailyUse3"),
+        t("dailyUse4"),
       ],
-      nota: "Disponible desde Nivel 1",
+      nota: t("dailyNote"),
     },
     {
-      nombre: "Especialidad Principal",
+      nombre: t("specialtyName"),
       icon: Stethoscope,
       color: "text-primary",
       bg: "bg-primary",
       lightBg: "bg-primary-50",
       border: "border-primary/30",
-      limite: "Hasta $250",
-      inicial: "40% (Nivel 3+: 35%)",
-      cuotas: "3 – 12 cuotas según nivel",
-      desc: "Para procedimientos especializados, cirugías electivas, laboratorios, imagenología y hospitalización. El límite crece con tu nivel.",
+      limite: t("specialtyLimit"),
+      inicial: t("specialtyInitial"),
+      cuotas: t("specialtyInstallments"),
+      desc: t("specialtyDesc"),
       usoCases: [
-        "Consulta cardiológica, traumatológica, neurológica",
-        "Cirugía electiva o estética",
-        "Tomografía, resonancia magnética",
-        "Hospitalización en clínica privada",
+        t("specialtyUse1"),
+        t("specialtyUse2"),
+        t("specialtyUse3"),
+        t("specialtyUse4"),
       ],
-      nota: "Disponible desde Nivel 1 · Más cuotas desde Nivel 3",
+      nota: t("specialtyNote"),
       featured: true,
     },
     {
-      nombre: "Mayor Cuidado",
+      nombre: t("elderCareName"),
       icon: Shield,
       color: "text-accent",
       bg: "bg-accent",
       lightBg: "bg-accent-50",
       border: "border-accent/20",
-      limite: "$150/mes",
-      inicial: "Suscripción mensual",
-      cuotas: "Débito automático mensual",
-      desc: "Suscripción mensual para contratar servicios a domicilio para adultos mayores. Los cobros se debitan automáticamente cada mes.",
+      limite: t("elderCareLimit"),
+      inicial: t("elderCareInitial"),
+      cuotas: t("elderCareInstallments"),
+      desc: t("elderCareDesc"),
       usoCases: [
-        "Enfermera a domicilio (hasta 5 días/sem)",
-        "Cuidador/a profesional certificado",
-        "Fisioterapia en casa (hasta 3 días/sem)",
-        "Especialista en geriatría a domicilio",
+        t("elderCareUse1"),
+        t("elderCareUse2"),
+        t("elderCareUse3"),
+        t("elderCareUse4"),
       ],
-      nota: "Requiere Nivel 4 (Platino) o superior",
+      nota: t("elderCareNote"),
     },
   ];
 
@@ -302,10 +310,10 @@ function LineasDetalle() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-16">
           <h2 className="font-display text-4xl font-bold text-dark mb-4">
-            Detalle de cada línea
+            {t("title")}
           </h2>
           <p className="text-slate-500 text-lg">
-            Entiende los límites, requisitos y casos de uso de cada línea.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -332,9 +340,9 @@ function LineasDetalle() {
                 <div className={`p-6 md:p-8 border-t md:border-t-0 md:border-l ${l.featured ? "border-white/10" : "border-slate-100"}`}>
                   <div className="space-y-5">
                     {[
-                      { label: "Límite disponible", value: l.limite, icon: TrendUp },
-                      { label: "Pago inicial", value: l.inicial, icon: Lightning },
-                      { label: "Cuotas", value: l.cuotas, icon: Clock },
+                      { label: t("statLimit"), value: l.limite, icon: TrendUp },
+                      { label: t("statInitial"), value: l.inicial, icon: Lightning },
+                      { label: t("statInstallments"), value: l.cuotas, icon: Clock },
                     ].map((stat) => (
                       <div key={stat.label} className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-lg ${l.featured ? "bg-white/10" : l.lightBg} flex items-center justify-center shrink-0`}>
@@ -352,7 +360,7 @@ function LineasDetalle() {
                 {/* Use cases col */}
                 <div className={`p-6 md:p-8 border-t md:border-t-0 md:border-l ${l.featured ? "border-white/10" : "border-slate-100"}`}>
                   <p className={`text-xs font-semibold uppercase tracking-wider mb-4 ${l.featured ? "text-white/50" : "text-slate-400"}`}>
-                    Casos de uso
+                    {t("useCases")}
                   </p>
                   <ul className="space-y-3">
                     {l.usoCases.map((uc) => (
@@ -373,13 +381,15 @@ function LineasDetalle() {
 }
 
 function ComoCrece() {
+  const t = useTranslations("CreditLines.howItGrows");
+
   const niveles = [
-    { num: 1, label: "Bronce", cotidiana: "$80", especialidad: "$100", elderCare: "—", inicial: "50%", color: "bg-amber-600" },
-    { num: 2, label: "Plata", cotidiana: "$80", especialidad: "$130", elderCare: "—", inicial: "45%", color: "bg-slate-400" },
-    { num: 3, label: "Oro", cotidiana: "$80", especialidad: "$180", elderCare: "—", inicial: "40%", color: "bg-yellow-500" },
-    { num: 4, label: "Platino", cotidiana: "$80", especialidad: "$200", elderCare: "$100/mes", inicial: "35%", color: "bg-cyan-500" },
-    { num: 5, label: "Diamante", cotidiana: "$80", especialidad: "$250", elderCare: "$130/mes", inicial: "30%", color: "bg-primary" },
-    { num: 6, label: "Elite", cotidiana: "$80", especialidad: "$250+", elderCare: "$150/mes", inicial: "25%", color: "bg-accent" },
+    { num: 1, label: t("levelBronze"), cotidiana: "$80", especialidad: "$100", elderCare: "—", inicial: "50%", color: "bg-amber-600" },
+    { num: 2, label: t("levelSilver"), cotidiana: "$80", especialidad: "$130", elderCare: "—", inicial: "45%", color: "bg-slate-400" },
+    { num: 3, label: t("levelGold"), cotidiana: "$80", especialidad: "$180", elderCare: "—", inicial: "40%", color: "bg-yellow-500" },
+    { num: 4, label: t("levelPlatinum"), cotidiana: "$80", especialidad: "$200", elderCare: "$100/mes", inicial: "35%", color: "bg-cyan-500" },
+    { num: 5, label: t("levelDiamond"), cotidiana: "$80", especialidad: "$250", elderCare: "$130/mes", inicial: "30%", color: "bg-primary" },
+    { num: 6, label: t("levelElite"), cotidiana: "$80", especialidad: "$250+", elderCare: "$150/mes", inicial: "25%", color: "bg-accent" },
   ];
 
   return (
@@ -387,13 +397,13 @@ function ComoCrece() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-12">
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-amber-50 text-amber-600 mb-4">
-            <Medal className="w-3.5 h-3.5" weight="duotone" /> Club SaludTech
+            <Medal className="w-3.5 h-3.5" weight="duotone" /> {t("tag")}
           </div>
           <h2 className="font-display text-4xl font-bold text-dark mb-4">
-            Tu línea crece con tu nivel
+            {t("title")}
           </h2>
           <p className="text-slate-500 text-lg">
-            Paga a tiempo, sube de nivel y accede a límites mayores con menos inicial.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -401,11 +411,11 @@ function ComoCrece() {
           <table className="w-full bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="text-left p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Nivel</th>
-                <th className="text-left p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Salud Cotidiana</th>
-                <th className="text-left p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Especialidad</th>
-                <th className="text-left p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Mayor Cuidado</th>
-                <th className="text-left p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Inicial</th>
+                <th className="text-left p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">{t("colLevel")}</th>
+                <th className="text-left p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">{t("colDaily")}</th>
+                <th className="text-left p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">{t("colSpecialty")}</th>
+                <th className="text-left p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">{t("colElderCare")}</th>
+                <th className="text-left p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">{t("colInitial")}</th>
               </tr>
             </thead>
             <tbody>
@@ -421,7 +431,7 @@ function ComoCrece() {
                   <td className="p-4 text-sm text-slate-700 font-medium">{n.especialidad}</td>
                   <td className="p-4 text-sm">
                     {n.elderCare === "—"
-                      ? <span className="text-slate-300">No disponible</span>
+                      ? <span className="text-slate-300">{t("notAvailable")}</span>
                       : <span className="text-accent font-semibold">{n.elderCare}</span>
                     }
                   </td>
@@ -437,28 +447,29 @@ function ComoCrece() {
 }
 
 function CTAFinal() {
+  const t = useTranslations("CreditLines.cta");
   return (
     <section className="py-20 bg-linear-to-r from-primary to-secondary">
       <div className="max-w-3xl mx-auto px-4 text-center">
         <h2 className="font-display text-4xl font-bold text-white mb-4">
-          Activa tu línea en 3 minutos
+          {t("title")}
         </h2>
         <p className="text-white/80 text-lg mb-8">
-          Regístrate en la página y accede a tu línea de crédito médico sin interés.
+          {t("subtitle")}
         </p>
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <Link
             href="/login"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white text-primary font-bold text-base hover:bg-primary-50 transition-colors"
           >
-            Crear cuenta gratis
+            {t("createAccount")}
             <ArrowRight className="w-5 h-5" />
           </Link>
           <Link
             href="/"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl border-2 border-white/40 text-white font-bold text-base hover:bg-white/10 transition-colors"
           >
-            Volver al inicio
+            {t("backHome")}
             <CaretRight className="w-5 h-5" />
           </Link>
         </div>

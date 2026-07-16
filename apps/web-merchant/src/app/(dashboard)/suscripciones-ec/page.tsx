@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Shield, UserPlus, Activity, RefreshCw } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 
 export default function SuscripcionesEcPage() {
+  const t = useTranslations("ECSubscriptions");
   const [subs, setSubs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,17 +24,17 @@ export default function SuscripcionesEcPage() {
     load();
   }, []);
 
-  const SERVICE_LABELS: Record<string, string> = {
-    NURSE: "Enfermera",
-    CAREGIVER: "Cuidador/a",
-    PHYSIOTHERAPY: "Fisioterapia",
-    GERIATRIC_SPECIALIST: "Geriatría",
+  const serviceKeyMap: Record<string, string> = {
+    NURSE: "serviceNurse",
+    CAREGIVER: "serviceCaregiver",
+    PHYSIOTHERAPY: "servicePhysiotherapy",
+    GERIATRIC_SPECIALIST: "serviceGeriatric",
   };
 
   if (loading)
     return (
       <div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
-        <RefreshCw className="w-5 h-5 animate-spin" /> Cargando suscripciones Elder Care...
+        <RefreshCw className="w-5 h-5 animate-spin" /> {t("loading")}
       </div>
     );
 
@@ -44,9 +46,9 @@ export default function SuscripcionesEcPage() {
       {/* KPI */}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
-          { label: "Suscriptores Activos", value: activeCount, icon: Shield, color: "text-violet-600" },
-          { label: "Total Suscripciones", value: subs.length, icon: UserPlus, color: "text-blue-600" },
-          { label: "Servicios Diferentes", value: serviceTypes, icon: Activity, color: "text-pink-600" },
+          { label: t("kpiActive"), value: activeCount, icon: Shield, color: "text-violet-600" },
+          { label: t("kpiTotal"), value: subs.length, icon: UserPlus, color: "text-blue-600" },
+          { label: t("kpiServices"), value: serviceTypes, icon: Activity, color: "text-pink-600" },
         ].map((kpi) => (
           <div key={kpi.label} className="card bg-base-100 border border-base-300 shadow-sm">
             <div className="card-body flex-row items-center gap-4 p-5">
@@ -64,25 +66,25 @@ export default function SuscripcionesEcPage() {
 
       <div className="card bg-base-100 border border-base-300 shadow-sm">
         <div className="card-body pb-0">
-          <h3 className="card-title font-(family-name:--font-syne)">Suscripciones Elder Care</h3>
-          <p className="text-sm text-base-content/60">Pacientes suscritos a tus servicios de cuidado mayor</p>
+          <h3 className="card-title font-(family-name:--font-syne)">{t("title")}</h3>
+          <p className="text-sm text-base-content/60">{t("subtitle")}</p>
         </div>
         <div className="p-0">
           {subs.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground">
               <Shield className="w-10 h-10 mx-auto mb-3 opacity-30" />
-              <p className="font-medium">Sin suscripciones activas</p>
-              <p className="text-sm mt-1">Los pacientes pueden suscribirse desde su app.</p>
+              <p className="font-medium">{t("empty")}</p>
+              <p className="text-sm mt-1">{t("emptyHint")}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-muted-foreground">
-                    <th className="text-left px-4 py-3 font-medium">Servicio</th>
-                    <th className="text-right px-4 py-3 font-medium">Monto/Mes</th>
-                    <th className="text-center px-4 py-3 font-medium">Estado</th>
-                    <th className="text-left px-4 py-3 font-medium">Próximo Cobro</th>
+                    <th className="text-left px-4 py-3 font-medium">{t("colService")}</th>
+                    <th className="text-right px-4 py-3 font-medium">{t("colMonthly")}</th>
+                    <th className="text-center px-4 py-3 font-medium">{t("colStatus")}</th>
+                    <th className="text-left px-4 py-3 font-medium">{t("colNextBilling")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -91,7 +93,7 @@ export default function SuscripcionesEcPage() {
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-violet-100 text-violet-700 text-xs font-semibold">
                           <Shield className="w-3 h-3" />
-                          {SERVICE_LABELS[s.service_type] ?? s.service_type}
+                          {serviceKeyMap[s.service_type] ? t(serviceKeyMap[s.service_type] as any) : s.service_type}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right font-semibold text-primary">
@@ -99,7 +101,7 @@ export default function SuscripcionesEcPage() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`badge ${s.status === "ACTIVE" ? "badge-primary" : "badge-ghost"}`}>
-                          {s.status === "ACTIVE" ? "Activa" : "Cancelada"}
+                          {s.status === "ACTIVE" ? t("statusActive") : t("statusCancelled")}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground text-xs">

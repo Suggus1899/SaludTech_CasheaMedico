@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../../lib/api";
 import { formatCurrency, formatWithVES, formatDate } from "../../../../lib/utils";
+import { useTranslations } from "next-intl";
 import type { Installment } from "../../../../types/patient";
 
 const testCards = process.env.NODE_ENV === "development" ? [
@@ -28,6 +29,8 @@ export default function PayInstallmentPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
+  const t = useTranslations("PayInstallment");
+  const tCommon = useTranslations("Common");
 
   const [installment, setInstallment] = useState<Installment | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,7 +52,7 @@ export default function PayInstallmentPage({
         const data = (await res.json()) as Installment;
         setInstallment(data ?? null);
       } catch {
-        setError("No se pudo cargar la cuota.");
+        setError(t("loadError"));
       } finally {
         setLoading(false);
       }
@@ -81,7 +84,7 @@ export default function PayInstallmentPage({
       setSuccess(true);
       setTimeout(() => router.push("/cuotas"), 1800);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo procesar el pago.");
+      setError(err instanceof Error ? err.message : t("paymentError"));
     } finally {
       setIsPaying(false);
     }
@@ -102,10 +105,10 @@ export default function PayInstallmentPage({
           <CheckCircle2 className="w-14 h-14 text-success" />
         </div>
         <h2 className="text-2xl font-bold text-foreground mt-6 font-display">
-          ¡Pago Confirmado!
+          {t("successTitle")}
         </h2>
         <p className="text-sm text-muted-foreground mt-2">
-          Tu cuota ha sido registrada exitosamente.
+          {t("successDesc")}
         </p>
       </div>
     );
@@ -114,29 +117,29 @@ export default function PayInstallmentPage({
   if (!installment) {
     return (
       <div className="py-20 text-center">
-        <p className="text-muted-foreground">Cuota no encontrada.</p>
+        <p className="text-muted-foreground">{t("notFound")}</p>
         <button onClick={() => router.push("/cuotas")} className="btn btn-primary btn-sm mt-4">
-          Volver a cuotas
+          {t("backToInstallments")}
         </button>
       </div>
     );
   }
 
   const isOverdue = installment.status === "OVERDUE";
-  const merchant = installment.transaction?.merchant?.tradeName ?? "Comercio";
+  const merchant = installment.transaction?.merchant?.tradeName ?? t("merchant");
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
       <button
         onClick={() => router.back()}
-        aria-label="Volver"
+        aria-label={t("back")}
         className="btn btn-ghost btn-sm -ml-2"
       >
-        <ArrowLeft className="w-4 h-4" /> Volver
+        <ArrowLeft className="w-4 h-4" /> {t("back")}
       </button>
 
       <h1 className="text-xl font-bold text-foreground">
-        Pagar Cuota
+        {t("title")}
       </h1>
 
       {/* Summary */}
@@ -167,7 +170,7 @@ export default function PayInstallmentPage({
                 isOverdue ? "text-error" : "text-muted-foreground"
               }`}
             >
-              Vence: {formatDate(installment.dueDate)}
+              {t("dueLabel", { date: formatDate(installment.dueDate) })}
             </p>
           </div>
         </div>
@@ -175,9 +178,9 @@ export default function PayInstallmentPage({
         <div className="divider my-4" />
 
         <div className="space-y-2">
-          <Row label="Monto cuota" value={formatWithVES(installment.amount, installment.amountVES)} />
+          <Row label={t("installmentAmount")} value={formatWithVES(installment.amount, installment.amountVES)} />
           <Row
-            label="Total a pagar"
+            label={t("totalToPay")}
             value={formatWithVES(installment.amount, installment.amountVES)}
             bold
           />
@@ -187,7 +190,7 @@ export default function PayInstallmentPage({
       {/* Payment method — Card form */}
       <section data-tour="card-form">
         <h2 className="text-base font-bold text-foreground mb-3 font-display">
-          Datos de la Tarjeta
+          {t("cardData")}
         </h2>
 
         {/* Test card quick-select */}
@@ -205,12 +208,12 @@ export default function PayInstallmentPage({
         </div>
 
         <div className="space-y-3">
-          <Input label="Número de Tarjeta" value={cardNumber} onChange={setCardNumber} type="text" placeholder="4111 1111 1111 1111" />
-          <Input label="Nombre del Titular" value={fullName} onChange={setFullName} type="text" placeholder="APPROVED" />
+          <Input label={t("cardNumber")} value={cardNumber} onChange={setCardNumber} type="text" placeholder="4111 1111 1111 1111" />
+          <Input label={t("cardHolder")} value={fullName} onChange={setFullName} type="text" placeholder="APPROVED" />
           <div className="grid grid-cols-3 gap-3">
-            <Input label="Mes" value={expMonth} onChange={setExpMonth} type="text" placeholder="01" />
-            <Input label="Año" value={expYear} onChange={setExpYear} type="text" placeholder="2027" />
-            <Input label="CVV" value={cvv} onChange={setCvv} type="text" placeholder="123" />
+            <Input label={t("expMonth")} value={expMonth} onChange={setExpMonth} type="text" placeholder="01" />
+            <Input label={t("expYear")} value={expYear} onChange={setExpYear} type="text" placeholder="2027" />
+            <Input label={t("cvv")} value={cvv} onChange={setCvv} type="text" placeholder="123" />
           </div>
         </div>
       </section>
@@ -219,8 +222,7 @@ export default function PayInstallmentPage({
       <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-primary/8">
         <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
         <p className="text-xs text-primary leading-relaxed">
-          El pago se registra en el sistema. Tu cuenta se reactivará automáticamente una
-          vez confirmado.
+          {t("paymentNotice")}
         </p>
       </div>
 
@@ -241,8 +243,8 @@ export default function PayInstallmentPage({
       >
         {isPaying ? <span className="loading loading-spinner loading-sm" /> : null}
         {isPaying
-          ? "Procesando..."
-          : `Confirmar Pago · ${formatWithVES(installment.amount, installment.amountVES)}`}
+          ? t("processing")
+          : t("confirmPay", { amount: formatWithVES(installment.amount, installment.amountVES) })}
       </button>
 
       {/* Confirm modal */}
@@ -250,15 +252,14 @@ export default function PayInstallmentPage({
         <div className="modal modal-open" role="dialog" aria-modal="true">
           <div className="modal-box">
             <h3 className="text-lg font-bold font-display">
-              Confirmar Pago
+              {t("confirmTitle")}
             </h3>
             <p className="py-4 text-sm text-muted-foreground">
-              Vas a pagar {formatWithVES(installment.amount, installment.amountVES)} para la cuota #
-              {installment.installmentNumber ?? "—"} de {merchant}. ¿Deseas continuar?
+              {t("confirmBody", { amount: formatWithVES(installment.amount, installment.amountVES), number: installment.installmentNumber ?? "—", merchant })}
             </p>
             <div className="modal-action">
               <button onClick={() => setShowConfirm(false)} className="btn btn-ghost btn-sm">
-                Cancelar
+                {tCommon("cancel")}
               </button>
               <button
                 onClick={() => {
@@ -269,13 +270,13 @@ export default function PayInstallmentPage({
                 className="btn btn-primary btn-sm"
               >
                 {isPaying ? <span className="loading loading-spinner loading-xs" /> : null}
-                Sí, pagar
+                {t("yesPay")}
               </button>
             </div>
           </div>
           <button
             className="modal-backdrop"
-            aria-label="Cerrar"
+            aria-label={t("close")}
             onClick={() => setShowConfirm(false)}
           />
         </div>

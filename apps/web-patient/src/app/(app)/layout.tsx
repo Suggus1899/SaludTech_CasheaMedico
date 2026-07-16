@@ -24,41 +24,42 @@ import {
 } from "lucide-react";
 import { clearSession, getStoredUser } from "../../lib/api";
 import { TourProvider, TourOverlay } from "../../lib/tours";
+import { useTranslations } from "next-intl";
 import type { UserResponse } from "../../types/patient";
 
 const navSections = [
   {
-    title: "Principal",
+    titleKey: "principal",
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: Home },
-      { href: "/pagar", label: "Pagar", icon: QrCode },
-      { href: "/cuotas", label: "Cuotas", icon: CalendarDays },
+      { href: "/dashboard", labelKey: "dashboard", icon: Home },
+      { href: "/pagar", labelKey: "pagar", icon: QrCode },
+      { href: "/cuotas", labelKey: "cuotas", icon: CalendarDays },
     ],
   },
   {
-    title: "Comprar",
+    titleKey: "comprar",
     items: [
-      { href: "/comercios", label: "Comercios", icon: Store },
-      { href: "/catalogo", label: "Catálogo", icon: Search },
-      { href: "/suscripciones", label: "Suscripciones", icon: Pill },
+      { href: "/comercios", labelKey: "comercios", icon: Store },
+      { href: "/catalogo", labelKey: "catalogo", icon: Search },
+      { href: "/suscripciones", labelKey: "suscripciones", icon: Pill },
     ],
   },
   {
-    title: "Mi Salud",
+    titleKey: "miSalud",
     items: [
-      { href: "/triaje", label: "Triaje", icon: Stethoscope },
-      { href: "/cuidado-mayor", label: "Cuidado Mayor", icon: Shield },
-      { href: "/salud", label: "Perfil de Salud", icon: Heart },
-      { href: "/historial", label: "Historial", icon: FileText },
-      { href: "/citas", label: "Citas", icon: CalendarPlus },
-      { href: "/recordatorios", label: "Recordatorios", icon: Bell },
-      { href: "/familia", label: "Familia", icon: Users },
+      { href: "/triaje", labelKey: "triaje", icon: Stethoscope },
+      { href: "/cuidado-mayor", labelKey: "cuidadoMayor", icon: Shield },
+      { href: "/salud", labelKey: "salud", icon: Heart },
+      { href: "/historial", labelKey: "historial", icon: FileText },
+      { href: "/citas", labelKey: "citas", icon: CalendarPlus },
+      { href: "/recordatorios", labelKey: "recordatorios", icon: Bell },
+      { href: "/familia", labelKey: "familia", icon: Users },
     ],
   },
   {
-    title: "Cuenta",
+    titleKey: "cuenta",
     items: [
-      { href: "/perfil", label: "Perfil", icon: User },
+      { href: "/perfil", labelKey: "perfil", icon: User },
     ],
   },
 ];
@@ -72,6 +73,7 @@ export default function AppLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations("Nav");
   const [user, setUser] = useState<UserResponse | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -109,9 +111,9 @@ export default function AppLayout({
           {/* Nav items */}
           <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-4">
             {navSections.map((section) => (
-              <div key={section.title}>
+              <div key={section.titleKey}>
                 <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
-                  {section.title}
+                  {t(section.titleKey)}
                 </p>
                 <div className="space-y-1">
                   {section.items.map((item) => {
@@ -129,7 +131,7 @@ export default function AppLayout({
                         }`}
                       >
                         <Icon className="w-4.5 h-4.5 shrink-0" />
-                        {item.label}
+                        {t(item.labelKey)}
                       </Link>
                     );
                   })}
@@ -153,7 +155,7 @@ export default function AppLayout({
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-error hover:bg-error/10 transition-colors"
             >
               <LogOut className="w-4.5 h-4.5" />
-              Cerrar Sesión
+              {t("logout")}
             </button>
           </div>
         </aside>
@@ -176,7 +178,7 @@ export default function AppLayout({
                 <button
                   onClick={() => setSidebarOpen(false)}
                   className="btn btn-ghost btn-sm btn-square"
-                  aria-label="Cerrar menú"
+                  aria-label={t("closeMenu")}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -185,9 +187,9 @@ export default function AppLayout({
               {/* Nav items */}
               <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-4">
                 {navSections.map((section) => (
-                  <div key={section.title}>
+                  <div key={section.titleKey}>
                     <p className="px-3 mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
-                      {section.title}
+                      {t(section.titleKey)}
                     </p>
                     <div className="space-y-1">
                       {section.items.map((item) => {
@@ -205,7 +207,7 @@ export default function AppLayout({
                             }`}
                           >
                             <Icon className="w-4.5 h-4.5 shrink-0" />
-                            {item.label}
+                            {t(item.labelKey)}
                           </Link>
                         );
                       })}
@@ -229,7 +231,7 @@ export default function AppLayout({
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-error hover:bg-error/10 transition-colors"
                 >
                   <LogOut className="w-4.5 h-4.5" />
-                  Cerrar Sesión
+                  {t("logout")}
                 </button>
               </div>
             </aside>
@@ -244,14 +246,14 @@ export default function AppLayout({
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden btn btn-ghost btn-sm btn-square mr-2"
-              aria-label="Abrir menú"
+              aria-label={t("openMenu")}
             >
               <Menu className="w-5 h-5" />
             </button>
 
             {/* Page title */}
             <h1 className="text-base font-bold text-foreground font-display">
-              {currentPage?.label ?? "SaludTech"}
+              {currentPage ? t(currentPage.labelKey) : "SaludTech"}
             </h1>
 
             {/* Spacer */}

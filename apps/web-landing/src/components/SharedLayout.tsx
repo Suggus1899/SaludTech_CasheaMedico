@@ -10,19 +10,22 @@ import {
   MapPin,
 } from "@phosphor-icons/react";
 import { Logo } from "@saludtech/ui";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@saludtech/i18n";
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("Nav");
 
   const links = [
-    { href: "/#como-funciona", label: "Cómo funciona" },
-    { href: "/lineas-de-credito", label: "Líneas de crédito" },
-    { href: "/lineas-de-credito#simulador", label: "Simulador" },
-    { href: "/club", label: "Club" },
-    { href: "/telemedicina", label: "Telemedicina" },
-    { href: "/faq", label: "FAQ" },
-    { href: "/para-comercios", label: "Comercios" },
+    { href: "/#como-funciona", label: t("howItWorks") },
+    { href: "/lineas-de-credito", label: t("creditLines") },
+    { href: "/lineas-de-credito#simulador", label: t("simulator") },
+    { href: "/club", label: t("club") },
+    { href: "/telemedicina", label: t("telemedicine") },
+    { href: "/faq", label: t("faq") },
+    { href: "/para-comercios", label: t("merchants") },
   ];
 
   return (
@@ -49,31 +52,37 @@ export function Navbar() {
 
           {/* CTA */}
           <div className="hidden md:flex items-center gap-3">
+            <LanguageSwitcher />
             <Link
               href="/para-comercios"
               className="text-sm font-semibold text-primary hover:underline"
             >
-              Soy Comercio
+              {t("iAmMerchant")}
             </Link>
             <Link
               href="/login"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-dark transition-colors"
             >
               <UserPlus className="w-4 h-4" />
-              Regístrate
+              {t("register")}
             </Link>
           </div>
 
           {/* Mobile hamburger */}
-          <button
-            type="button"
-            className="md:hidden p-2 rounded-lg hover:bg-slate-100 active:bg-slate-200 transition-colors"
-            onClick={() => setOpen((v) => !v)}
-            aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
-            aria-expanded={open}
-          >
-            {open ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="md:hidden">
+              <LanguageSwitcher />
+            </div>
+            <button
+              type="button"
+              className="md:hidden p-2 rounded-lg hover:bg-slate-100 active:bg-slate-200 transition-colors"
+              onClick={() => setOpen((v) => !v)}
+              aria-label={open ? t("closeMenu") : t("openMenu")}
+              aria-expanded={open}
+            >
+              {open ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile menu — animated slide-down */}
@@ -100,14 +109,14 @@ export function Navbar() {
                 href="/para-comercios"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-primary text-primary font-semibold text-sm hover:bg-primary hover:text-white transition-all"
               >
-                Soy Comercio
+                {t("iAmMerchant")}
               </Link>
               <Link
                 href="/login"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-dark transition-all"
               >
                 <UserPlus className="w-4 h-4" />
-                Regístrate
+                {t("register")}
               </Link>
             </div>
           </div>
@@ -119,26 +128,28 @@ export function Navbar() {
 
 // ─── Footer ───────────────────────────────────────────────────────────────────
 export function Footer() {
+  const t = useTranslations("Footer");
+
   const links: Record<string, { label: string; href: string }[]> = {
-    Producto: [
-      { label: "Cómo funciona", href: "/#como-funciona" },
-      { label: "Líneas de crédito", href: "/lineas-de-credito" },
-      { label: "Simulador de cuotas", href: "/lineas-de-credito#simulador" },
-      { label: "Club SaludTech", href: "/club" },
-      { label: "Telemedicina", href: "/telemedicina" },
-      { label: "Elder Care", href: "/telemedicina#elder-care" },
+    [t("sectionProduct")]: [
+      { label: t("productHowItWorks"), href: "/#como-funciona" },
+      { label: t("productCreditLines"), href: "/lineas-de-credito" },
+      { label: t("productInstallmentSimulator"), href: "/lineas-de-credito#simulador" },
+      { label: t("productClub"), href: "/club" },
+      { label: t("productTelemedicine"), href: "/telemedicina" },
+      { label: t("productElderCare"), href: "/telemedicina#elder-care" },
     ],
-    Comercios: [
-      { label: "Afilia tu comercio", href: "/para-comercios" },
-      { label: "Cómo funciona el cobro", href: "/para-comercios#como-funciona-comercio" },
-      { label: "Portal de comercios", href: "#" },
-      { label: "Documentos requeridos", href: "/para-comercios#proceso" },
+    [t("sectionMerchants")]: [
+      { label: t("merchantsAffiliate"), href: "/para-comercios" },
+      { label: t("merchantsHowItWorks"), href: "/para-comercios#como-funciona-comercio" },
+      { label: t("merchantsPortal"), href: "#" },
+      { label: t("merchantsDocuments"), href: "/para-comercios#proceso" },
     ],
-    Legal: [
-      { label: "Términos y condiciones", href: "#" },
-      { label: "Política de privacidad", href: "#" },
-      { label: "Preguntas frecuentes", href: "/faq" },
-      { label: "Contacto", href: "mailto:hola@saludtech.app" },
+    [t("sectionLegal")]: [
+      { label: t("legalTerms"), href: "#" },
+      { label: t("legalPrivacy"), href: "#" },
+      { label: t("legalFaq"), href: "/faq" },
+      { label: t("legalContact"), href: "mailto:hola@saludtech.app" },
     ],
   };
 
@@ -152,8 +163,7 @@ export function Footer() {
               <Logo size="md" light />
             </div>
             <p className="text-white/50 text-sm leading-relaxed max-w-xs">
-              Financiamiento médico sin interés para ti y tu familia. Tu salud primero,
-              el pago después.
+              {t("description")}
             </p>
             <div className="flex items-center gap-3 mt-5">
               <a
@@ -167,7 +177,7 @@ export function Footer() {
             <div className="flex items-center gap-3 mt-2">
               <span className="flex items-center gap-2 text-white/40 text-xs">
                 <MapPin className="w-4 h-4" />
-                Venezuela
+                {t("location")}
               </span>
             </div>
           </div>
@@ -194,10 +204,10 @@ export function Footer() {
 
         <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-white/30 text-xs">
-            © {new Date().getFullYear()} SaludTech. Todos los derechos reservados.
+            {t("copyright", { year: new Date().getFullYear() })}
           </p>
           <p className="text-white/30 text-xs">
-            Financiamiento sin interés · No somos un banco · Venezuela
+            {t("tagline")}
           </p>
         </div>
       </div>

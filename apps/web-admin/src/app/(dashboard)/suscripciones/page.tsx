@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Pill } from "lucide-react";
 import { useFetchData } from "@saludtech/shared";
 import { getApiUrl } from "../../../lib/api";
 
 export default function SuscripcionesPage() {
+  const t = useTranslations("Subscriptions");
   const [searchTerm, setSearchTerm] = useState("");
   const { data, loading } = useFetchData<any>(getApiUrl("admin/subscriptions/all?limit=50&offset=0"));
 
-  if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando suscripciones...</div>;
+  if (loading) return <div className="p-8 text-center text-muted-foreground">{t("loading")}</div>;
 
   const subs: any[] = data?.subscriptions || [];
   const filtered = subs.filter((s: any) =>
@@ -20,9 +22,9 @@ export default function SuscripcionesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground text-sm">{filtered.length} suscripciones de farmacia activas</p>
+        <p className="text-muted-foreground text-sm">{t("count", { count: filtered.length })}</p>
         <div className="relative hidden sm:block mr-2">
-          <input type="search" placeholder="Buscar..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
+          <input type="search" placeholder={t("searchPlaceholder")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
         </div>
       </div>
       <div className="card bg-base-100 border border-base-300 shadow-sm">
@@ -30,19 +32,19 @@ export default function SuscripcionesPage() {
           {filtered.length === 0 ? (
             <div className="text-center py-16 opacity-40">
               <Pill className="w-10 h-10 mx-auto mb-3" />
-              <p>Sin suscripciones activas</p>
+              <p>{t("noActive")}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="table table-sm w-full">
                 <thead>
                   <tr className="border-base-300">
-                    <th>Producto</th>
-                    <th>Farmacia</th>
-                    <th>Paciente</th>
-                    <th>Monto/Mes</th>
-                    <th>Próximo Cobro</th>
-                    <th>Estado</th>
+                    <th>{t("colProduct")}</th>
+                    <th>{t("colPharmacy")}</th>
+                    <th>{t("colPatient")}</th>
+                    <th>{t("colAmountMonth")}</th>
+                    <th>{t("colNextBilling")}</th>
+                    <th>{t("colStatus")}</th>
                   </tr>
                 </thead>
                 <tbody>

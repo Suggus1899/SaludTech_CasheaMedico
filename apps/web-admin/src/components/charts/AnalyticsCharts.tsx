@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -39,6 +40,7 @@ const getColor = (key: string, idx: number): string =>
 // ─── Revenue Line Chart ─────────────────────────────────────────────────────
 
 export function RevenueLineChart({ data }: { data: AnalyticsResponse["revenueByMonth"] }) {
+  const t = useTranslations("Charts");
   const chartData = data.map((d) => ({
     month: d.month,
     revenue: toNum(d.revenue),
@@ -46,7 +48,7 @@ export function RevenueLineChart({ data }: { data: AnalyticsResponse["revenueByM
   }));
 
   if (chartData.length === 0) {
-    return <EmptyChart label="Sin datos de revenue" />;
+    return <EmptyChart label={t("noRevenueData")} />;
   }
 
   return (
@@ -62,7 +64,7 @@ export function RevenueLineChart({ data }: { data: AnalyticsResponse["revenueByM
             borderRadius: "8px",
             fontSize: "13px",
           }}
-          formatter={(value: number) => [`$${value.toFixed(2)}`, "Revenue"]}
+          formatter={(value: number) => [`$${value.toFixed(2)}`, t("revenue")]}
         />
         <Line
           type="monotone"
@@ -80,6 +82,7 @@ export function RevenueLineChart({ data }: { data: AnalyticsResponse["revenueByM
 // ─── Transaction Status Donut ───────────────────────────────────────────────
 
 export function TransactionStatusPie({ data }: { data: AnalyticsResponse["transactionStatus"] }) {
+  const t = useTranslations("Charts");
   const chartData = data.map((d) => ({
     name: d.status,
     value: d.count,
@@ -87,7 +90,7 @@ export function TransactionStatusPie({ data }: { data: AnalyticsResponse["transa
   }));
 
   if (chartData.length === 0) {
-    return <EmptyChart label="Sin transacciones" />;
+    return <EmptyChart label={t("noTransactions")} />;
   }
 
   return (
@@ -127,6 +130,7 @@ export function TransactionStatusPie({ data }: { data: AnalyticsResponse["transa
 // ─── Installment Status Bar ─────────────────────────────────────────────────
 
 export function InstallmentStatusBar({ data }: { data: AnalyticsResponse["installmentStatus"] }) {
+  const t = useTranslations("Charts");
   const chartData = data.map((d) => ({
     status: d.status,
     count: d.count,
@@ -134,7 +138,7 @@ export function InstallmentStatusBar({ data }: { data: AnalyticsResponse["instal
   }));
 
   if (chartData.length === 0) {
-    return <EmptyChart label="Sin cuotas" />;
+    return <EmptyChart label={t("noInstallments")} />;
   }
 
   return (
@@ -151,8 +155,8 @@ export function InstallmentStatusBar({ data }: { data: AnalyticsResponse["instal
             fontSize: "13px",
           }}
           formatter={(value: number, name: string) => {
-            if (name === "count") return [value, "Cuotas"];
-            return [`$${value.toFixed(2)}`, "Monto"];
+            if (name === "count") return [value, t("installments")];
+            return [`$${value.toFixed(2)}`, t("amount")];
           }}
         />
         <Bar dataKey="count" radius={[4, 4, 0, 0]}>
@@ -168,6 +172,7 @@ export function InstallmentStatusBar({ data }: { data: AnalyticsResponse["instal
 // ─── Top Merchants Horizontal Bar ───────────────────────────────────────────
 
 export function TopMerchantsChart({ data }: { data: AnalyticsResponse["topMerchants"] }) {
+  const t = useTranslations("Charts");
   const chartData = data.map((d) => ({
     name: d.merchant_name,
     revenue: toNum(d.revenue),
@@ -176,7 +181,7 @@ export function TopMerchantsChart({ data }: { data: AnalyticsResponse["topMercha
   }));
 
   if (chartData.length === 0) {
-    return <EmptyChart label="Sin comercios" />;
+    return <EmptyChart label={t("noMerchants")} />;
   }
 
   return (
@@ -202,7 +207,7 @@ export function TopMerchantsChart({ data }: { data: AnalyticsResponse["topMercha
             borderRadius: "8px",
             fontSize: "13px",
           }}
-          formatter={(value: number) => [`$${value.toFixed(2)}`, "Revenue"]}
+          formatter={(value: number) => [`$${value.toFixed(2)}`, t("revenue")]}
         />
         <Bar dataKey="revenue" radius={[0, 4, 4, 0]}>
           {chartData.map((_, idx) => (
@@ -217,13 +222,14 @@ export function TopMerchantsChart({ data }: { data: AnalyticsResponse["topMercha
 // ─── Merchant Category Donut ────────────────────────────────────────────────
 
 export function CategoryDonut({ data }: { data: AnalyticsResponse["categoryDistribution"] }) {
+  const t = useTranslations("Charts");
   const chartData = data.map((d) => ({
     name: d.category,
     value: d.merchant_count,
   }));
 
   if (chartData.length === 0) {
-    return <EmptyChart label="Sin categorias" />;
+    return <EmptyChart label={t("noCategories")} />;
   }
 
   return (
@@ -262,16 +268,17 @@ export function CategoryDonut({ data }: { data: AnalyticsResponse["categoryDistr
 // ─── Triage Funnel ──────────────────────────────────────────────────────────
 
 export function TriageFunnel({ data }: { data: AnalyticsResponse["triageConversion"] }) {
+  const t = useTranslations("Charts");
   const chartData = [
-    { stage: "Pendientes", count: data.pending_count, fill: "#fbbf24" },
-    { stage: "En Revision", count: data.reviewing_count, fill: "#3b82f6" },
-    { stage: "Resueltos", count: data.resolved_count, fill: "#22c55e" },
-    { stage: "Referidos", count: data.referred_count, fill: "#a855f7" },
-    { stage: "Completados", count: data.completed_count, fill: "#06b6d4" },
+    { stage: t("stagePending"), count: data.pending_count, fill: "#fbbf24" },
+    { stage: t("stageReviewing"), count: data.reviewing_count, fill: "#3b82f6" },
+    { stage: t("stageResolved"), count: data.resolved_count, fill: "#22c55e" },
+    { stage: t("stageReferred"), count: data.referred_count, fill: "#a855f7" },
+    { stage: t("stageCompleted"), count: data.completed_count, fill: "#06b6d4" },
   ].filter((d) => d.count > 0);
 
   if (chartData.length === 0) {
-    return <EmptyChart label="Sin triajes" />;
+    return <EmptyChart label={t("noTriages")} />;
   }
 
   return (
@@ -287,7 +294,7 @@ export function TriageFunnel({ data }: { data: AnalyticsResponse["triageConversi
             borderRadius: "8px",
             fontSize: "13px",
           }}
-          formatter={(value: number) => [value, "Triajes"]}
+          formatter={(value: number) => [value, t("triages")]}
         />
         <Bar dataKey="count" radius={[4, 4, 0, 0]}>
           {chartData.map((entry, idx) => (

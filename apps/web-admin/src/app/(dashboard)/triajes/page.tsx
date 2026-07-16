@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Activity, Send } from "lucide-react";
 import { useFetchData } from "@saludtech/shared";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 
 export default function TriajesPage() {
+  const t = useTranslations("Triages");
   const [searchTerm, setSearchTerm] = useState("");
   const { data, loading, refetch } = useFetchData<any>(getApiUrl("admin/triage/pending?limit=50&offset=0"));
   const [responding, setResponding] = useState<string | null>(null);
@@ -14,9 +16,9 @@ export default function TriajesPage() {
 
   const triages = data?.triage || [];
   const filtered = triages.filter(
-    (t: any) =>
-      t.symptoms?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.priority?.toLowerCase().includes(searchTerm.toLowerCase())
+    (triage: any) =>
+      triage.symptoms?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      triage.priority?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const URGENCY_COLOR: Record<string, string> = {
@@ -26,10 +28,10 @@ export default function TriajesPage() {
     LOW: "bg-green-100 text-green-700 border-green-200",
   };
   const URGENCY_LABEL: Record<string, string> = {
-    EMERGENCY: "🚨 EMERGENCIA",
-    HIGH: "⚠️ Alta",
-    MEDIUM: "🔶 Media",
-    LOW: "🟢 Baja",
+    EMERGENCY: t("urgencyEmergency"),
+    HIGH: t("urgencyHigh"),
+    MEDIUM: t("urgencyMedium"),
+    LOW: t("urgencyLow"),
   };
 
   const handleRespond = async (id: string) => {
@@ -43,51 +45,51 @@ export default function TriajesPage() {
     } catch (e) { console.error(e); }
   };
 
-  if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando triajes pendientes...</div>;
+  if (loading) return <div className="p-8 text-center text-muted-foreground">{t("loading")}</div>;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground text-sm">{filtered.length} triajes pendientes (ordenados por urgencia)</p>
+        <p className="text-muted-foreground text-sm">{t("count", { count: filtered.length })}</p>
         <div className="relative hidden sm:block mr-2">
-          <input type="search" placeholder="Buscar..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
+          <input type="search" placeholder={t("searchPlaceholder")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
         </div>
       </div>
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
           <Activity className="w-10 h-10 mx-auto mb-3 opacity-40" />
-          <p className="font-medium">No hay triajes pendientes</p>
+          <p className="font-medium">{t("noPending")}</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {filtered.map((t: any) => (
-            <div key={t.id} className={`card bg-base-100 shadow-sm ${t.priority === 'EMERGENCY' ? 'border border-red-300' : 'border border-base-300'}`}>
+          {filtered.map((triage: any) => (
+            <div key={triage.id} className={`card bg-base-100 shadow-sm ${triage.priority === 'EMERGENCY' ? 'border border-red-300' : 'border border-base-300'}`}>
               <div className="card-body p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${URGENCY_COLOR[t.priority] ?? URGENCY_COLOR.LOW}`}>
-                        {URGENCY_LABEL[t.priority] ?? t.priority}
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${URGENCY_COLOR[triage.priority] ?? URGENCY_COLOR.LOW}`}>
+                        {URGENCY_LABEL[triage.priority] ?? triage.priority}
                       </span>
                       <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
-                        Severidad: {t.perceived_severity}/10
+                        {t("severity", { value: triage.perceived_severity })}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        {t.user_name && `👤 ${t.user_name} · `}
-                        {t.created_at ? new Date(t.created_at).toLocaleString('es-VE') : ''}
+                        {triage.user_name && `👤 ${triage.user_name} · `}
+                        {triage.created_at ? new Date(triage.created_at).toLocaleString('es-VE') : ''}
                       </span>
                     </div>
-                    <p className="text-sm text-foreground">{t.symptoms}</p>
-                    {t.recommendation && (
-                      <p className="text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2">{t.recommendation}</p>
+                    <p className="text-sm text-foreground">{triage.symptoms}</p>
+                    {triage.recommendation && (
+                      <p className="text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2">{triage.recommendation}</p>
                     )}
                   </div>
-                  <button className="btn btn-primary btn-sm gap-1 shrink-0" onClick={() => setResponding(t.id)}>
-                    <Send className="w-3.5 h-3.5" /> Responder
+                  <button className="btn btn-primary btn-sm gap-1 shrink-0" onClick={() => setResponding(triage.id)}>
+                    <Send className="w-3.5 h-3.5" /> {t("respond")}
                   </button>
                 </div>
 
-                {responding === t.id && (
+                {responding === triage.id && (
                   <div className="mt-4 pt-4 border-t border-border space-y-3">
                     <div className="flex gap-2">
                       {["RESOLVED", "REFERRED"].map(s => (
@@ -102,12 +104,12 @@ export default function TriajesPage() {
                     <textarea
                       value={notes}
                       onChange={e => setNotes(e.target.value)}
-                      placeholder="Notas del médico..."
+                      placeholder={t("medicalNotesPlaceholder")}
                       className="w-full min-h-[80px] text-sm p-3 rounded-lg border border-border bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
                     />
                     <div className="flex gap-2 justify-end">
-                      <button className="btn btn-ghost btn-sm" onClick={() => setResponding(null)}>Cancelar</button>
-                      <button className="btn btn-primary btn-sm" onClick={() => handleRespond(t.id)} disabled={!notes.trim()}>Confirmar Respuesta</button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => setResponding(null)}>{t("cancel")}</button>
+                      <button className="btn btn-primary btn-sm" onClick={() => handleRespond(t.id)} disabled={!notes.trim()}>{t("confirmResponse")}</button>
                     </div>
                   </div>
                 )}

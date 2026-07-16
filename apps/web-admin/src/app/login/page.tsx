@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { Logo } from "@saludtech/ui";
 import { loginSchema } from "../../lib/validations";
@@ -14,6 +15,8 @@ function getApiUrl(path: string): string {
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const t = useTranslations("Login");
+  const tValidation = useTranslations("Validation");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +28,7 @@ export default function AdminLoginPage() {
     setError(null);
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
-      setError(result.error.issues[0].message);
+      setError(tValidation(result.error.issues[0].message));
       return;
     }
     setIsLoading(true);
@@ -38,7 +41,7 @@ export default function AdminLoginPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.message ?? "Credenciales incorrectas");
+        throw new Error(data.message ?? t("errorInvalidCredentials"));
       }
       const data = await res.json();
       // JWT is now stored in an httpOnly cookie by the backend.
@@ -48,7 +51,7 @@ export default function AdminLoginPage() {
       document.cookie = `jwt_token=${data.token}; path=/; max-age=${60 * 60 * 24}; samesite=lax`;
       router.push("/");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
+      setError(err instanceof Error ? err.message : t("errorGeneric"));
     } finally {
       setIsLoading(false);
     }
@@ -61,24 +64,24 @@ export default function AdminLoginPage() {
         <div className="flex flex-col items-center mb-8">
           <Logo size="lg" className="mb-4" />
           <h1 className="text-2xl font-bold font-(family-name:--font-syne) text-foreground">
-            Panel de Administración
+            {t("title")}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">SaludTech — Acceso restringido</p>
+          <p className="text-sm text-muted-foreground mt-1">{t("subtitle")}</p>
         </div>
 
         {/* Card */}
         <div className="bg-card border border-border rounded-2xl shadow-sm p-8">
           <h2 className="text-lg font-semibold font-(family-name:--font-syne) mb-6">
-            Inicia sesión
+            {t("signIn")}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="form-control gap-1">
-              <label htmlFor="email" className="label pb-0"><span className="label-text font-medium">Correo electrónico</span></label>
+              <label htmlFor="email" className="label pb-0"><span className="label-text font-medium">{t("email")}</span></label>
               <input
                 id="email"
                 type="email"
-                placeholder="admin@saludtech.com"
+                placeholder={t("emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -89,7 +92,7 @@ export default function AdminLoginPage() {
             </div>
 
             <div className="form-control gap-1">
-              <label htmlFor="password" className="label pb-0"><span className="label-text font-medium">Contraseña</span></label>
+              <label htmlFor="password" className="label pb-0"><span className="label-text font-medium">{t("password")}</span></label>
               <div className="relative">
                 <input
                   id="password"
@@ -105,7 +108,7 @@ export default function AdminLoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  aria-label={showPassword ? t("hidePassword") : t("showPassword")}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -122,13 +125,13 @@ export default function AdminLoginPage() {
 
             <button type="submit" className="btn btn-primary w-full" disabled={isLoading}>
               {isLoading ? <span className="loading loading-spinner loading-sm" /> : null}
-              {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
+              {isLoading ? t("submitting") : t("submit")}
             </button>
           </form>
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Solo para personal autorizado de SaludTech.
+          {t("authorizedOnly")}
         </p>
       </div>
     </div>

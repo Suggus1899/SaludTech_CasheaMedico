@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Shield, Building2, Activity } from "lucide-react";
 import { useFetchData } from "@saludtech/shared";
 import { getApiUrl } from "../../../lib/api";
 
 export default function ElderCarePage() {
+  const t = useTranslations("ElderCare");
   const [searchTerm, setSearchTerm] = useState("");
   const { data, loading } = useFetchData<any>(getApiUrl("admin/elder-care?limit=50&offset=0"));
 
-  if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando datos Elder Care...</div>;
+  if (loading) return <div className="p-8 text-center text-muted-foreground">{t("loading")}</div>;
 
   const subs: any[] = data?.subscriptions || [];
 
@@ -23,24 +25,24 @@ export default function ElderCarePage() {
   const serviceTypes = new Set(subs.map((s: any) => s.service_type));
 
   const SERVICE_LABELS: Record<string, string> = {
-    NURSE: 'Enfermera', CAREGIVER: 'Cuidador/a',
-    PHYSIOTHERAPY: 'Fisioterapia', GERIATRIC_SPECIALIST: 'Geriatría',
+    NURSE: t("serviceNurse"), CAREGIVER: t("serviceCaregiver"),
+    PHYSIOTHERAPY: t("servicePhysiotherapy"), GERIATRIC_SPECIALIST: t("serviceGeriatric"),
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="opacity-60 text-sm">{filtered.length} suscripciones Elder Care</p>
+        <p className="opacity-60 text-sm">{t("count", { count: filtered.length })}</p>
         <div className="relative hidden sm:block mr-2">
-          <input type="search" placeholder="Buscar..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
+          <input type="search" placeholder={t("searchPlaceholder")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
         </div>
       </div>
       {/* KPIs */}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
-          { label: "Suscriptores Activos", value: activeSubs.length, icon: Shield, color: "text-violet-600" },
-          { label: "Total Suscripciones", value: subs.length, icon: Building2, color: "text-blue-600" },
-          { label: "Tipos de Servicio", value: serviceTypes.size, icon: Activity, color: "text-pink-600" },
+          { label: t("kpiActiveSubscribers"), value: activeSubs.length, icon: Shield, color: "text-violet-600" },
+          { label: t("kpiTotalSubscriptions"), value: subs.length, icon: Building2, color: "text-blue-600" },
+          { label: t("kpiServiceTypes"), value: serviceTypes.size, icon: Activity, color: "text-pink-600" },
         ].map(kpi => (
           <div key={kpi.label} className="card bg-base-100 border border-base-300 shadow-sm">
             <div className="card-body flex-row items-center gap-4 p-5">
@@ -57,22 +59,22 @@ export default function ElderCarePage() {
       {/* Subscriptions table */}
       <div className="card bg-base-100 border border-base-300 shadow-sm">
         <div className="card-body pb-0">
-          <h3 className="card-title font-(family-name:--font-syne)">Suscripciones Elder Care</h3>
+          <h3 className="card-title font-(family-name:--font-syne)">{t("subscriptionsTitle")}</h3>
         </div>
         <div className="p-0">
           {filtered.length === 0 ? (
-            <div className="text-center py-12 opacity-40"><Shield className="w-10 h-10 mx-auto mb-3" /><p>Sin suscripciones</p></div>
+            <div className="text-center py-12 opacity-40"><Shield className="w-10 h-10 mx-auto mb-3" /><p>{t("noSubscriptions")}</p></div>
           ) : (
             <div className="overflow-x-auto">
               <table className="table table-sm w-full">
                 <thead>
                   <tr className="border-base-300">
-                    <th>Paciente</th>
-                    <th>Proveedor</th>
-                    <th>Servicio</th>
-                    <th>Monto/Mes</th>
-                    <th>Próximo Cobro</th>
-                    <th>Estado</th>
+                    <th>{t("colPatient")}</th>
+                    <th>{t("colProvider")}</th>
+                    <th>{t("colService")}</th>
+                    <th>{t("colAmountMonth")}</th>
+                    <th>{t("colNextBilling")}</th>
+                    <th>{t("colStatus")}</th>
                   </tr>
                 </thead>
                 <tbody>

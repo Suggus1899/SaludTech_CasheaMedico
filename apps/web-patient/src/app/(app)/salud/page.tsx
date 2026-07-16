@@ -4,10 +4,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Heart, Droplet, Ruler, Weight, Phone, AlertCircle, Pill, Save, CheckCircle2 } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../lib/api";
+import { useTranslations } from "next-intl";
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "unknown"];
 
 export default function HealthProfilePage() {
+  const t = useTranslations("Health");
+  const tCommon = useTranslations("Common");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -90,7 +93,7 @@ export default function HealthProfilePage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al guardar");
+      setError(err instanceof Error ? err.message : t("saveError"));
     } finally {
       setSaving(false);
     }
@@ -118,36 +121,36 @@ export default function HealthProfilePage() {
   return (
     <div className="space-y-6">
       <Link href="/dashboard" className="btn btn-ghost btn-sm -ml-2">
-        <ArrowLeft className="w-4 h-4" /> Volver
+        <ArrowLeft className="w-4 h-4" /> {tCommon("back")}
       </Link>
 
       <div>
         <h1 className="text-xl font-bold text-foreground font-display flex items-center gap-2">
-          <Heart className="w-5 h-5 text-error" /> Perfil de Salud
+          <Heart className="w-5 h-5 text-error" /> {t("title")}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Información médica que nos ayuda a atenderte mejor
+          {t("subtitle")}
         </p>
       </div>
 
       {/* Blood type + measurements */}
       <div className="card bg-base-100 border border-base-300 shadow-sm">
         <div className="card-body space-y-4">
-          <h2 className="card-title text-base font-display">Datos Básicos</h2>
+          <h2 className="card-title text-base font-display">{t("basicData")}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium flex items-center gap-1"><Droplet className="w-3.5 h-3.5" /> Tipo de Sangre</span></label>
+              <label className="label pb-0"><span className="label-text font-medium flex items-center gap-1"><Droplet className="w-3.5 h-3.5" /> {t("bloodType")}</span></label>
               <select value={bloodType} onChange={(e) => setBloodType(e.target.value)} className="select select-bordered w-full text-sm">
-                <option value="">Desconocido</option>
+                <option value="">{t("bloodTypeUnknown")}</option>
                 {bloodTypes.map((bt) => <option key={bt} value={bt}>{bt}</option>)}
               </select>
             </div>
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium flex items-center gap-1"><Ruler className="w-3.5 h-3.5" /> Altura (cm)</span></label>
+              <label className="label pb-0"><span className="label-text font-medium flex items-center gap-1"><Ruler className="w-3.5 h-3.5" /> {t("height")}</span></label>
               <input type="number" value={heightCm} onChange={(e) => setHeightCm(e.target.value)} placeholder="170" className="input input-bordered w-full text-sm" />
             </div>
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium flex items-center gap-1"><Weight className="w-3.5 h-3.5" /> Peso (kg)</span></label>
+              <label className="label pb-0"><span className="label-text font-medium flex items-center gap-1"><Weight className="w-3.5 h-3.5" /> {t("weight")}</span></label>
               <input type="number" step="0.1" value={weightKg} onChange={(e) => setWeightKg(e.target.value)} placeholder="70.5" className="input input-bordered w-full text-sm" />
             </div>
           </div>
@@ -158,7 +161,7 @@ export default function HealthProfilePage() {
       <div className="card bg-base-100 border border-base-300 shadow-sm">
         <div className="card-body space-y-2">
           <h2 className="card-title text-base font-display flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-warning" /> Alergias
+            <AlertCircle className="w-4 h-4 text-warning" /> {t("allergies")}
           </h2>
           <div className="flex gap-2">
             <input
@@ -166,10 +169,10 @@ export default function HealthProfilePage() {
               value={allergyInput}
               onChange={(e) => setAllergyInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addTag(allergyInput, allergies, setAllergies, allergyInput, setAllergyInput)}
-              placeholder="Ej: Penicilina, mariscos..."
+              placeholder={t("allergiesPlaceholder")}
               className="input input-bordered flex-1 text-sm"
             />
-            <button onClick={() => addTag(allergyInput, allergies, setAllergies, allergyInput, setAllergyInput)} className="btn btn-outline btn-sm">Agregar</button>
+            <button onClick={() => addTag(allergyInput, allergies, setAllergies, allergyInput, setAllergyInput)} className="btn btn-outline btn-sm">{tCommon("add")}</button>
           </div>
           <TagList items={allergies} onRemove={(t) => removeTag(t, allergies, setAllergies)} color="badge-warning" />
         </div>
@@ -178,17 +181,17 @@ export default function HealthProfilePage() {
       {/* Chronic conditions */}
       <div className="card bg-base-100 border border-base-300 shadow-sm">
         <div className="card-body space-y-2">
-          <h2 className="card-title text-base font-display">Condiciones Crónicas</h2>
+          <h2 className="card-title text-base font-display">{t("chronicConditions")}</h2>
           <div className="flex gap-2">
             <input
               type="text"
               value={conditionInput}
               onChange={(e) => setConditionInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addTag(conditionInput, chronicConditions, setChronicConditions, conditionInput, setConditionInput)}
-              placeholder="Ej: Diabetes, hipertensión..."
+              placeholder={t("conditionsPlaceholder")}
               className="input input-bordered flex-1 text-sm"
             />
-            <button onClick={() => addTag(conditionInput, chronicConditions, setChronicConditions, conditionInput, setConditionInput)} className="btn btn-outline btn-sm">Agregar</button>
+            <button onClick={() => addTag(conditionInput, chronicConditions, setChronicConditions, conditionInput, setConditionInput)} className="btn btn-outline btn-sm">{tCommon("add")}</button>
           </div>
           <TagList items={chronicConditions} onRemove={(t) => removeTag(t, chronicConditions, setChronicConditions)} color="badge-error" />
         </div>
@@ -198,7 +201,7 @@ export default function HealthProfilePage() {
       <div className="card bg-base-100 border border-base-300 shadow-sm">
         <div className="card-body space-y-2">
           <h2 className="card-title text-base font-display flex items-center gap-2">
-            <Pill className="w-4 h-4 text-primary" /> Medicamentos Actuales
+            <Pill className="w-4 h-4 text-primary" /> {t("currentMedications")}
           </h2>
           <div className="flex gap-2">
             <input
@@ -206,10 +209,10 @@ export default function HealthProfilePage() {
               value={medicationInput}
               onChange={(e) => setMedicationInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addTag(medicationInput, currentMedications, setCurrentMedications, medicationInput, setMedicationInput)}
-              placeholder="Ej: Metformina 500mg..."
+              placeholder={t("medicationsPlaceholder")}
               className="input input-bordered flex-1 text-sm"
             />
-            <button onClick={() => addTag(medicationInput, currentMedications, setCurrentMedications, medicationInput, setMedicationInput)} className="btn btn-outline btn-sm">Agregar</button>
+            <button onClick={() => addTag(medicationInput, currentMedications, setCurrentMedications, medicationInput, setMedicationInput)} className="btn btn-outline btn-sm">{tCommon("add")}</button>
           </div>
           <TagList items={currentMedications} onRemove={(t) => removeTag(t, currentMedications, setCurrentMedications)} color="badge-primary" />
         </div>
@@ -219,26 +222,26 @@ export default function HealthProfilePage() {
       <div className="card bg-base-100 border border-base-300 shadow-sm">
         <div className="card-body space-y-4">
           <h2 className="card-title text-base font-display flex items-center gap-2">
-            <Phone className="w-4 h-4 text-success" /> Contacto de Emergencia
+            <Phone className="w-4 h-4 text-success" /> {t("emergencyContact")}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium">Nombre</span></label>
-              <input value={emergName} onChange={(e) => setEmergName(e.target.value)} placeholder="Nombre completo" className="input input-bordered w-full text-sm" />
+              <label className="label pb-0"><span className="label-text font-medium">{t("name")}</span></label>
+              <input value={emergName} onChange={(e) => setEmergName(e.target.value)} placeholder={t("namePlaceholder")} className="input input-bordered w-full text-sm" />
             </div>
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium">Teléfono</span></label>
-              <input type="tel" value={emergPhone} onChange={(e) => setEmergPhone(e.target.value)} placeholder="+58 412..." className="input input-bordered w-full text-sm" />
+              <label className="label pb-0"><span className="label-text font-medium">{t("phone")}</span></label>
+              <input type="tel" value={emergPhone} onChange={(e) => setEmergPhone(e.target.value)} placeholder={t("phonePlaceholder")} className="input input-bordered w-full text-sm" />
             </div>
             <div className="form-control gap-1">
-              <label className="label pb-0"><span className="label-text font-medium">Relación</span></label>
+              <label className="label pb-0"><span className="label-text font-medium">{t("relation")}</span></label>
               <select value={emergRelation} onChange={(e) => setEmergRelation(e.target.value)} className="select select-bordered w-full text-sm">
-                <option value="">Seleccionar...</option>
-                <option value="parent">Padre/Madre</option>
-                <option value="spouse">Cónyuge</option>
-                <option value="sibling">Hermano/a</option>
-                <option value="child">Hijo/a</option>
-                <option value="other">Otro</option>
+                <option value="">{t("selectRelation")}</option>
+                <option value="parent">{t("relationParent")}</option>
+                <option value="spouse">{t("relationSpouse")}</option>
+                <option value="sibling">{t("relationSibling")}</option>
+                <option value="child">{t("relationChild")}</option>
+                <option value="other">{t("relationOther")}</option>
               </select>
             </div>
           </div>
@@ -248,11 +251,11 @@ export default function HealthProfilePage() {
       {/* Notes */}
       <div className="card bg-base-100 border border-base-300 shadow-sm">
         <div className="card-body space-y-2">
-          <h2 className="card-title text-base font-display">Notas</h2>
+          <h2 className="card-title text-base font-display">{tCommon("notes")}</h2>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Información adicional relevante para tu atención médica..."
+            placeholder={t("notesPlaceholder")}
             className="textarea textarea-bordered w-full text-sm"
             rows={3}
           />
@@ -270,12 +273,12 @@ export default function HealthProfilePage() {
       <div className="flex justify-end gap-2">
         {saved && (
           <span className="text-success text-sm flex items-center gap-1">
-            <CheckCircle2 className="w-4 h-4" /> Guardado
+            <CheckCircle2 className="w-4 h-4" /> {t("saved")}
           </span>
         )}
         <button onClick={handleSave} disabled={saving} className="btn btn-primary btn-sm gap-2">
           {saving ? <span className="loading loading-spinner loading-xs" /> : <Save className="w-4 h-4" />}
-          Guardar Perfil
+          {t("save")}
         </button>
       </div>
     </div>

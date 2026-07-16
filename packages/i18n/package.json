@@ -8,6 +8,10 @@
     "next-intl": "^4.13.2"
   },
   "peerDependencies": {
+    "next": "^16.0.0",
     "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
   }
 }

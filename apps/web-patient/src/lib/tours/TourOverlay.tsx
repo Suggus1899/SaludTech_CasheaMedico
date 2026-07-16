@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { X, ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useTour } from "./TourContext";
 import { getTourById } from "./tours";
 
@@ -15,6 +16,7 @@ interface Rect {
 export function TourOverlay() {
   const { activeTourId, currentStep, nextStep, prevStep, endTour, skipTour } =
     useTour();
+  const t = useTranslations("Tours");
   const [targetRect, setTargetRect] = useState<Rect | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{
     top: number;
@@ -163,7 +165,7 @@ export function TourOverlay() {
         <button
           onClick={skipTour}
           className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Cerrar tutorial"
+          aria-label={t("closeTutorial")}
         >
           <X className="w-4 h-4" />
         </button>
@@ -185,10 +187,10 @@ export function TourOverlay() {
         </div>
 
         <h3 className="text-sm font-bold text-foreground mb-1.5 pr-6">
-          {step.title}
+          {t(`${tour.id}.steps.${currentStep}.title`)}
         </h3>
         <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-          {step.body}
+          {t(`${tour.id}.steps.${currentStep}.body`)}
         </p>
 
         {/* Controls */}
@@ -201,10 +203,10 @@ export function TourOverlay() {
               <button
                 onClick={prevStep}
                 className="btn btn-ghost btn-xs gap-1"
-                aria-label="Paso anterior"
+                aria-label={t("prevStep")}
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                Atrás
+                {t("back")}
               </button>
             )}
             {isLastStep ? (
@@ -213,14 +215,14 @@ export function TourOverlay() {
                 className="btn btn-primary btn-xs gap-1"
               >
                 <Check className="w-3.5 h-3.5" />
-                Listo
+                {t("done")}
               </button>
             ) : (
               <button
                 onClick={nextStep}
                 className="btn btn-primary btn-xs gap-1"
               >
-                Siguiente
+                {t("next")}
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
@@ -233,7 +235,7 @@ export function TourOverlay() {
             onClick={skipTour}
             className="absolute -bottom-7 right-0 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
           >
-            Saltar tutorial
+            {t("skipTutorial")}
           </button>
         )}
       </div>

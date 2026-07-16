@@ -24,11 +24,14 @@ import {
   quickActionStyles,
 } from "../../../lib/creditLineStyles";
 import { useTour } from "../../../lib/tours";
+import { useTranslations } from "next-intl";
 import type { CreditLine, Installment, UserResponse } from "../../../types/patient";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<UserResponse | null>(null);
   const { startTour, hasSeenTour } = useTour();
+  const t = useTranslations("Dashboard");
+  const tCommon = useTranslations("Common");
 
   useEffect(() => {
     setUser(getStoredUser<UserResponse>());
@@ -50,14 +53,14 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 border border-primary/20">
           <GraduationCap className="w-5 h-5 text-primary shrink-0" />
           <div className="flex-1">
-            <p className="text-xs font-semibold text-foreground">¿Primera vez aquí?</p>
-            <p className="text-[11px] text-muted-foreground">Toma un tour guiado de 30 segundos.</p>
+            <p className="text-xs font-semibold text-foreground">{t("tourPromptTitle")}</p>
+            <p className="text-[11px] text-muted-foreground">{t("tourPromptDesc")}</p>
           </div>
           <button
             onClick={() => startTour("dashboard")}
             className="btn btn-primary btn-xs"
           >
-            Ver tour
+            {t("seeTour")}
           </button>
         </div>
       )}
@@ -71,9 +74,9 @@ export default function DashboardPage() {
       ) : linesError ? (
         <div className="flex flex-col items-center py-12 gap-4">
           <WifiOff className="w-12 h-12 text-muted-foreground" />
-          <p className="text-muted-foreground">No se pudieron cargar las líneas de crédito.</p>
+          <p className="text-muted-foreground">{t("loadCreditLinesError")}</p>
           <button onClick={() => refetchLines()} className="btn btn-primary btn-sm">
-            Reintentar
+            {tCommon("retry")}
           </button>
         </div>
       ) : creditLines && creditLines.length > 0 ? (
@@ -84,7 +87,7 @@ export default function DashboardPage() {
         </div>
       ) : (
         <p className="text-center text-muted-foreground py-8">
-          No hay líneas de crédito disponibles
+          {t("noCreditLines")}
         </p>
       )}
       </div>
@@ -92,49 +95,49 @@ export default function DashboardPage() {
       {/* Quick actions */}
       <section data-tour="quick-actions">
         <h2 className="text-base font-bold text-foreground mb-3.5">
-          Acciones Rápidas
+          {t("quickActions")}
         </h2>
         <div className="grid grid-cols-4 lg:grid-cols-7 gap-3">
           <QuickAction
             href="/triaje"
             icon={<Stethoscope className="w-5 h-5" />}
-            label="Triaje"
+            label={t("triaje")}
             color={quickActionStyles.triaje.color}
           />
           <QuickAction
             href="/pagar"
             icon={<QrCode className="w-5 h-5" />}
-            label="Pagar"
+            label={t("pay")}
             color={quickActionStyles.pagar.color}
           />
           <QuickAction
             href="/suscripciones"
             icon={<Pill className="w-5 h-5" />}
-            label="Medicinas"
+            label={t("medicines")}
             color={quickActionStyles.medicinas.color}
           />
           <QuickAction
             href="/cuidado-mayor"
             icon={<Shield className="w-5 h-5" />}
-            label="Cuidado Mayor"
+            label={t("elderCare")}
             color={quickActionStyles.cuidadoMayor.color}
           />
           <QuickAction
             href="/comercios"
             icon={<Store className="w-5 h-5" />}
-            label="Comercios"
+            label={t("merchants")}
             color="#2563eb"
           />
           <QuickAction
             href="/catalogo"
             icon={<Search className="w-5 h-5" />}
-            label="Catálogo"
+            label={t("catalog")}
             color="#0891b2"
           />
           <QuickAction
             href="/cuotas"
             icon={<CalendarDays className="w-5 h-5" />}
-            label="Cuotas"
+            label={t("installments")}
             color={quickActionStyles.cuotas.color}
           />
         </div>
@@ -144,19 +147,19 @@ export default function DashboardPage() {
       <section data-tour="upcoming-payments">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-bold text-foreground">
-            Próximos Pagos
+            {t("upcomingPayments")}
           </h2>
           <Link
             href="/cuotas"
             className="text-sm font-semibold text-primary hover:underline"
           >
-            Ver todas
+            {t("viewAll")}
           </Link>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {pendingInstallments.length === 0 ? (
             <p className="text-center text-muted-foreground py-6 text-sm">
-              No hay pagos pendientes 🎉
+              {t("noPendingPayments")}
             </p>
           ) : (
             pendingInstallments.map((inst) => {
@@ -169,7 +172,7 @@ export default function DashboardPage() {
                   className="block"
                 >
                   <PaymentCard
-                    storeName={inst.transaction?.merchant?.tradeName ?? "Comercio"}
+                    storeName={inst.transaction?.merchant?.tradeName ?? t("merchant")}
                     installment={
                       inst.installmentNumber && inst.totalInstallments
                         ? `${inst.installmentNumber} de ${inst.totalInstallments}`
@@ -177,8 +180,8 @@ export default function DashboardPage() {
                     }
                     dueLabel={
                       isUrgent
-                        ? `Vence en ${days} día${days === 1 ? "" : "s"}`
-                        : `Vence el ${formatDate(inst.dueDate)}`
+                        ? t("dueInDays", { count: days })
+                        : t("dueOnDate", { date: formatDate(inst.dueDate) })
                     }
                     amount={inst.amount}
                     amountVES={inst.amountVES}
@@ -195,6 +198,7 @@ export default function DashboardPage() {
 }
 
 function CreditLineCard({ line, level }: { line: CreditLine; level?: number }) {
+  const t = useTranslations("Dashboard");
   const meta = getCreditLineStyle(line.type);
   const Icon = meta.icon;
   const used = line.limitAmount - line.available;
@@ -219,7 +223,7 @@ function CreditLineCard({ line, level }: { line: CreditLine; level?: number }) {
             className="px-3 py-1 rounded-full bg-black/10 flex items-center gap-1"
           >
             <Award className="w-3.5 h-3.5 text-black/85" />
-            <span className="text-xs font-bold text-black/85">Nivel {level}</span>
+            <span className="text-xs font-bold text-black/85">{t("level", { level })}</span>
           </Link>
         )}
       </div>
@@ -227,11 +231,11 @@ function CreditLineCard({ line, level }: { line: CreditLine; level?: number }) {
       <p className="text-4xl font-bold mt-5 leading-none font-display">
         ${line.available.toFixed(2)}
       </p>
-      <p className="text-sm text-black/65 mt-1">Disponible para financiar</p>
+      <p className="text-sm text-black/65 mt-1">{t("availableToFinance")}</p>
 
       <div className="mt-5">
         <div className="flex justify-between text-xs text-black/70 mb-1.5">
-          <span>Utilizado</span>
+          <span>{t("used")}</span>
           <span>
             ${used.toFixed(2)} / ${line.limitAmount.toFixed(2)}
           </span>
@@ -291,6 +295,7 @@ function PaymentCard({
   amountVES?: number;
   isUrgent: boolean;
 }) {
+  const t = useTranslations("Dashboard");
   return (
     <div
       className={`p-4 rounded-2xl border bg-base-100 flex items-center gap-3.5 ${
@@ -310,7 +315,7 @@ function PaymentCard({
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-foreground truncate font-display">
-          Cuota {installment} · {storeName}
+          {t("installmentLabel", { installment, storeName })}
         </p>
         <p
           className={`text-xs mt-0.5 ${

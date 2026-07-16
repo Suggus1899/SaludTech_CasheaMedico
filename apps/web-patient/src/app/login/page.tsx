@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Mail, Lock, Eye, EyeOff, AlertCircle, HeartPulse, ShieldCheck, Clock } from "lucide-react";
 import { Logo } from "@saludtech/ui";
 import { getApiUrl, setSession } from "../../lib/api";
@@ -10,6 +11,8 @@ import type { UserResponse } from "../../types/patient";
 
 export default function PatientLoginPage() {
   const router = useRouter();
+  const t = useTranslations("Login");
+  const tVal = useTranslations("Validations");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,7 +24,7 @@ export default function PatientLoginPage() {
     setError(null);
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
-      setError(result.error.issues[0].message);
+      setError(tVal(result.error.issues[0].message as any));
       return;
     }
     setIsLoading(true);
@@ -34,7 +37,7 @@ export default function PatientLoginPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.message ?? "Credenciales incorrectas");
+        throw new Error(data.message ?? t("invalidCredentials"));
       }
       const data = await res.json();
       setSession(data.token, data.user as UserResponse);
@@ -43,7 +46,7 @@ export default function PatientLoginPage() {
       document.cookie = `jwt_token=${data.token}; path=/; max-age=${60 * 60 * 24}; samesite=lax`;
       router.push("/dashboard");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
+      setError(err instanceof Error ? err.message : t("loginError"));
     } finally {
       setIsLoading(false);
     }
@@ -73,24 +76,24 @@ export default function PatientLoginPage() {
         <div className="relative z-10 space-y-8">
           <div>
             <h1 className="text-4xl font-bold text-white leading-tight mb-4">
-              Tu salud,
+              {t("heroTitle1")}
               <br />
               <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                sin esperar
+                {t("heroTitle2")}
               </span>
               <br />
-              ni endeudarte
+              {t("heroTitle3")}
             </h1>
             <p className="text-white/60 text-lg max-w-md">
-              Accede a farmacias, clínicas y especialistas. Paga en cuotas cada 14 días con 0% de interés.
+              {t("heroDesc")}
             </p>
           </div>
 
           <div className="space-y-4">
             {[
-              { icon: HeartPulse, title: "0% de interés siempre", desc: "Sin letras ocultas ni sorpresas" },
-              { icon: Clock, title: "Aprobación en 3 minutos", desc: "Registro 100% digital" },
-              { icon: ShieldCheck, title: "Red de +127 comercios", desc: "Farmacias, clínicas, laboratorios" },
+              { icon: HeartPulse, title: t("feature1Title"), desc: t("feature1Desc") },
+              { icon: Clock, title: t("feature2Title"), desc: t("feature2Desc") },
+              { icon: ShieldCheck, title: t("feature3Title"), desc: t("feature3Desc") },
             ].map((f) => (
               <div key={f.title} className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-white/10 backdrop-blur shrink-0">
@@ -108,9 +111,9 @@ export default function PatientLoginPage() {
         {/* Bottom: Stats */}
         <div className="relative z-10 flex gap-8">
           {[
-            { value: "0%", label: "Interés" },
-            { value: "3 min", label: "Aprobación" },
-            { value: "14 días", label: "Entre cuotas" },
+            { value: "0%", label: t("statInterest") },
+            { value: "3 min", label: t("statApproval") },
+            { value: "14 días", label: t("statBetweenInstallments") },
           ].map((s) => (
             <div key={s.label}>
               <div className="text-2xl font-bold text-white">{s.value}</div>
@@ -126,27 +129,27 @@ export default function PatientLoginPage() {
           {/* Mobile logo */}
           <div className="flex lg:hidden flex-col items-center mb-8">
             <Logo size="lg" />
-            <p className="text-sm text-muted-foreground mt-2">Salud financiada a tu alcance</p>
+            <p className="text-sm text-muted-foreground mt-2">{t("mobileTagline")}</p>
           </div>
 
           {/* Header */}
           <div className="hidden lg:block mb-8">
-            <h2 className="text-2xl font-bold text-base-content">Bienvenido de nuevo</h2>
-            <p className="text-muted-foreground text-sm mt-1">Ingresa a tu cuenta para continuar</p>
+            <h2 className="text-2xl font-bold text-base-content">{t("welcomeBack")}</h2>
+            <p className="text-muted-foreground text-sm mt-1">{t("loginToContinue")}</p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="form-control gap-1.5">
               <label htmlFor="email" className="label pb-0">
-                <span className="label-text font-medium text-sm">Correo electrónico</span>
+                <span className="label-text font-medium text-sm">{t("email")}</span>
               </label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   id="email"
                   type="email"
-                  placeholder="tu@correo.com"
+                  placeholder={t("emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -159,14 +162,14 @@ export default function PatientLoginPage() {
             <div className="form-control gap-1.5">
               <div className="flex items-center justify-between">
                 <label htmlFor="password" className="label pb-0">
-                  <span className="label-text font-medium text-sm">Contraseña</span>
+                  <span className="label-text font-medium text-sm">{t("password")}</span>
                 </label>
                 <button
                   type="button"
                   className="text-xs text-primary hover:underline"
                   onClick={() => {}}
                 >
-                  ¿Olvidaste tu contraseña?
+                  {t("forgotPassword")}
                 </button>
               </div>
               <div className="relative">
@@ -184,7 +187,7 @@ export default function PatientLoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  aria-label={showPassword ? t("hidePassword") : t("showPassword")}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-base-content transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -210,26 +213,26 @@ export default function PatientLoginPage() {
               {isLoading ? (
                 <>
                   <span className="loading loading-spinner loading-sm" />
-                  Iniciando sesión...
+                  {t("signingIn")}
                 </>
               ) : (
-                "Iniciar Sesión"
+                t("signIn")
               )}
             </button>
           </form>
 
           {/* Divider */}
-          <div className="divider text-xs text-muted-foreground my-6">o</div>
+          <div className="divider text-xs text-muted-foreground my-6">{t("or")}</div>
 
           {/* Register CTA */}
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              ¿No tienes cuenta?{" "}
+              {t("noAccount")}{" "}
               <button
                 onClick={() => router.push("/registro")}
                 className="font-bold text-primary hover:underline"
               >
-                Crear cuenta gratis
+                {t("createAccountFree")}
               </button>
             </p>
           </div>

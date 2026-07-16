@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { DollarSign, Users, Store, AlertTriangle, TrendingUp, TrendingDown, Search, CreditCard, BarChart3 } from "lucide-react";
 import { useFetchData } from "@saludtech/shared";
 import { getApiUrl } from "../../../lib/api";
@@ -15,12 +16,14 @@ import {
 } from "../../../components/charts/AnalyticsCharts";
 
 export default function DashboardPage() {
+  const t = useTranslations("Dashboard");
+  const tCommon = useTranslations("Common");
   const [searchTerm, setSearchTerm] = useState("");
   const { data: stats, loading: statsLoading } = useFetchData<DashboardStats>(getApiUrl("admin/dashboard"));
   const { data: usersData, loading: usersLoading } = useFetchData<AdminUsersResponse>(getApiUrl("admin/users?limit=5&offset=0"));
   const { data: analytics, loading: analyticsLoading } = useFetchData<AnalyticsResponse>(getApiUrl("admin/analytics"));
 
-  if (statsLoading || usersLoading) return <div className="p-8 text-center text-muted-foreground">Cargando dashboard...</div>;
+  if (statsLoading || usersLoading) return <div className="p-8 text-center text-muted-foreground">{t("loading")}</div>;
 
   const users: AdminUser[] = usersData?.users || [];
   const filtered = users.filter(
@@ -35,33 +38,33 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[
           {
-            title: "Volumen Total",
+            title: t("kpiTotalVolume"),
             value: `$${Number(stats?.totalRevenue || 0).toFixed(2)}`,
-            sub: "Transacciones totales",
+            sub: t("kpiTotalTransactions"),
             icon: DollarSign,
             trend: "up",
             progress: 100,
           },
           {
-            title: "Pacientes",
+            title: t("kpiPatients"),
             value: stats?.patients || 0,
-            sub: `${stats?.users || 0} usuarios totales`,
+            sub: t("kpiUsersTotal", { count: stats?.users || 0 }),
             icon: Users,
             trend: "up",
             progress: 100,
           },
           {
-            title: "Comercios Activos",
+            title: t("kpiActiveMerchants"),
             value: stats?.activeMerchants || 0,
-            sub: `${stats?.merchants || 0} comercios totales`,
+            sub: t("kpiMerchantsTotal", { count: stats?.merchants || 0 }),
             icon: Store,
             trend: "neutral",
             progress: 100,
           },
           {
-            title: "Cuotas en Mora",
+            title: t("kpiOverdueInstallments"),
             value: stats?.overdueInstallments || 0,
-            sub: `$${Number(stats?.pendingAmount || 0).toFixed(2)} pendiente`,
+            sub: t("kpiPending", { amount: Number(stats?.pendingAmount || 0).toFixed(2) }),
             icon: AlertTriangle,
             trend: (stats?.overdueInstallments ?? 0) > 0 ? "down" : "up",
             progress: stats?.creditLines ? Math.min(((stats?.overdueInstallments ?? 0) / stats?.creditLines) * 100, 100) : 0,
@@ -101,16 +104,16 @@ export default function DashboardPage() {
       <div className="space-y-6">
         <div className="flex items-center gap-2">
           <BarChart3 className="w-5 h-5 text-primary" />
-          <h2 className="text-xl font-bold font-(family-name:--font-syne)">Analytics</h2>
+          <h2 className="text-xl font-bold font-(family-name:--font-syne)">{t("analytics")}</h2>
         </div>
 
         {/* Revenue + Transaction Status */}
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="card bg-base-100 border border-base-300 shadow-sm lg:col-span-2">
             <div className="card-body">
-              <h3 className="card-title font-(family-name:--font-syne)">Revenue por Mes</h3>
+              <h3 className="card-title font-(family-name:--font-syne)">{t("revenueByMonth")}</h3>
               {analyticsLoading ? (
-                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">{tCommon("loading")}</div>
               ) : (
                 <RevenueLineChart data={analytics?.revenueByMonth ?? []} />
               )}
@@ -118,9 +121,9 @@ export default function DashboardPage() {
           </div>
           <div className="card bg-base-100 border border-base-300 shadow-sm">
             <div className="card-body">
-              <h3 className="card-title font-(family-name:--font-syne)">Estado de Transacciones</h3>
+              <h3 className="card-title font-(family-name:--font-syne)">{t("transactionStatus")}</h3>
               {analyticsLoading ? (
-                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">{tCommon("loading")}</div>
               ) : (
                 <TransactionStatusPie data={analytics?.transactionStatus ?? []} />
               )}
@@ -132,9 +135,9 @@ export default function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="card bg-base-100 border border-base-300 shadow-sm">
             <div className="card-body">
-              <h3 className="card-title font-(family-name:--font-syne)">Estado de Cuotas</h3>
+              <h3 className="card-title font-(family-name:--font-syne)">{t("installmentStatus")}</h3>
               {analyticsLoading ? (
-                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">{tCommon("loading")}</div>
               ) : (
                 <InstallmentStatusBar data={analytics?.installmentStatus ?? []} />
               )}
@@ -142,9 +145,9 @@ export default function DashboardPage() {
           </div>
           <div className="card bg-base-100 border border-base-300 shadow-sm">
             <div className="card-body">
-              <h3 className="card-title font-(family-name:--font-syne)">Top Comercios por Revenue</h3>
+              <h3 className="card-title font-(family-name:--font-syne)">{t("topMerchantsByRevenue")}</h3>
               {analyticsLoading ? (
-                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">{tCommon("loading")}</div>
               ) : (
                 <TopMerchantsChart data={analytics?.topMerchants ?? []} />
               )}
@@ -156,9 +159,9 @@ export default function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="card bg-base-100 border border-base-300 shadow-sm">
             <div className="card-body">
-              <h3 className="card-title font-(family-name:--font-syne)">Comercios por Categoria</h3>
+              <h3 className="card-title font-(family-name:--font-syne)">{t("merchantsByCategory")}</h3>
               {analyticsLoading ? (
-                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">{tCommon("loading")}</div>
               ) : (
                 <CategoryDonut data={analytics?.categoryDistribution ?? []} />
               )}
@@ -166,9 +169,9 @@ export default function DashboardPage() {
           </div>
           <div className="card bg-base-100 border border-base-300 shadow-sm">
             <div className="card-body">
-              <h3 className="card-title font-(family-name:--font-syne)">Embudo de Triajes</h3>
+              <h3 className="card-title font-(family-name:--font-syne)">{t("triageFunnel")}</h3>
               {analyticsLoading ? (
-                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">Cargando...</div>
+                <div className="h-[280px] flex items-center justify-center text-sm opacity-40">{tCommon("loading")}</div>
               ) : (
                 <TriageFunnel data={analytics?.triageConversion ?? { pending_count: 0, reviewing_count: 0, resolved_count: 0, referred_count: 0, completed_count: 0 }} />
               )}
@@ -181,22 +184,22 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-7">
         <div className="card bg-base-100 border border-base-300 shadow-sm lg:col-span-4">
           <div className="card-body">
-            <h3 className="card-title font-(family-name:--font-syne)">Usuarios Recientes</h3>
+            <h3 className="card-title font-(family-name:--font-syne)">{t("recentUsers")}</h3>
             {filtered.length === 0 ? (
               <div className="text-center py-12 opacity-40">
                 <Search className="w-10 h-10 mx-auto mb-3" />
-                <p className="font-medium">Sin resultados</p>
+                <p className="font-medium">{t("noResults")}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="table table-sm w-full">
                   <thead>
                     <tr className="border-base-300">
-                      <th>Nombre</th>
-                      <th>Email</th>
-                      <th>Rol</th>
-                      <th>Nivel</th>
-                      <th className="text-right">Total Pagado</th>
+                      <th>{t("colName")}</th>
+                      <th>{t("colEmail")}</th>
+                      <th>{t("colRole")}</th>
+                      <th>{t("colLevel")}</th>
+                      <th className="text-right">{t("colTotalPaid")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -208,7 +211,7 @@ export default function DashboardPage() {
                           <span className={`badge badge-sm ${u.role === "ADMIN" ? "badge-secondary" : u.role === "MERCHANT" ? "badge-accent" : "badge-ghost"}`}>{u.role}</span>
                         </td>
                         <td>
-                          <span className="badge badge-sm badge-primary badge-outline">Nv. {u.level}</span>
+                          <span className="badge badge-sm badge-primary badge-outline">{t("levelPrefix", { level: u.level })}</span>
                         </td>
                         <td className="text-right font-semibold">${Number(u.total_paid || 0).toFixed(2)}</td>
                       </tr>
@@ -221,18 +224,18 @@ export default function DashboardPage() {
         </div>
         <div className="card bg-base-100 border border-base-300 shadow-sm lg:col-span-3">
           <div className="card-body">
-            <h3 className="card-title font-(family-name:--font-syne)">Resumen</h3>
+            <h3 className="card-title font-(family-name:--font-syne)">{t("summary")}</h3>
             <div className="space-y-3 pt-2">
               <div className="flex justify-between items-center pb-2 border-b border-base-300">
-                <span className="text-sm opacity-60 flex items-center gap-2"><CreditCard className="w-4 h-4" /> Transacciones</span>
+                <span className="text-sm opacity-60 flex items-center gap-2"><CreditCard className="w-4 h-4" /> {t("summaryTransactions")}</span>
                 <span className="font-bold">{stats?.transactions || 0}</span>
               </div>
               <div className="flex justify-between items-center pb-2 border-b border-base-300">
-                <span className="text-sm opacity-60 flex items-center gap-2"><CreditCard className="w-4 h-4" /> Líneas de Crédito</span>
+                <span className="text-sm opacity-60 flex items-center gap-2"><CreditCard className="w-4 h-4" /> {t("summaryCreditLines")}</span>
                 <span className="font-bold">{stats?.creditLines || 0}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm opacity-60 flex items-center gap-2"><DollarSign className="w-4 h-4" /> Monto Pendiente</span>
+                <span className="text-sm opacity-60 flex items-center gap-2"><DollarSign className="w-4 h-4" /> {t("summaryPendingAmount")}</span>
                 <span className="font-bold text-error">${Number(stats?.pendingAmount || 0).toFixed(2)}</span>
               </div>
             </div>

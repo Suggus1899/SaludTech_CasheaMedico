@@ -4,16 +4,19 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Pill, Plus, Trash2, Clock, Bell, X, AlertCircle } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../lib/api";
+import { useTranslations } from "next-intl";
 
 const frequencyConfig: Record<string, string> = {
-  DAILY: "Diario",
-  TWICE_DAILY: "2x al día",
-  THREE_TIMES_DAY: "3x al día",
-  WEEKLY: "Semanal",
-  AS_NEEDED: "Según necesidad",
+  DAILY: "freqDaily",
+  TWICE_DAILY: "freqTwiceDaily",
+  THREE_TIMES_DAY: "freqThreeTimesDay",
+  WEEKLY: "freqWeekly",
+  AS_NEEDED: "freqAsNeeded",
 };
 
 export default function MedicationRemindersPage() {
+  const t = useTranslations("Reminders");
+  const tCommon = useTranslations("Common");
   const [reminders, setReminders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
@@ -49,7 +52,7 @@ export default function MedicationRemindersPage() {
     e.preventDefault();
     setError(null);
     if (!form.medicationName) {
-      setError("El nombre del medicamento es obligatorio");
+      setError(t("nameRequired"));
       return;
     }
     setSaving(true);
@@ -58,19 +61,19 @@ export default function MedicationRemindersPage() {
         method: "POST",
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error("Error al crear recordatorio");
+      if (!res.ok) throw new Error(t("createError"));
       setShowAdd(false);
       setForm({ medicationName: "", dosage: "", frequency: "DAILY", times: ["08:00"], endDate: "", notes: "" });
       fetchReminders();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error");
+      setError(err instanceof Error ? err.message : tCommon("error"));
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("¿Eliminar este recordatorio?")) return;
+    if (!confirm(t("deleteConfirm"))) return;
     try {
       await apiFetch(getApiUrl(`patient/medication-reminders/${id}`), {
         method: "DELETE",
@@ -93,20 +96,20 @@ export default function MedicationRemindersPage() {
   return (
     <div className="space-y-6">
       <Link href="/dashboard" className="btn btn-ghost btn-sm -ml-2">
-        <ArrowLeft className="w-4 h-4" /> Volver
+        <ArrowLeft className="w-4 h-4" /> {tCommon("back")}
       </Link>
 
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-foreground font-display flex items-center gap-2">
-            <Bell className="w-5 h-5 text-primary" /> Recordatorios
+            <Bell className="w-5 h-5 text-primary" /> {t("title")}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Medicación recurrente y recordatorios
+            {t("subtitle")}
           </p>
         </div>
         <button onClick={() => setShowAdd(true)} className="btn btn-primary btn-sm gap-2">
-          <Plus className="w-4 h-4" /> Nuevo
+          <Plus className="w-4 h-4" /> {t("new")}
         </button>
       </div>
 
@@ -117,8 +120,8 @@ export default function MedicationRemindersPage() {
       ) : reminders.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
           <Pill className="w-12 h-12 mx-auto mb-3 opacity-40" />
-          <p className="font-medium">No tienes recordatorios activos</p>
-          <p className="text-xs mt-1">Agrega tu medicación recurrente</p>
+          <p className="font-medium">{t("noReminders")}</p>
+          <p className="text-xs mt-1">{t("addMedication")}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -140,7 +143,7 @@ export default function MedicationRemindersPage() {
                   </button>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap pt-1">
-                  <span className="badge badge-sm badge-outline">{frequencyConfig[r.frequency] || r.frequency}</span>
+                  <span className="badge badge-sm badge-outline">{frequencyConfig[r.frequency] ? t(frequencyConfig[r.frequency] as any) : r.frequency}</span>
                   {(r.times || []).map((t: string, i: number) => (
                     <span key={i} className="badge badge-sm badge-primary gap-1">
                       <Clock className="w-3 h-3" /> {String(t).slice(0, 5)}
@@ -158,30 +161,30 @@ export default function MedicationRemindersPage() {
       {showAdd && (
         <div className="modal modal-open">
           <div className="modal-box max-w-md">
-            <h3 className="text-lg font-bold font-display">Nuevo Recordatorio</h3>
+            <h3 className="text-lg font-bold font-display">{t("newTitle")}</h3>
             <form onSubmit={handleCreate} className="space-y-4 mt-4">
               <div className="form-control gap-1">
-                <label className="label pb-0"><span className="label-text font-medium">Medicamento</span></label>
-                <input value={form.medicationName} onChange={(e) => setForm({ ...form, medicationName: e.target.value })} placeholder="Ej: Metformina 500mg" className="input input-bordered w-full text-sm" required />
+                <label className="label pb-0"><span className="label-text font-medium">{t("medication")}</span></label>
+                <input value={form.medicationName} onChange={(e) => setForm({ ...form, medicationName: e.target.value })} placeholder={t("medicationPlaceholder")} className="input input-bordered w-full text-sm" required />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="form-control gap-1">
-                  <label className="label pb-0"><span className="label-text font-medium">Dosis</span></label>
-                  <input value={form.dosage} onChange={(e) => setForm({ ...form, dosage: e.target.value })} placeholder="1 tableta" className="input input-bordered w-full text-sm" />
+                  <label className="label pb-0"><span className="label-text font-medium">{t("dosage")}</span></label>
+                  <input value={form.dosage} onChange={(e) => setForm({ ...form, dosage: e.target.value })} placeholder={t("dosagePlaceholder")} className="input input-bordered w-full text-sm" />
                 </div>
                 <div className="form-control gap-1">
-                  <label className="label pb-0"><span className="label-text font-medium">Frecuencia</span></label>
+                  <label className="label pb-0"><span className="label-text font-medium">{t("frequency")}</span></label>
                   <select value={form.frequency} onChange={(e) => setForm({ ...form, frequency: e.target.value })} className="select select-bordered w-full text-sm">
-                    {Object.entries(frequencyConfig).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                    {Object.entries(frequencyConfig).map(([k, v]) => <option key={k} value={k}>{t(v as any)}</option>)}
                   </select>
                 </div>
               </div>
               <div className="form-control gap-1">
-                <label className="label pb-0"><span className="label-text font-medium">Horarios</span></label>
+                <label className="label pb-0"><span className="label-text font-medium">{t("schedules")}</span></label>
                 <div className="space-y-2">
-                  {form.times.map((t, i) => (
+                  {form.times.map((tm, i) => (
                     <div key={i} className="flex gap-2 items-center">
-                      <input type="time" value={t} onChange={(e) => updateTime(i, e.target.value)} className="input input-bordered flex-1 text-sm" />
+                      <input type="time" value={tm} onChange={(e) => updateTime(i, e.target.value)} className="input input-bordered flex-1 text-sm" />
                       {form.times.length > 1 && (
                         <button type="button" onClick={() => removeTime(i)} className="btn btn-ghost btn-xs text-error">
                           <X className="w-4 h-4" />
@@ -189,15 +192,15 @@ export default function MedicationRemindersPage() {
                       )}
                     </div>
                   ))}
-                  <button type="button" onClick={addTime} className="btn btn-outline btn-xs">+ Agregar horario</button>
+                  <button type="button" onClick={addTime} className="btn btn-outline btn-xs">{t("addSchedule")}</button>
                 </div>
               </div>
               <div className="form-control gap-1">
-                <label className="label pb-0"><span className="label-text font-medium">Fecha fin (opcional)</span></label>
+                <label className="label pb-0"><span className="label-text font-medium">{t("endDate")}</span></label>
                 <input type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} className="input input-bordered w-full text-sm" />
               </div>
               <div className="form-control gap-1">
-                <label className="label pb-0"><span className="label-text font-medium">Notas</span></label>
+                <label className="label pb-0"><span className="label-text font-medium">{tCommon("notes")}</span></label>
                 <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} className="textarea textarea-bordered w-full text-sm" />
               </div>
               {error && (
@@ -206,9 +209,9 @@ export default function MedicationRemindersPage() {
                 </div>
               )}
               <div className="flex justify-end gap-2 pt-2 border-t border-base-300">
-                <button type="button" onClick={() => setShowAdd(false)} className="btn btn-ghost btn-sm">Cancelar</button>
+                <button type="button" onClick={() => setShowAdd(false)} className="btn btn-ghost btn-sm">{tCommon("cancel")}</button>
                 <button type="submit" disabled={saving} className="btn btn-primary btn-sm">
-                  {saving && <span className="loading loading-spinner loading-xs" />} Guardar
+                  {saving && <span className="loading loading-spinner loading-xs" />} {tCommon("save")}
                 </button>
               </div>
             </form>

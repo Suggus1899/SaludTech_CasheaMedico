@@ -12,31 +12,34 @@ import {
 } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { formatCurrency } from "../../../lib/utils";
+import { useTranslations } from "next-intl";
 import type { MedicalService, MedicalSupply } from "../../../types/patient";
 
 type Tab = "services" | "supplies";
 
 const serviceCategories = [
-  { value: "", label: "Todas" },
-  { value: "CONSULTATION", label: "Consultas" },
-  { value: "LAB_TEST", label: "Laboratorios" },
-  { value: "DENTAL", label: "Dental" },
-  { value: "IMAGING", label: "Imágenes" },
-  { value: "PROCEDURE", label: "Procedimientos" },
-  { value: "VACCINATION", label: "Vacunas" },
+  { value: "", labelKey: "catAll" },
+  { value: "CONSULTATION", labelKey: "catConsultation" },
+  { value: "LAB_TEST", labelKey: "catLabTest" },
+  { value: "DENTAL", labelKey: "catDental" },
+  { value: "IMAGING", labelKey: "catImaging" },
+  { value: "PROCEDURE", labelKey: "catProcedure" },
+  { value: "VACCINATION", labelKey: "catVaccination" },
 ];
 
 const supplyCategories = [
-  { value: "", label: "Todos" },
-  { value: "MEDICATION", label: "Medicamentos" },
-  { value: "DEVICE", label: "Dispositivos" },
-  { value: "SUPPLY", label: "Insumos" },
-  { value: "OXYGEN", label: "Oxígeno" },
-  { value: "NUTRITION", label: "Nutrición" },
-  { value: "PERSONAL_CARE", label: "Cuidado Personal" },
+  { value: "", labelKey: "catAllM" },
+  { value: "MEDICATION", labelKey: "catMedication" },
+  { value: "DEVICE", labelKey: "catDevice" },
+  { value: "SUPPLY", labelKey: "catSupply" },
+  { value: "OXYGEN", labelKey: "catOxygen" },
+  { value: "NUTRITION", labelKey: "catNutrition" },
+  { value: "PERSONAL_CARE", labelKey: "catPersonalCare" },
 ];
 
 export default function CatalogoPage() {
+  const t = useTranslations("Catalog");
+  const tCommon = useTranslations("Common");
   const [tab, setTab] = useState<Tab>("services");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
@@ -76,15 +79,15 @@ export default function CatalogoPage() {
   return (
     <div className="space-y-5">
       <Link href="/dashboard" className="btn btn-ghost btn-sm -ml-2">
-        <ArrowLeft className="w-4 h-4" /> Volver
+        <ArrowLeft className="w-4 h-4" /> {tCommon("back")}
       </Link>
 
       <div>
         <h1 className="text-xl font-bold text-foreground font-display">
-          Catálogo Médico
+          {t("title")}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Busca servicios e insumos en todos los comercios
+          {t("subtitle")}
         </p>
       </div>
 
@@ -95,7 +98,7 @@ export default function CatalogoPage() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar (ej: cardiología, losartán, limpieza dental)..."
+          placeholder={t("searchPlaceholder")}
           className="input input-bordered w-full pl-10 text-sm"
         />
       </div>
@@ -107,14 +110,14 @@ export default function CatalogoPage() {
           className={`tab ${tab === "services" ? "tab-active" : ""}`}
         >
           <Stethoscope className="w-4 h-4 mr-1.5 inline" />
-          Servicios
+          {t("services")}
         </button>
         <button
           onClick={() => { setTab("supplies"); setCategory(""); }}
           className={`tab ${tab === "supplies" ? "tab-active" : ""}`}
         >
           <Pill className="w-4 h-4 mr-1.5 inline" />
-          Insumos
+          {t("supplies")}
         </button>
       </div>
 
@@ -126,7 +129,7 @@ export default function CatalogoPage() {
             onClick={() => setCategory(c.value)}
             className={`btn btn-xs ${category === c.value ? "btn-primary" : "btn-outline"}`}
           >
-            {c.label}
+            {t(c.labelKey as any)}
           </button>
         ))}
       </div>
@@ -138,12 +141,12 @@ export default function CatalogoPage() {
         </div>
       ) : results.length === 0 ? (
         <p className="text-center text-muted-foreground py-8 text-sm">
-          No se encontraron resultados
+          {t("noResults")}
         </p>
       ) : (
         <div data-tour="catalog-results" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <p className="text-xs text-muted-foreground">
-            {results.length} resultado(s)
+            {t("resultsCount", { count: results.length })}
           </p>
           {tab === "services"
             ? services.map((svc) => (
@@ -198,7 +201,7 @@ export default function CatalogoPage() {
                         {sup.requiresPrescription && (
                           <span className="badge badge-warning badge-xs gap-1">
                             <AlertTriangle className="w-2.5 h-2.5" />
-                            Receta
+                            {tCommon("receta")}
                           </span>
                         )}
                       </div>

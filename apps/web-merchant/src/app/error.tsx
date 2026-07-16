@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AlertCircle, RotateCcw } from "lucide-react";
 
 export default function Error({
@@ -9,6 +10,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("Errors");
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="max-w-md w-full text-center space-y-6">
@@ -19,10 +21,10 @@ export default function Error({
         </div>
         <div className="space-y-2">
           <h1 className="text-xl font-bold text-foreground">
-            Error del sistema
+            {t("systemError")}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {error.message || "Ocurrió un error inesperado."}
+            {error.message || t("unexpectedError")}
           </p>
           {error.digest && (
             <p className="text-xs text-muted-foreground/60">
@@ -35,7 +37,7 @@ export default function Error({
           className="btn btn-primary gap-2"
         >
           <RotateCcw className="w-4 h-4" />
-          Reintentar
+          {t("retry")}
         </button>
       </div>
     </div>

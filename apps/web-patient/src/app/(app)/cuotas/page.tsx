@@ -13,9 +13,12 @@ import {
 import { useFetchData } from "@saludtech/shared";
 import { getApiUrl } from "../../../lib/api";
 import { formatWithVES, formatDate } from "../../../lib/utils";
+import { useTranslations } from "next-intl";
 import type { Installment } from "../../../types/patient";
 
 export default function CuotasPage() {
+  const t = useTranslations("Installments");
+  const tCommon = useTranslations("Common");
   const [tab, setTab] = useState<"pending" | "overdue">("pending");
   const { data, loading, error, refetch } = useFetchData<Installment[]>(
     getApiUrl("patient/transactions/my/installments/pending")
@@ -31,11 +34,11 @@ export default function CuotasPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-foreground">
-          Mis Cuotas
+          {t("title")}
         </h1>
         <button
           onClick={() => refetch()}
-          aria-label="Recargar"
+          aria-label={t("reload")}
           className="btn btn-ghost btn-sm btn-square"
         >
           <RefreshCw className="w-4 h-4" />
@@ -50,7 +53,7 @@ export default function CuotasPage() {
           className={`tab ${tab === "pending" ? "tab-active" : ""}`}
           onClick={() => setTab("pending")}
         >
-          Pendientes ({pending.length})
+          {t("tabPending", { count: pending.length })}
         </button>
         <button
           role="tab"
@@ -58,7 +61,7 @@ export default function CuotasPage() {
           className={`tab ${tab === "overdue" ? "tab-active" : ""}`}
           onClick={() => setTab("overdue")}
         >
-          En mora ({overdue.length})
+          {t("tabOverdue", { count: overdue.length })}
         </button>
       </div>
 
@@ -70,9 +73,9 @@ export default function CuotasPage() {
       ) : error ? (
         <div className="flex flex-col items-center py-12 gap-4">
           <WifiOff className="w-12 h-12 text-muted-foreground" />
-          <p className="text-muted-foreground">No se pudieron cargar las cuotas.</p>
+          <p className="text-muted-foreground">{t("loadError")}</p>
           <button onClick={() => refetch()} className="btn btn-primary btn-sm">
-            Reintentar
+            {tCommon("retry")}
           </button>
         </div>
       ) : current.length === 0 ? (
@@ -83,7 +86,7 @@ export default function CuotasPage() {
             <CalendarCheck className="w-14 h-14 text-muted-foreground" />
           )}
           <p className="text-base text-muted-foreground">
-            {tab === "overdue" ? "Sin cuotas en mora" : "Sin cuotas pendientes"}
+            {tab === "overdue" ? t("noOverdue") : t("noPending")}
           </p>
         </div>
       ) : (
@@ -93,18 +96,18 @@ export default function CuotasPage() {
             <table className="table table-zebra">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Comercio</th>
-                  <th>Monto</th>
-                  <th>Vence</th>
-                  <th>Estado</th>
-                  <th className="text-right">Acción</th>
+                  <th>{t("colNumber")}</th>
+                  <th>{t("colMerchant")}</th>
+                  <th>{t("colAmount")}</th>
+                  <th>{t("colDue")}</th>
+                  <th>{t("colStatus")}</th>
+                  <th className="text-right">{t("colAction")}</th>
                 </tr>
               </thead>
               <tbody>
                 {current.map((inst, idx) => {
                   const isOverdue = tab === "overdue";
-                  const merchant = inst.transaction?.merchant?.tradeName ?? "Comercio";
+                  const merchant = inst.transaction?.merchant?.tradeName ?? t("merchant");
                   return (
                     <tr key={inst.id} data-tour={idx === 0 ? "installment-card" : undefined}>
                       <td className="font-semibold">#{inst.installmentNumber ?? "—"}</td>
@@ -113,12 +116,12 @@ export default function CuotasPage() {
                       <td className="text-sm">{formatDate(inst.dueDate)}</td>
                       <td>
                         <span className={`badge badge-sm ${isOverdue ? "badge-error" : "badge-warning"}`}>
-                          {isOverdue ? "En mora" : "Pendiente"}
+                          {isOverdue ? t("overdue") : t("pending")}
                         </span>
                       </td>
                       <td className="text-right">
                         <Link href={`/cuotas/${inst.id}`} className="btn btn-primary btn-xs">
-                          Pagar
+                          {t("pay")}
                         </Link>
                       </td>
                     </tr>
@@ -132,7 +135,7 @@ export default function CuotasPage() {
           <ul data-tour="installment-list" className="lg:hidden space-y-3">
             {current.map((inst, idx) => {
               const isOverdue = tab === "overdue";
-              const merchant = inst.transaction?.merchant?.tradeName ?? "Comercio";
+              const merchant = inst.transaction?.merchant?.tradeName ?? t("merchant");
               return (
                 <li key={inst.id} data-tour={idx === 0 ? "installment-card" : undefined}>
                   <Link
@@ -155,11 +158,10 @@ export default function CuotasPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-foreground font-display">
-                          Cuota #
-                          {inst.installmentNumber ?? "—"} · {merchant}
+                          {t("installmentNumber")}{inst.installmentNumber ?? "—"} · {merchant}
                         </p>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          Vence: {formatDate(inst.dueDate)}
+                          {t("dueLabel", { date: formatDate(inst.dueDate) })}
                         </p>
                       </div>
                       <div className="text-right shrink-0">

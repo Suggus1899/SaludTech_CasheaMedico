@@ -3,19 +3,22 @@
 import { useState } from "react";
 import { UserPlus, List, X } from "@phosphor-icons/react";
 import { Logo } from "@saludtech/ui";
-
-const links = [
-  { href: "/#como-funciona", label: "Cómo funciona" },
-  { href: "/lineas-de-credito", label: "Líneas de crédito" },
-  { href: "/lineas-de-credito#simulador", label: "Simulador" },
-  { href: "/telemedicina", label: "Telemedicina" },
-  { href: "/club", label: "Club" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/para-comercios", label: "Comercios" },
-];
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@saludtech/i18n";
 
 export default function MainNavbar() {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("Nav");
+
+  const links = [
+    { href: "/#como-funciona", label: t("howItWorks") },
+    { href: "/lineas-de-credito", label: t("creditLines") },
+    { href: "/lineas-de-credito#simulador", label: t("simulator") },
+    { href: "/telemedicina", label: t("telemedicine") },
+    { href: "/club", label: t("club") },
+    { href: "/faq", label: t("faq") },
+    { href: "/para-comercios", label: t("merchants") },
+  ];
 
   return (
     <nav
@@ -44,28 +47,34 @@ export default function MainNavbar() {
 
           {/* CTA desktop */}
           <div className="hidden md:flex items-center gap-3">
+            <LanguageSwitcher />
             <a
               href="/para-comercios"
               className="text-sm font-semibold text-primary hover:underline"
             >
-              Soy Comercio
+              {t("iAmMerchant")}
             </a>
             <a href="/login" className="btn btn-primary btn-sm gap-2">
               <UserPlus className="w-4 h-4" />
-              Regístrate
+              {t("register")}
             </a>
           </div>
 
           {/* Mobile hamburger */}
-          <button
-            type="button"
-            className="md:hidden p-2 rounded-lg hover:bg-slate-100 active:bg-slate-200 transition-colors relative z-10"
-            onClick={() => setOpen((v) => !v)}
-            aria-label={open ? "Cerrar menú" : "Abrir menú"}
-            aria-expanded={open}
-          >
-            {open ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="md:hidden">
+              <LanguageSwitcher />
+            </div>
+            <button
+              type="button"
+              className="md:hidden p-2 rounded-lg hover:bg-slate-100 active:bg-slate-200 transition-colors relative z-10"
+              onClick={() => setOpen((v) => !v)}
+              aria-label={open ? t("closeMenu") : t("openMenu")}
+              aria-expanded={open}
+            >
+              {open ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile menu — animated slide-down */}
@@ -92,14 +101,14 @@ export default function MainNavbar() {
                 href="/para-comercios"
                 className="btn btn-outline btn-primary btn-sm w-full justify-center"
               >
-                Soy Comercio
+                {t("iAmMerchant")}
               </a>
               <a
                 href="/login"
                 className="btn btn-primary btn-sm w-full justify-center gap-2"
               >
                 <UserPlus className="w-4 h-4" />
-                Regístrate
+                {t("register")}
               </a>
             </div>
           </div>

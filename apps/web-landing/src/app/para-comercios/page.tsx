@@ -23,9 +23,11 @@ import {
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import SharedLayout from "../../components/SharedLayout";
+import { useTranslations } from "next-intl";
 
 // ─── Hero Comercios ────────────────────────────────────────────────────────────
 function Hero() {
+  const t = useTranslations("Merchants.hero");
   return (
     <section className="pt-32 pb-20 bg-hero-gradient overflow-hidden relative">
       <div className="absolute inset-0 overflow-hidden">
@@ -35,25 +37,24 @@ function Hero() {
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/15 border border-primary/30 mb-6">
           <Buildings className="w-4 h-4 text-primary" />
-          <span className="text-primary text-xs font-semibold tracking-widest uppercase">Para Comercios · Clínicas · Farmacias</span>
+          <span className="text-primary text-xs font-semibold tracking-widest uppercase">{t("badge")}</span>
         </div>
         <h1 className="font-display text-5xl sm:text-6xl font-bold text-white mb-6 leading-tight">
-          Acepta SaludTech y
+          {t("titleLine1")}
           <br />
           <span className="bg-clip-text text-transparent bg-linear-to-r from-primary to-secondary">
-            aumenta tus ventas +20%
+            {t("titleLine2")}
           </span>
         </h1>
         <p className="text-slate-300 text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-          Ofrece financiamiento sin interés a tus pacientes. SaludTech asume el riesgo,
-          tú recibes el pago completo al instante.
+          {t("subtitle")}
         </p>
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <a
             href="#proceso"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-primary text-white font-bold text-base hover:bg-primary-dark transition-colors shadow-lg shadow-primary/30"
           >
-            Ver cómo afiliarse
+            {t("seeHowToAffiliate")}
             <ArrowRight className="w-5 h-5" />
           </a>
           <a
@@ -61,16 +62,16 @@ function Hero() {
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl border-2 border-white/30 text-white font-bold text-base hover:bg-white/10 transition-colors"
           >
             <Phone className="w-5 h-5" weight="regular" />
-            Hablar con un asesor
+            {t("talkToAdvisor")}
           </a>
         </div>
 
         {/* Stats strip */}
         <div className="grid grid-cols-3 gap-4 sm:gap-6 mt-12 sm:mt-16 max-w-2xl mx-auto">
           {[
-            { value: "+20%", label: "Aumento en ventas" },
-            { value: "48h", label: "Activación típica" },
-            { value: "0", label: "Riesgo para ti" },
+            { value: t("stat1Value"), label: t("stat1Label") },
+            { value: t("stat2Value"), label: t("stat2Label") },
+            { value: t("stat3Value"), label: t("stat3Label") },
           ].map((s) => (
             <div key={s.label} className="text-center">
               <div className="text-3xl font-display font-bold text-white">{s.value}</div>
@@ -85,46 +86,48 @@ function Hero() {
 
 // ─── Beneficios ────────────────────────────────────────────────────────────────
 function Beneficios() {
+  const t = useTranslations("Merchants.benefits");
+
   const items = [
     {
       icon: TrendUp,
-      title: "Aumenta tu ticket promedio",
-      desc: "Los pacientes que antes diferían la consulta o el medicamento ahora compran sin dudarlo. Tu ticket promedio sube porque no hay fricción de pago.",
+      title: t("item1Title"),
+      desc: t("item1Desc"),
       color: "text-secondary",
       bg: "bg-secondary-50",
     },
     {
       icon: CreditCard,
-      title: "Liquidación garantizada",
-      desc: "SaludTech te paga el 100% de la transacción (menos el MDR de 3.5%). Tú no gestionas cuotas ni cobros al paciente.",
+      title: t("item2Title"),
+      desc: t("item2Desc"),
       color: "text-primary",
       bg: "bg-primary-50",
     },
     {
       icon: Users,
-      title: "Acceso a más pacientes",
-      desc: "Los usuarios de SaludTech buscan activamente comercios aliados en la página. Tu clínica o farmacia aparece geolocalizada para usuarios cercanos.",
+      title: t("item3Title"),
+      desc: t("item3Desc"),
       color: "text-accent",
       bg: "bg-accent-50",
     },
     {
       icon: QrCode,
-      title: "Cobro en segundos con QR",
-      desc: "Genera el QR desde tu portal de comercio. El paciente lo escanea y confirma. Sin POS adicional, sin integración compleja.",
+      title: t("item4Title"),
+      desc: t("item4Desc"),
       color: "text-primary",
       bg: "bg-primary-50",
     },
     {
       icon: ShieldCheck,
-      title: "Sin riesgo de impago",
-      desc: "El riesgo crediticio del paciente lo asume SaludTech, no tú. Una vez confirmada la transacción, el pago está garantizado.",
+      title: t("item5Title"),
+      desc: t("item5Desc"),
       color: "text-secondary",
       bg: "bg-secondary-50",
     },
     {
       icon: Clock,
-      title: "Activación en 48 horas",
-      desc: "Proceso 100% digital. Sin visitas a oficinas, sin papeleo físico. Sube los documentos, firma el contrato digital y listo.",
+      title: t("item6Title"),
+      desc: t("item6Desc"),
       color: "text-accent",
       bg: "bg-accent-50",
     },
@@ -135,10 +138,10 @@ function Beneficios() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-16">
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
-            ¿Por qué elegir SaludTech para tu negocio?
+            {t("title")}
           </h2>
           <p className="text-slate-500 text-lg">
-            El método de pago que convierte más pacientes en clientes.
+            {t("subtitle")}
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -159,36 +162,38 @@ function Beneficios() {
 
 // ─── Cómo funciona para el comercio ──────────────────────────────────────────
 function ComoFunciona() {
+  const t = useTranslations("Merchants.howItWorks");
+
   const steps = [
     {
       num: "01",
-      title: "El paciente llega a tu consulta",
-      desc: "El paciente ya tiene SaludTech instalado y con su línea de crédito aprobada. Decide pagar con SaludTech.",
+      title: t("step1Title"),
+      desc: t("step1Desc"),
     },
     {
       num: "02",
-      title: "Generas el QR de cobro",
-      desc: "Desde tu portal web de comercio ingresas el monto y descripción del servicio. El sistema genera un QR único e irrepetible (válido 5 min).",
+      title: t("step2Title"),
+      desc: t("step2Desc"),
     },
     {
       num: "03",
-      title: "El paciente escanea y confirma",
-      desc: "El paciente escanea el QR con la página de SaludTech, ve el desglose (inicial + cuotas) y confirma el pago con su PIN.",
+      title: t("step3Title"),
+      desc: t("step3Desc"),
     },
     {
       num: "04",
-      title: "Recibes confirmación instantánea",
-      desc: "Tu portal muestra el pago confirmado en tiempo real. Puedes emitir la factura y entregar el servicio.",
+      title: t("step4Title"),
+      desc: t("step4Desc"),
     },
     {
       num: "05",
-      title: "SaludTech gestiona las cuotas",
-      desc: "A partir de aquí SaludTech cobra las cuotas al paciente cada 14 días. Tú ya cobraste — sin intervención adicional de tu parte.",
+      title: t("step5Title"),
+      desc: t("step5Desc"),
     },
     {
       num: "06",
-      title: "Recibes la liquidación",
-      desc: "En el ciclo de liquidación acordado (semanal o quincenal), SaludTech transfiere el monto acumulado menos el MDR (3.5%).",
+      title: t("step6Title"),
+      desc: t("step6Desc"),
     },
   ];
 
@@ -197,13 +202,13 @@ function ComoFunciona() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-primary-100 text-primary mb-4">
-            <QrCode className="w-3.5 h-3.5" weight="duotone" /> Flujo de cobro
+            <QrCode className="w-3.5 h-3.5" weight="duotone" /> {t("tag")}
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
-            Cómo funciona el cobro con SaludTech
+            {t("title")}
           </h2>
           <p className="text-slate-500 text-lg">
-            De la consulta al cobro en menos de 60 segundos.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -233,39 +238,41 @@ function ComoFunciona() {
 
 // ─── Proceso de afiliación ────────────────────────────────────────────────────
 function ProcesoAfiliacion() {
+  const t = useTranslations("Merchants.affiliation");
+
   const pasos = [
     {
       num: 1,
-      title: "Completa el formulario",
-      desc: "Llena el formulario de registro online. Toma menos de 5 minutos.",
+      title: t("step1Title"),
+      desc: t("step1Desc"),
       icon: FileText,
     },
     {
       num: 2,
-      title: "Sube los documentos",
-      desc: "Registro mercantil, acta de junta directiva, RIF actualizado, cédula del representante y factura fiscal.",
+      title: t("step2Title"),
+      desc: t("step2Desc"),
       icon: CheckCircle,
     },
     {
       num: 3,
-      title: "Firma el contrato digital",
-      desc: "Revisas y firmas el contrato de manera 100% digital y segura. Sin visitas ni papeles.",
+      title: t("step3Title"),
+      desc: t("step3Desc"),
       icon: ShieldCheck,
     },
     {
       num: 4,
-      title: "Recibe acceso al portal",
-      desc: "En 48 horas recibes tus credenciales para el portal de comercio y ya puedes generar QRs.",
+      title: t("step4Title"),
+      desc: t("step4Desc"),
       icon: Buildings,
     },
   ];
 
   const documentos = [
-    { nombre: "Registro mercantil", desc: "o documento constitutivo de la empresa" },
-    { nombre: "Acta de junta directiva", desc: "última acta vigente" },
-    { nombre: "RIF actualizado", desc: "en PDF · uno por sucursal con razón social distinta" },
-    { nombre: "Cédula vigente", desc: "del o los representantes legales" },
-    { nombre: "Factura fiscal", desc: "capacidad para emitir factura fiscal (manual o digital)" },
+    { nombre: t("doc1Name"), desc: t("doc1Desc") },
+    { nombre: t("doc2Name"), desc: t("doc2Desc") },
+    { nombre: t("doc3Name"), desc: t("doc3Desc") },
+    { nombre: t("doc4Name"), desc: t("doc4Desc") },
+    { nombre: t("doc5Name"), desc: t("doc5Desc") },
   ];
 
   return (
@@ -273,13 +280,13 @@ function ProcesoAfiliacion() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-white/10 text-white/70 mb-4">
-            <Star className="w-3.5 h-3.5" weight="duotone" /> Afiliación
+            <Star className="w-3.5 h-3.5" weight="duotone" /> {t("tag")}
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-bold mb-4">
-            Afíliate en 4 pasos
+            {t("title")}
           </h2>
           <p className="text-white/60 text-lg">
-            Proceso 100% digital. Activación típica en 48 horas.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -292,7 +299,7 @@ function ProcesoAfiliacion() {
                   <paso.icon className="w-6 h-6 text-primary-light" />
                 </div>
                 <div>
-                  <div className="text-white/40 text-xs font-semibold mb-1">PASO {paso.num}</div>
+                  <div className="text-white/40 text-xs font-semibold mb-1">{t("stepLabel", { num: paso.num })}</div>
                   <h4 className="font-display font-bold text-white mb-1">{paso.title}</h4>
                   <p className="text-white/60 text-sm leading-relaxed">{paso.desc}</p>
                 </div>
@@ -304,14 +311,14 @@ function ProcesoAfiliacion() {
               className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-primary text-white font-bold text-base hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20 mt-4"
             >
               <Envelope className="w-5 h-5" />
-              Iniciar mi registro
+              {t("startRegistration")}
             </a>
           </div>
 
           {/* Documentos requeridos */}
           <div className="bg-white/5 rounded-3xl border border-white/10 p-7">
-            <h3 className="font-display font-bold text-white text-xl mb-2">Documentos requeridos</h3>
-            <p className="text-white/50 text-sm mb-6">Ten estos documentos listos para agilizar el proceso.</p>
+            <h3 className="font-display font-bold text-white text-xl mb-2">{t("documentsTitle")}</h3>
+            <p className="text-white/50 text-sm mb-6">{t("documentsSubtitle")}</p>
             <div className="space-y-4">
               {documentos.map((doc) => (
                 <div key={doc.nombre} className="flex gap-3">
@@ -325,7 +332,7 @@ function ProcesoAfiliacion() {
             </div>
 
             <div className="mt-6 pt-6 border-t border-white/10">
-              <p className="text-white/60 text-sm">¿Tienes dudas sobre los documentos?</p>
+              <p className="text-white/60 text-sm">{t("doubtsAboutDocs")}</p>
               <a href="mailto:comercios@saludtech.app" className="flex items-center gap-2 text-primary-light text-sm font-semibold mt-2 hover:underline">
                 <Envelope className="w-4 h-4" />
                 comercios@saludtech.app
@@ -344,28 +351,21 @@ function ProcesoAfiliacion() {
 
 // ─── Categorías aceptadas ──────────────────────────────────────────────────────
 function Categorias() {
+  const t = useTranslations("Merchants.categories");
+
   const cats = [
-    "Farmacia / Droguería",
-    "Clínica privada",
-    "Consultorio médico",
-    "Laboratorio clínico",
-    "Imagenología / Radiología",
-    "Fisioterapia",
-    "Odontología",
-    "Óptica",
-    "Centro de diálisis",
-    "Servicio de Elder Care",
-    "Centro de triage / urgencias",
-    "Nutrición y dietética",
+    t("cat1"), t("cat2"), t("cat3"), t("cat4"),
+    t("cat5"), t("cat6"), t("cat7"), t("cat8"),
+    t("cat9"), t("cat10"), t("cat11"), t("cat12"),
   ];
 
   return (
     <section className="py-20 bg-surface">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="font-display text-3xl sm:text-4xl font-bold text-dark mb-4">
-          Categorías de comercios aceptados
+          {t("title")}
         </h2>
-        <p className="text-slate-500 mb-10">Si tu negocio es del sector salud, SaludTech es para ti.</p>
+        <p className="text-slate-500 mb-10">{t("subtitle")}</p>
         <div className="flex flex-wrap justify-center gap-3">
           {cats.map((cat) => (
             <span
@@ -383,15 +383,15 @@ function Categorias() {
 
 // ─── CTA final ────────────────────────────────────────────────────────────────
 function CTAFinal() {
+  const t = useTranslations("Merchants.cta");
   return (
     <section className="py-20 bg-primary">
       <div className="max-w-3xl mx-auto px-4 text-center">
         <h2 className="font-display text-4xl font-bold text-white mb-4">
-          ¿Listo para crecer con SaludTech?
+          {t("title")}
         </h2>
         <p className="text-white/70 text-lg mb-8">
-          Únete a la red de comercios de salud más innovadora de Venezuela.
-          Sin riesgos. Sin papeles. En 48 horas.
+          {t("subtitle")}
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <a
@@ -399,13 +399,13 @@ function CTAFinal() {
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white text-primary font-bold text-base hover:bg-primary-50 transition-colors"
           >
             <Envelope className="w-5 h-5" />
-            Afiliar mi comercio
+            {t("affiliateMerchant")}
           </a>
           <Link
             href="/"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl border-2 border-white/40 text-white font-bold text-base hover:bg-white/10 transition-colors"
           >
-            Ver landing principal
+            {t("seeMainLanding")}
             <CaretRight className="w-5 h-5" />
           </Link>
         </div>
@@ -416,15 +416,17 @@ function CTAFinal() {
 
 // ─── Red de Aliados ───────────────────────────────────────────────────────────
 function RedAliados() {
+  const t = useTranslations("Merchants.allies");
+
   const categorias = [
-    { label: "Farmacia", icon: Pill, count: "48" },
-    { label: "Clínica", icon: Buildings, count: "32" },
-    { label: "Especialistas", icon: Stethoscope, count: "67" },
-    { label: "Laboratorio", icon: Waveform, count: "24" },
-    { label: "Imagenología", icon: ShieldCheck, count: "18" },
-    { label: "Fisioterapia", icon: Heart, count: "21" },
-    { label: "Odontología", icon: Star, count: "30" },
-    { label: "Elder Care", icon: Shield, count: "15" },
+    { label: t("cat1Label"), icon: Pill, count: "48" },
+    { label: t("cat2Label"), icon: Buildings, count: "32" },
+    { label: t("cat3Label"), icon: Stethoscope, count: "67" },
+    { label: t("cat4Label"), icon: Waveform, count: "24" },
+    { label: t("cat5Label"), icon: ShieldCheck, count: "18" },
+    { label: t("cat6Label"), icon: Heart, count: "21" },
+    { label: t("cat7Label"), icon: Star, count: "30" },
+    { label: t("cat8Label"), icon: Shield, count: "15" },
   ];
 
   return (
@@ -433,19 +435,19 @@ function RedAliados() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
           <div>
             <div className="section-tag bg-secondary-50 text-secondary mb-3">
-              <Buildings className="w-3.5 h-3.5" /> Red de aliados
+              <Buildings className="w-3.5 h-3.5" /> {t("tag")}
             </div>
             <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark">
-              Estas clínicas y farmacias
+              {t("titleLine1")}
               <br />
-              <span className="text-primary">ya aceptan SaludTech</span>
+              <span className="text-primary">{t("titleLine2")}</span>
             </h2>
           </div>
           <a
             href="#proceso"
             className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-primary text-primary font-bold text-sm hover:bg-primary hover:text-white transition-colors"
           >
-            Afiliar mi comercio
+            {t("affiliateMerchant")}
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>
@@ -461,14 +463,14 @@ function RedAliados() {
                 <cat.icon className="w-5 h-5 text-slate-500 group-hover:text-primary transition-colors" />
               </div>
               <span className="text-xs font-semibold text-slate-600 group-hover:text-primary transition-colors text-center leading-tight">{cat.label}</span>
-              <span className="text-xs text-slate-400">{cat.count} aliados</span>
+              <span className="text-xs text-slate-400">{t("alliesCount", { count: cat.count })}</span>
             </button>
           ))}
         </div>
 
         {/* Logos placeholder strip */}
         <div className="relative overflow-hidden rounded-2xl bg-surface border border-slate-100 py-6 px-8">
-          <p className="text-center text-xs text-slate-400 uppercase tracking-wider font-semibold mb-6">Algunos de nuestros comercios aliados</p>
+          <p className="text-center text-xs text-slate-400 uppercase tracking-wider font-semibold mb-6">{t("someAllies")}</p>
           <div className="flex flex-wrap justify-center items-center gap-6 opacity-60">
             {[
               "Farmatodo", "Locatel", "Clinica El Ávila", "Centro Médico",
@@ -487,11 +489,13 @@ function RedAliados() {
 
 // ─── Para Comercios Banner ─────────────────────────────────────────────────────
 function ParaComerciosBanner() {
+  const t = useTranslations("Merchants.banner");
+
   const benefits = [
-    { icon: TrendUp, title: "Aumenta tus ventas", desc: "Clientes que antes no podían pagar ahora sí pueden. Accede a más pacientes." },
-    { icon: CreditCard, title: "Liquidación garantizada", desc: "SaludTech te paga el total de la venta. Tú no asumes el riesgo de cuotas." },
-    { icon: QrCode, title: "QR en segundos", desc: "Genera un código QR desde tu portal y el paciente paga desde su página al instante." },
-    { icon: ShieldCheck, title: "Sin papeleo", desc: "Registro 100% digital. Tu comercio activo en menos de 48 horas." },
+    { icon: TrendUp, title: t("benefit1Title"), desc: t("benefit1Desc") },
+    { icon: CreditCard, title: t("benefit2Title"), desc: t("benefit2Desc") },
+    { icon: QrCode, title: t("benefit3Title"), desc: t("benefit3Desc") },
+    { icon: ShieldCheck, title: t("benefit4Title"), desc: t("benefit4Desc") },
   ];
 
   return (
@@ -501,16 +505,15 @@ function ParaComerciosBanner() {
           <div className="space-y-8">
             <div>
               <div className="section-tag bg-white/10 text-white/80 border border-white/20 mb-4">
-                <Buildings className="w-3.5 h-3.5" /> Para Comercios
+                <Buildings className="w-3.5 h-3.5" /> {t("tag")}
               </div>
               <h2 className="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
-                Lleva SaludTech
+                {t("titleLine1")}
                 <br />
-                a tu clínica o farmacia
+                {t("titleLine2")}
               </h2>
               <p className="text-white/60 text-lg leading-relaxed">
-                Únete a la red de comercios de salud más innovadora de Venezuela.
-                Sin riesgos, sin cobros adicionales, con liquidación garantizada.
+                {t("subtitle")}
               </p>
             </div>
 
@@ -529,11 +532,11 @@ function ParaComerciosBanner() {
             <div className="flex flex-wrap gap-4">
               <a href="mailto:comercios@saludtech.app" className="btn btn-primary gap-2 px-7 py-4 text-base h-auto">
                 <Envelope className="w-5 h-5" />
-                Registrar mi comercio
+                {t("registerMerchant")}
               </a>
               <a href="tel:+58000SALUDTECH" className="btn btn-ghost text-white border-white/30 hover:bg-white/10 gap-2 px-7 py-4 text-base h-auto">
                 <Phone className="w-5 h-5" />
-                Hablar con un asesor
+                {t("talkToAdvisor")}
               </a>
             </div>
           </div>
@@ -546,18 +549,18 @@ function ParaComerciosBanner() {
                   <Buildings className="w-5 h-5 text-primary-light" />
                 </div>
                 <div>
-                  <p className="text-white font-semibold text-sm">Portal Comercio</p>
-                  <p className="text-white/40 text-xs">Clínica Santa María · Activo</p>
+                  <p className="text-white font-semibold text-sm">{t("portalTitle")}</p>
+                  <p className="text-white/40 text-xs">{t("portalSubtitle")}</p>
                 </div>
-                <div className="ml-auto px-2 py-1 rounded-full bg-secondary/20 text-secondary text-xs font-bold">EN LÍNEA</div>
+                <div className="ml-auto px-2 py-1 rounded-full bg-secondary/20 text-secondary text-xs font-bold">{t("online")}</div>
               </div>
 
               <div className="grid grid-cols-2 gap-3 mb-5">
                 {[
-                  { label: "Ventas este mes", value: "$3,240", icon: TrendUp, color: "text-secondary" },
-                  { label: "Transacciones", value: "47", icon: CreditCard, color: "text-primary-light" },
-                  { label: "Pacientes nuevos", value: "12", icon: Users, color: "text-accent-light" },
-                  { label: "Liquidación pend.", value: "$890", icon: Clock, color: "text-amber-400" },
+                  { label: t("stat1Label"), value: "$3,240", icon: TrendUp, color: "text-secondary" },
+                  { label: t("stat2Label"), value: "47", icon: CreditCard, color: "text-primary-light" },
+                  { label: t("stat3Label"), value: "12", icon: Users, color: "text-accent-light" },
+                  { label: t("stat4Label"), value: "$890", icon: Clock, color: "text-amber-400" },
                 ].map((stat) => (
                   <div key={stat.label} className="bg-white/8 rounded-xl p-3">
                     <stat.icon className={`w-4 h-4 ${stat.color} mb-2`} />
@@ -569,8 +572,8 @@ function ParaComerciosBanner() {
 
               <div className="bg-white/8 rounded-2xl p-4 flex items-center justify-between">
                 <div>
-                  <p className="text-white/60 text-xs mb-1">Generar QR de cobro</p>
-                  <p className="text-white font-semibold">$150.00 · Consulta cardiología</p>
+                  <p className="text-white/60 text-xs mb-1">{t("generateQr")}</p>
+                  <p className="text-white font-semibold">{t("qrDescription")}</p>
                 </div>
                 <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
                   <QrCode className="w-6 h-6 text-white" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Sidebar } from "../../components/shared/Sidebar";
 import { Topbar } from "../../components/shared/Topbar";
 import { X } from "lucide-react";
@@ -10,6 +11,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const tNav = useTranslations("Nav");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -25,7 +27,7 @@ export default function DashboardLayout({
 
       {/* Sidebar — desktop */}
       <aside className="hidden md:flex w-60 border-r border-border bg-card flex-col shrink-0">
-        <Sidebar onLogout={() => {}} onSettings={() => {}} />
+        <Sidebar onLogout={() => {}} />
       </aside>
 
       {/* Sidebar — mobile drawer */}
@@ -33,18 +35,18 @@ export default function DashboardLayout({
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border flex flex-col transform transition-transform duration-300 md:hidden ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
-        aria-label="Menú lateral"
+        aria-label={tNav("sidebar")}
       >
         <div className="flex items-center justify-end p-4 border-b border-border">
           <button
             onClick={() => setSidebarOpen(false)}
-            aria-label="Cerrar menú"
+            aria-label={tNav("closeMenu")}
             className="p-2 rounded-lg hover:bg-muted transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
-        <Sidebar onLogout={() => {}} onSettings={() => {}} />
+        <Sidebar onLogout={() => {}} />
       </aside>
 
       {/* Main Content */}

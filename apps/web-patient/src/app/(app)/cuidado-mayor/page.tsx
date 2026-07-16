@@ -23,59 +23,62 @@ import {
   elderCareAccentColor,
   elderCareEmptyColor,
 } from "../../../lib/creditLineStyles";
+import { useTranslations } from "next-intl";
 import type { Subscription, UserResponse } from "../../../types/patient";
 
 interface ServiceDef {
   type: keyof typeof elderCareServiceStyles;
-  label: string;
+  labelKey: string;
+  descKey: string;
   icon: LucideIcon;
-  description: string;
   defaultAmount: number;
 }
 
 const services: ServiceDef[] = [
   {
     type: "NURSE",
-    label: "Enfermera",
+    labelKey: "serviceNurse",
+    descKey: "serviceNurseDesc",
     icon: Heart,
-    description: "Cuidado de salud profesional en el hogar",
     defaultAmount: 120,
   },
   {
     type: "CAREGIVER",
-    label: "Cuidador/a",
+    labelKey: "serviceCaregiver",
+    descKey: "serviceCaregiverDesc",
     icon: HeartHandshake,
-    description: "Acompañamiento y asistencia diaria",
     defaultAmount: 90,
   },
   {
     type: "PHYSIOTHERAPY",
-    label: "Fisioterapia",
+    labelKey: "servicePhysiotherapy",
+    descKey: "servicePhysiotherapyDesc",
     icon: Activity,
-    description: "Rehabilitación y ejercicio terapéutico",
     defaultAmount: 100,
   },
   {
     type: "GERIATRIC_SPECIALIST",
-    label: "Geriatría",
+    labelKey: "serviceGeriatric",
+    descKey: "serviceGeriatricDesc",
     icon: Stethoscope,
-    description: "Consulta especializada en adultos mayores",
     defaultAmount: 150,
   },
 ];
 
-const serviceLabels: Record<string, string> = {
-  NURSE: "Enfermera",
-  CAREGIVER: "Cuidador/a",
-  PHYSIOTHERAPY: "Fisioterapia",
-  GERIATRIC_SPECIALIST: "Geriatría",
-  VISITA_DIARIA: "Visita Diaria",
-  ENFERMERIA_24H: "Enfermería 24H",
+const serviceLabelKeys: Record<string, string> = {
+  NURSE: "labelNurse",
+  CAREGIVER: "labelCaregiver",
+  PHYSIOTHERAPY: "labelPhysiotherapy",
+  GERIATRIC_SPECIALIST: "labelGeriatric",
+  VISITA_DIARIA: "labelVisitaDiaria",
+  ENFERMERIA_24H: "labelEnfermeria24h",
 };
 
 const PLACEHOLDER_MERCHANT_ID = "00000000-0000-0000-0000-000000000001";
 
 export default function CuidadoMayorPage() {
+  const t = useTranslations("ElderCare");
+  const tCommon = useTranslations("Common");
   const [tab, setTab] = useState<"services" | "subscriptions">("services");
   const [user, setUser] = useState<UserResponse | null>(null);
 
@@ -132,12 +135,12 @@ export default function CuidadoMayorPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-foreground">
-          Cuidado Mayor
+          {t("title")}
         </h1>
         {tab === "subscriptions" && (
           <button
             onClick={() => refetch()}
-            aria-label="Recargar"
+            aria-label={t("reload")}
             className="btn btn-ghost btn-sm btn-square"
           >
             <RefreshCw className="w-4 h-4" />
@@ -153,7 +156,7 @@ export default function CuidadoMayorPage() {
           className={`tab ${tab === "services" ? "tab-active" : ""}`}
           onClick={() => setTab("services")}
         >
-          Servicios
+          {t("tabServices")}
         </button>
         <button
           role="tab"
@@ -161,7 +164,7 @@ export default function CuidadoMayorPage() {
           className={`tab ${tab === "subscriptions" ? "tab-active" : ""}`}
           onClick={() => setTab("subscriptions")}
         >
-          Mis Suscripciones
+          {t("tabSubscriptions")}
         </button>
       </div>
 
@@ -176,11 +179,10 @@ export default function CuidadoMayorPage() {
           >
             <Shield className="w-9 h-9" />
             <h2 className="text-xl font-bold mt-3">
-              Cuidado para tus seres queridos
+              {t("heroTitle")}
             </h2>
             <p className="text-sm text-white/85 mt-2 leading-relaxed">
-              Suscripciones mensuales para adultos mayores usando tu línea MAYOR CUIDADO.
-              Requiere nivel 4+.
+              {t("heroDesc")}
             </p>
           </div>
 
@@ -190,11 +192,10 @@ export default function CuidadoMayorPage() {
               <Lock className="w-5 h-5 text-warning shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-bold text-foreground font-display">
-                  Nivel {userLevel} — Bloqueado
+                  {t("levelLocked", { level: userLevel })}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Necesitas nivel 4 o superior para suscribirte a servicios de Cuidado Mayor.
-                  Sigue pagando tus cuotas a tiempo para subir de nivel.
+                  {t("levelLockedDesc")}
                 </p>
               </div>
             </div>
@@ -220,14 +221,14 @@ export default function CuidadoMayorPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-foreground font-display">
-                      {s.label}
+                      {t(s.labelKey as any)}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{s.description}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t(s.descKey as any)}</p>
                     <p
                       className="text-sm font-bold mt-1 font-display"
                       style={{ color: style.color }}
                     >
-                      {formatCurrency(s.defaultAmount)}/mes
+                      {formatCurrency(s.defaultAmount)}{tCommon("perMonth")}
                     </p>
                   </div>
                   <button
@@ -236,7 +237,7 @@ export default function CuidadoMayorPage() {
                     className="btn btn-sm text-white"
                     style={{ backgroundColor: style.color }}
                   >
-                    {isLocked ? <Lock className="w-3.5 h-3.5" /> : "Suscribir"}
+                    {isLocked ? <Lock className="w-3.5 h-3.5" /> : t("subscribe")}
                   </button>
                 </div>
               );
@@ -253,10 +254,10 @@ export default function CuidadoMayorPage() {
             <div className="flex flex-col items-center py-16 text-center">
               <Shield className="w-14 h-14" style={{ color: elderCareEmptyColor }} />
               <h2 className="text-lg font-bold text-foreground mt-4">
-                Sin suscripciones activas
+                {t("noSubscriptions")}
               </h2>
               <p className="text-sm text-muted-foreground mt-2">
-                Activa un servicio de cuidado en la pestaña "Servicios".
+                {t("noSubscriptionsDesc")}
               </p>
             </div>
           ) : (
@@ -272,34 +273,34 @@ export default function CuidadoMayorPage() {
                   >
                     <div className="flex items-start justify-between">
                       <p className="text-sm font-bold text-foreground font-display">
-                        {sub.merchant?.tradeName ?? "Proveedor"}
+                        {sub.merchant?.tradeName ?? t("provider")}
                       </p>
                       <span
                         className={`badge badge-sm ${
                           isActive ? "badge-primary" : "badge-ghost"
                         }`}
                       >
-                        {isActive ? "Activa" : "Cancelada"}
+                        {isActive ? t("active") : t("cancelled")}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 mt-2">
                       <Activity className="w-3.5 h-3.5 text-muted-foreground" />
                       <span className="text-xs text-muted-foreground">
-                        {serviceLabels[sub.serviceType ?? ""] ?? sub.serviceType}
+                        {serviceLabelKeys[sub.serviceType ?? ""] ? t(serviceLabelKeys[sub.serviceType ?? ""] as any) : sub.serviceType}
                       </span>
                       <span className="flex-1" />
                       <span
                         className="text-sm font-bold font-display"
                         style={{ color: elderCareAccentColor }}
                       >
-                        {formatCurrency(sub.monthlyAmount ?? 0)}/mes
+                        {formatCurrency(sub.monthlyAmount ?? 0)}{tCommon("perMonth")}
                       </span>
                     </div>
                     {sub.nextBilling && (
                       <div className="flex items-center gap-1.5 mt-1.5">
                         <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                         <span className="text-xs text-muted-foreground">
-                          Próximo cobro: {formatDate(sub.nextBilling)}
+                          {t("nextBilling", { date: formatDate(sub.nextBilling) })}
                         </span>
                       </div>
                     )}
@@ -309,7 +310,7 @@ export default function CuidadoMayorPage() {
                           onClick={() => setCancelId(sub.id)}
                           className="btn btn-ghost btn-xs text-error gap-1"
                         >
-                          <X className="w-3 h-3" /> Cancelar
+                          <X className="w-3 h-3" /> {t("cancel")}
                         </button>
                       </div>
                     )}
@@ -328,12 +329,11 @@ export default function CuidadoMayorPage() {
             <div className="flex items-center gap-2">
               <confirmService.icon className="w-5 h-5" style={{ color: elderCareServiceStyles[confirmService.type].color }} />
               <h3 className="text-lg font-bold font-display">
-                {confirmService.label}
+                {t(confirmService.labelKey as any)}
               </h3>
             </div>
             <p className="py-4 text-sm">
-              Se cargará {formatCurrency(confirmService.defaultAmount)}/mes a tu línea MAYOR
-              CUIDADO.
+              {t("subscribeConfirm", { amount: formatCurrency(confirmService.defaultAmount) })}
             </p>
             <div
               className="flex items-start gap-2 p-2.5 rounded-lg"
@@ -341,12 +341,12 @@ export default function CuidadoMayorPage() {
             >
               <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: elderCareServiceStyles[confirmService.type].color }} />
               <p className="text-xs text-muted-foreground">
-                Puedes cancelar en cualquier momento.
+                {t("cancelAnytime")}
               </p>
             </div>
             <div className="modal-action">
               <button onClick={() => setConfirmService(null)} className="btn btn-ghost btn-sm">
-                Cancelar
+                {tCommon("cancel")}
               </button>
               <button
                 onClick={handleSubscribe}
@@ -355,13 +355,13 @@ export default function CuidadoMayorPage() {
                 style={{ backgroundColor: elderCareServiceStyles[confirmService.type].color }}
               >
                 {isSubscribing ? <span className="loading loading-spinner loading-xs" /> : null}
-                Confirmar
+                {t("confirm")}
               </button>
             </div>
           </div>
           <button
             className="modal-backdrop"
-            aria-label="Cerrar"
+            aria-label={t("close")}
             onClick={() => setConfirmService(null)}
           />
         </div>
@@ -372,14 +372,14 @@ export default function CuidadoMayorPage() {
         <div className="modal modal-open" role="dialog" aria-modal="true">
           <div className="modal-box">
             <h3 className="text-lg font-bold font-display">
-              Cancelar Suscripción
+              {t("cancelTitle")}
             </h3>
             <p className="py-4 text-sm text-muted-foreground">
-              ¿Estás seguro? El cobro del próximo mes no se realizará.
+              {t("cancelConfirm")}
             </p>
             <div className="modal-action">
               <button onClick={() => setCancelId(null)} className="btn btn-ghost btn-sm">
-                No
+                {t("no")}
               </button>
               <button
                 onClick={() => handleCancel(cancelId)}
@@ -387,13 +387,13 @@ export default function CuidadoMayorPage() {
                 className="btn btn-error btn-sm text-error-content"
               >
                 {isCancelling ? <span className="loading loading-spinner loading-xs" /> : null}
-                Cancelar
+                {t("cancel")}
               </button>
             </div>
           </div>
           <button
             className="modal-backdrop"
-            aria-label="Cerrar"
+            aria-label={t("close")}
             onClick={() => setCancelId(null)}
           />
         </div>

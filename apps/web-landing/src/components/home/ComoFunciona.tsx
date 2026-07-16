@@ -1,14 +1,17 @@
 "use client";
 
 import { UserPlus, Lightning, QrCode, CreditCard } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
 export default function ComoFunciona() {
+  const t = useTranslations("Home.howItWorks");
+
   const steps = [
     {
       num: "01",
       icon: UserPlus,
-      title: "Regístrate en la página",
-      desc: "Crea tu cuenta con cédula, número de teléfono y datos básicos. Sin papeleo.",
+      title: t("step1Title"),
+      desc: t("step1Desc"),
       color: "text-primary",
       bg: "bg-primary-50",
       border: "border-primary/20",
@@ -16,8 +19,8 @@ export default function ComoFunciona() {
     {
       num: "02",
       icon: Lightning,
-      title: "Aprobación en 3 min",
-      desc: "Evaluamos tu perfil al instante y te asignamos tus líneas de crédito médico.",
+      title: t("step2Title"),
+      desc: t("step2Desc"),
       color: "text-secondary",
       bg: "bg-secondary-50",
       border: "border-secondary/20",
@@ -25,8 +28,8 @@ export default function ComoFunciona() {
     {
       num: "03",
       icon: QrCode,
-      title: "Escanea en el comercio",
-      desc: "El comercio genera un QR. Tú lo escaneas y pagas la inicial directamente desde la página.",
+      title: t("step3Title"),
+      desc: t("step3Desc"),
       color: "text-accent",
       bg: "bg-accent-50",
       border: "border-accent/20",
@@ -34,8 +37,8 @@ export default function ComoFunciona() {
     {
       num: "04",
       icon: CreditCard,
-      title: "Paga en cuotas",
-      desc: "El resto se divide en 3 cuotas iguales cada 14 días. Sin interés, sin sorpresas.",
+      title: t("step4Title"),
+      desc: t("step4Desc"),
       color: "text-primary",
       bg: "bg-primary-50",
       border: "border-primary/20",
@@ -47,13 +50,13 @@ export default function ComoFunciona() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <div className="section-tag bg-primary-100 text-primary mb-4">
-            <Lightning className="w-3.5 h-3.5" /> Simple y rápido
+            <Lightning className="w-3.5 h-3.5" /> {t("tag")}
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
-            Cómo funciona SaludTech
+            {t("title")}
           </h2>
           <p className="text-slate-500 text-lg">
-            Desde el registro hasta tu primera compra en menos de 5 minutos.
+            {t("subtitle")}
           </p>
         </div>
 

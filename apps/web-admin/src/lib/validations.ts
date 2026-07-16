@@ -7,72 +7,72 @@ const nationalIdRegex = /^(V|E|G|J|C)?\d{6,9}$/i;
 export const loginSchema = z.object({
   email: z
     .string()
-    .min(1, "El email es requerido")
-    .email("Email inválido"),
+    .min(1, "emailRequired")
+    .email("emailInvalid"),
   password: z
     .string()
-    .min(1, "La contraseña es requerida")
-    .min(8, "La contraseña debe tener mínimo 8 caracteres"),
+    .min(1, "passwordRequired")
+    .min(8, "passwordMinLength"),
 });
 
 export const merchantFormSchema = z.object({
   legalName: z
     .string()
-    .min(2, "La razón social debe tener al menos 2 caracteres")
-    .max(100, "La razón social no puede exceder 100 caracteres"),
+    .min(2, "legalNameMin")
+    .max(100, "legalNameMax"),
   tradeName: z
     .string()
-    .min(2, "El nombre comercial debe tener al menos 2 caracteres")
-    .max(100, "El nombre comercial no puede exceder 100 caracteres"),
+    .min(2, "tradeNameMin")
+    .max(100, "tradeNameMax"),
   rif: z
     .string()
-    .min(1, "El RIF es requerido")
-    .regex(rifRegex, "Formato inválido. Ej: J-12345678 o V-12345678"),
+    .min(1, "rifRequired")
+    .regex(rifRegex, "rifInvalid"),
   email: z
     .string()
-    .min(1, "El email es requerido")
-    .email("Email inválido"),
+    .min(1, "emailRequired")
+    .email("emailInvalid"),
   phone: z
     .string()
-    .min(1, "El teléfono es requerido")
-    .regex(phoneRegex, "Formato inválido. Ej: +584121234567"),
+    .min(1, "phoneRequired")
+    .regex(phoneRegex, "phoneInvalid"),
   city: z
     .string()
-    .min(2, "La ciudad debe tener al menos 2 caracteres")
-    .max(50, "La ciudad no puede exceder 50 caracteres"),
+    .min(2, "cityMin")
+    .max(50, "cityMax"),
   contactName: z
     .string()
-    .min(2, "El nombre del contacto debe tener al menos 2 caracteres")
-    .max(100, "El nombre del contacto no puede exceder 100 caracteres"),
+    .min(2, "contactNameMin")
+    .max(100, "contactNameMax"),
 });
 
 export const patientFormSchema = z.object({
   firstName: z
     .string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(50, "El nombre no puede exceder 50 caracteres"),
+    .min(2, "firstNameMin")
+    .max(50, "firstNameMax"),
   lastName: z
     .string()
-    .min(2, "El apellido debe tener al menos 2 caracteres")
-    .max(50, "El apellido no puede exceder 50 caracteres"),
+    .min(2, "lastNameMin")
+    .max(50, "lastNameMax"),
   email: z
     .string()
-    .min(1, "El email es requerido")
-    .email("Email inválido"),
+    .min(1, "emailRequired")
+    .email("emailInvalid"),
   phone: z
     .string()
-    .min(1, "El teléfono es requerido")
-    .regex(phoneRegex, "Formato inválido. Ej: +584121234567"),
+    .min(1, "phoneRequired")
+    .regex(phoneRegex, "phoneInvalid"),
   identityDocument: z
     .string()
-    .min(1, "La cédula es requerida")
-    .regex(nationalIdRegex, "Formato inválido. Ej: V12345678"),
+    .min(1, "identityRequired")
+    .regex(nationalIdRegex, "identityInvalid"),
   password: z
     .string()
-    .min(8, "La contraseña debe tener mínimo 8 caracteres")
-    .regex(/[A-Z]/, "Debe contener al menos una mayúscula")
-    .regex(/[a-z]/, "Debe contener al menos una minúscula")
-    .regex(/\d/, "Debe contener al menos un número"),
+    .min(8, "passwordMinLength")
+    .regex(/[A-Z]/, "passwordUppercase")
+    .regex(/[a-z]/, "passwordLowercase")
+    .regex(/\d/, "passwordNumber"),
 });
 
 export type LoginForm = z.infer<typeof loginSchema>;

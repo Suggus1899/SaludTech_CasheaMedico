@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { RefreshCw, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function ServiceWorkerRegister() {
+  const t = useTranslations("ServiceWorker");
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
 
@@ -56,19 +58,19 @@ export default function ServiceWorkerRegister() {
             className="text-sm font-bold text-foreground"
             style={{ fontFamily: "var(--font-outfit, sans-serif)" }}
           >
-            Nueva versión disponible
+            {t("newVersion")}
           </p>
-          <p className="text-xs text-muted-foreground">Recarga para actualizar la app.</p>
+          <p className="text-xs text-muted-foreground">{t("reloadToUpdate")}</p>
         </div>
         <button
           onClick={applyUpdate}
           className="btn btn-primary btn-sm"
         >
-          Actualizar
+          {t("update")}
         </button>
         <button
           onClick={() => setUpdateAvailable(false)}
-          aria-label="Cerrar"
+          aria-label={t("close")}
           className="btn btn-ghost btn-sm btn-square"
         >
           <X className="w-4 h-4" />

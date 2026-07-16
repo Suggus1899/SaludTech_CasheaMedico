@@ -18,6 +18,9 @@ import {
 } from "lucide-react";
 import { useTheme } from "../../../../hooks/useTheme";
 import { getApiUrl, apiFetch } from "../../../../lib/api";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@saludtech/i18n";
+import { Globe } from "lucide-react";
 
 type NotificationPrefs = {
   push: boolean;
@@ -52,6 +55,8 @@ function savePrefs(prefs: NotificationPrefs) {
 
 export default function ConfiguracionPage() {
   const router = useRouter();
+  const t = useTranslations("Settings");
+  const tCommon = useTranslations("Common");
   const { theme, toggleTheme, mounted } = useTheme();
   const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULT_PREFS);
 
@@ -83,12 +88,12 @@ export default function ConfiguracionPage() {
     setPasswordStatus({ type: null, message: "" });
 
     if (newPassword !== confirmPassword) {
-      setPasswordStatus({ type: "error", message: "Las contraseñas no coinciden." });
+      setPasswordStatus({ type: "error", message: t("passwordsNoMatch") });
       return;
     }
 
     if (newPassword.length < 8) {
-      setPasswordStatus({ type: "error", message: "La nueva contraseña debe tener al menos 8 caracteres." });
+      setPasswordStatus({ type: "error", message: t("passwordTooShort") });
       return;
     }
 
@@ -107,10 +112,10 @@ export default function ConfiguracionPage() {
       if (!res.ok) {
         setPasswordStatus({
           type: "error",
-          message: data.error || "Error al cambiar la contraseña.",
+          message: data.error || t("passwordUpdateError"),
         });
       } else {
-        setPasswordStatus({ type: "success", message: "Contraseña actualizada correctamente." });
+        setPasswordStatus({ type: "success", message: t("passwordUpdated") });
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
@@ -118,7 +123,7 @@ export default function ConfiguracionPage() {
     } catch {
       setPasswordStatus({
         type: "error",
-        message: "Error de conexión. Intenta de nuevo.",
+        message: t("connectionError"),
       });
     } finally {
       setIsSubmitting(false);
@@ -131,13 +136,13 @@ export default function ConfiguracionPage() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => router.back()}
-          aria-label="Volver"
+          aria-label={t("back")}
           className="btn btn-ghost btn-sm btn-square"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold text-foreground font-display">
-          Configuración
+          {t("title")}
         </h1>
       </div>
 
@@ -145,7 +150,7 @@ export default function ConfiguracionPage() {
       <section className="p-5 rounded-2xl border border-border bg-base-100 space-y-4">
         <h2 className="text-base font-bold text-foreground font-display flex items-center gap-2">
           <Sun className="w-5 h-5 text-primary" />
-          Apariencia
+          {t("appearance")}
         </h2>
 
         <div className="flex items-center justify-between py-2">
@@ -159,28 +164,52 @@ export default function ConfiguracionPage() {
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">
-                Modo {mounted && theme === "dark" ? "Oscuro" : "Claro"}
+                {mounted && theme === "dark" ? t("modeDark") : t("modeLight")}
               </p>
               <p className="text-xs text-muted-foreground">
-                Cambia entre tema claro y oscuro
+                {t("themeDesc")}
               </p>
             </div>
           </div>
           <button
             onClick={toggleTheme}
             className="btn btn-sm btn-primary gap-2"
-            aria-label="Cambiar tema"
+            aria-label={t("changeTheme")}
           >
             {mounted && theme === "dark" ? (
               <>
-                <Sun className="w-4 h-4" /> Claro
+                <Sun className="w-4 h-4" /> {t("light")}
               </>
             ) : (
               <>
-                <Moon className="w-4 h-4" /> Oscuro
+                <Moon className="w-4 h-4" /> {t("dark")}
               </>
             )}
           </button>
+        </div>
+      </section>
+
+      {/* ─── Idioma ─────────────────────────────────────────────── */}
+      <section className="p-5 rounded-2xl border border-border bg-base-100 space-y-4">
+        <h2 className="text-base font-bold text-foreground font-display flex items-center gap-2">
+          <Globe className="w-5 h-5 text-primary" />
+          {t("language")}
+        </h2>
+        <div className="flex items-center justify-between py-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <Globe className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                {t("language")}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t("languageDesc")}
+              </p>
+            </div>
+          </div>
+          <LanguageSwitcher />
         </div>
       </section>
 
@@ -188,27 +217,27 @@ export default function ConfiguracionPage() {
       <section className="p-5 rounded-2xl border border-border bg-base-100 space-y-4">
         <h2 className="text-base font-bold text-foreground font-display flex items-center gap-2">
           <Bell className="w-5 h-5 text-primary" />
-          Notificaciones
+          {t("notifications")}
         </h2>
 
         <ToggleRow
           icon={<Bell className="w-5 h-5" />}
-          label="Notificaciones Push"
-          description="Recibe alertas en tu dispositivo"
+          label={t("pushNotifications")}
+          description={t("pushDesc")}
           checked={prefs.push}
           onChange={(v) => updatePref("push", v)}
         />
         <ToggleRow
           icon={<Mail className="w-5 h-5" />}
-          label="Notificaciones por Email"
-          description="Resúmenes y alertas por correo"
+          label={t("emailNotifications")}
+          description={t("emailDesc")}
           checked={prefs.email}
           onChange={(v) => updatePref("email", v)}
         />
         <ToggleRow
           icon={<Clock className="w-5 h-5" />}
-          label="Recordatorio de Cuotas"
-          description="Te avisa antes del vencimiento"
+          label={t("installmentReminders")}
+          description={t("remindersDesc")}
           checked={prefs.reminders}
           onChange={(v) => updatePref("reminders", v)}
         />
@@ -218,11 +247,11 @@ export default function ConfiguracionPage() {
       <section className="p-5 rounded-2xl border border-border bg-base-100 space-y-4">
         <h2 className="text-base font-bold text-foreground font-display flex items-center gap-2">
           <Lock className="w-5 h-5 text-primary" />
-          Seguridad
+          {t("security")}
         </h2>
 
         <form onSubmit={handlePasswordSubmit} className="space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">Cambiar Contraseña</h3>
+          <h3 className="text-sm font-semibold text-foreground">{t("changePassword")}</h3>
 
           {/* Current password */}
           <div className="relative">
@@ -230,7 +259,7 @@ export default function ConfiguracionPage() {
               type={showCurrent ? "text" : "password"}
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Contraseña actual"
+              placeholder={t("currentPassword")}
               required
               className="input input-bordered w-full pr-10"
             />
@@ -238,7 +267,7 @@ export default function ConfiguracionPage() {
               type="button"
               onClick={() => setShowCurrent(!showCurrent)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-              aria-label="Mostrar/ocultar contraseña"
+              aria-label={t("showHidePassword")}
             >
               {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -250,7 +279,7 @@ export default function ConfiguracionPage() {
               type={showNew ? "text" : "password"}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Nueva contraseña (mín. 8 caracteres)"
+              placeholder={t("newPassword")}
               required
               minLength={8}
               className="input input-bordered w-full pr-10"
@@ -259,7 +288,7 @@ export default function ConfiguracionPage() {
               type="button"
               onClick={() => setShowNew(!showNew)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-              aria-label="Mostrar/ocultar contraseña"
+              aria-label={t("showHidePassword")}
             >
               {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -271,7 +300,7 @@ export default function ConfiguracionPage() {
               type={showConfirm ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirmar nueva contraseña"
+              placeholder={t("confirmNewPassword")}
               required
               className="input input-bordered w-full pr-10"
             />
@@ -279,7 +308,7 @@ export default function ConfiguracionPage() {
               type="button"
               onClick={() => setShowConfirm(!showConfirm)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-              aria-label="Mostrar/ocultar contraseña"
+              aria-label={t("showHidePassword")}
             >
               {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -309,7 +338,7 @@ export default function ConfiguracionPage() {
             className="btn btn-primary w-full gap-2"
           >
             {isSubmitting && <span className="loading loading-spinner loading-sm" />}
-            Actualizar Contraseña
+            {t("updatePassword")}
           </button>
         </form>
 
@@ -320,11 +349,11 @@ export default function ConfiguracionPage() {
               <Fingerprint className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">Biometría</p>
-              <p className="text-xs text-muted-foreground">Acceso con huella o rostro</p>
+              <p className="text-sm font-semibold text-foreground">{t("biometry")}</p>
+              <p className="text-xs text-muted-foreground">{t("biometryDesc")}</p>
             </div>
           </div>
-          <span className="badge badge-ghost badge-sm">Próximamente</span>
+          <span className="badge badge-ghost badge-sm">{t("comingSoon")}</span>
         </div>
       </section>
     </div>

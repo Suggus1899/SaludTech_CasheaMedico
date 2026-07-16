@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Syne } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,10 +15,13 @@ const syne = Syne({
   weight: ["600", "700", "800"],
 });
 
-export const metadata: Metadata = {
-  title: "SaludTech - Portal Comercios",
-  description: "Portal de gestión para comercios afiliados a SaludTech",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -27,6 +30,7 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const t = await getTranslations("Common");
 
   return (
     <html
@@ -45,7 +49,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <a href="#main-content" className="skip-link">
-            Saltar al contenido principal
+            {t("skipToContent")}
           </a>
           {children}
         </NextIntlClientProvider>

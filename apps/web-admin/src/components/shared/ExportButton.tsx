@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Download } from "lucide-react";
 
 interface ExportButtonProps {
@@ -8,6 +9,7 @@ interface ExportButtonProps {
 }
 
 export function ExportButton({ endpoint, label }: ExportButtonProps) {
+  const tCommon = useTranslations("Common");
   const handleExport = () => {
     const url = getApiUrl(endpoint);
     window.open(url, "_blank");
@@ -17,10 +19,10 @@ export function ExportButton({ endpoint, label }: ExportButtonProps) {
     <button
       onClick={handleExport}
       className="btn btn-sm btn-outline gap-2"
-      title={`Exportar ${label} a CSV`}
+      title={tCommon("exportToCsv", { label })}
     >
       <Download className="w-4 h-4" />
-      CSV
+      {tCommon("csv")}
     </button>
   );
 }

@@ -2,18 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Menu, ArrowLeft, CheckCircle2, Sun, Moon, ChevronDown, User, Settings } from "lucide-react";
 
-const VIEW_TITLES: Record<string, string> = {
-  "/dashboard": "Generar Cobro BNPL",
-  "/liquidaciones": "Liquidaciones",
-  "/historial": "Historial de Transacciones",
-  "/suscripciones-ec": "Elder Care — Mis Suscripciones",
+const VIEW_TITLE_KEYS: Record<string, string> = {
+  "/dashboard": "titleGenerateQr",
+  "/liquidaciones": "titleSettlements",
+  "/historial": "titleHistory",
+  "/suscripciones-ec": "titleElderCare",
 };
 
 export function Topbar({ setSidebarOpen }: { setSidebarOpen: (v: boolean) => void }) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations("Topbar");
+  const tNav = useTranslations("Nav");
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [merchantUser, setMerchantUser] = useState<any>(null);
 
@@ -36,26 +39,27 @@ export function Topbar({ setSidebarOpen }: { setSidebarOpen: (v: boolean) => voi
   return (
     <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4 md:px-6 shrink-0">
       <div className="flex items-center gap-3">
-        <button className="md:hidden p-2 rounded-lg hover:bg-muted" onClick={() => setSidebarOpen(true)} aria-label="Abrir menú">
+        <button className="md:hidden p-2 rounded-lg hover:bg-muted" onClick={() => setSidebarOpen(true)} aria-label={tNav("openMenu")}>
           <Menu className="w-5 h-5" />
         </button>
         {pathname === "/historial" && (
-          <button onClick={() => router.push("/dashboard")} aria-label="Volver" className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground">
+          <button onClick={() => router.push("/dashboard")} aria-label={tNav("back")} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground">
             <ArrowLeft className="w-4 h-4" />
           </button>
         )}
-        <h1 className="text-lg font-semibold font-(family-name:--font-syne)">{VIEW_TITLES[pathname] || "Dashboard"}</h1>
+        <h1 className="text-lg font-semibold font-(family-name:--font-syne)">{VIEW_TITLE_KEYS[pathname] ? t(VIEW_TITLE_KEYS[pathname] as any) : t("titleDashboard")}</h1>
       </div>
       <div className="flex items-center gap-2">
         <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full">
           <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-          Sistema Operativo
+          {t("systemOperational")}
         </div>
-        <button onClick={toggleDarkMode} aria-label={isDarkMode ? "Modo claro" : "Modo oscuro"} className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+
+        <button onClick={toggleDarkMode} aria-label={isDarkMode ? t("lightMode") : t("darkMode")} className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
           {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
         <div className="dropdown dropdown-end">
-          <button tabIndex={0} aria-label="Menú de usuario" className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors">
+          <button tabIndex={0} aria-label={t("userMenu")} className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors">
             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-content font-bold text-sm">
               {(merchantUser?.firstName?.[0] ?? "C").toUpperCase()}
             </div>
@@ -63,18 +67,18 @@ export function Topbar({ setSidebarOpen }: { setSidebarOpen: (v: boolean) => voi
           </button>
           <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box shadow-lg border border-base-300 w-52 z-50 p-1 mt-1">
             <li className="menu-title px-3 py-1">
-              <p className="text-sm font-semibold">{merchantUser?.firstName ?? "Comercio"}</p>
+              <p className="text-sm font-semibold">{merchantUser?.firstName ?? t("merchant")}</p>
               <p className="text-xs opacity-60">{merchantUser?.email ?? ""}</p>
             </li>
             <li><hr className="my-1 border-base-300" /></li>
             <li>
               <button className="flex items-center gap-2">
-                <User className="w-4 h-4" /> Mi Perfil
+                <User className="w-4 h-4" /> {t("myProfile")}
               </button>
             </li>
             <li>
               <button className="flex items-center gap-2">
-                <Settings className="w-4 h-4" /> Configuración
+                <Settings className="w-4 h-4" /> {t("settings")}
               </button>
             </li>
           </ul>

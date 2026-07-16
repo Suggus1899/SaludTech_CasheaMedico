@@ -1,14 +1,17 @@
 "use client";
 
 import { CheckCircle, Lightning, Buildings, Clock, ShieldCheck } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
 export default function TrustStrip() {
+  const t = useTranslations("Home.trustStrip");
+
   const items = [
-    { value: "0%", label: "Interés siempre", icon: CheckCircle, color: "text-secondary" },
-    { value: "3 min", label: "Aprobación instantánea", icon: Lightning, color: "text-primary" },
-    { value: "+200", label: "Comercios aliados", icon: Buildings, color: "text-accent" },
-    { value: "14 días", label: "Tiempo entre cuotas", icon: Clock, color: "text-secondary" },
-    { value: "100%", label: "Digital, sin papeles", icon: ShieldCheck, color: "text-primary" },
+    { value: t("stat1Value"), label: t("stat1Label"), icon: CheckCircle, color: "text-secondary" },
+    { value: t("stat2Value"), label: t("stat2Label"), icon: Lightning, color: "text-primary" },
+    { value: t("stat3Value"), label: t("stat3Label"), icon: Buildings, color: "text-accent" },
+    { value: t("stat4Value"), label: t("stat4Label"), icon: Clock, color: "text-secondary" },
+    { value: t("stat5Value"), label: t("stat5Label"), icon: ShieldCheck, color: "text-primary" },
   ];
   return (
     <div className="bg-white border-b border-slate-100">

@@ -15,12 +15,15 @@ import {
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { parseQrPayload, formatCurrency, formatWithVES, formatDate } from "../../../lib/utils";
+import { useTranslations } from "next-intl";
 import type { CheckoutPreview } from "../../../types/patient";
 
 type Step = "scan" | "amount" | "checkout" | "success" | "error";
 
 export default function PagarPage() {
   const router = useRouter();
+  const t = useTranslations("Pay");
+  const tCommon = useTranslations("Common");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const controlsRef = useRef<{ stop: () => void } | null>(null);
@@ -56,9 +59,7 @@ export default function PagarPage() {
         controlsRef.current = controls;
       } catch {
         if (!cancelled) {
-          setCameraError(
-            "No se pudo acceder a la cámara. Usa el modo manual o verifica los permisos."
-          );
+          setCameraError(t("cameraError"));
         }
       }
     };
@@ -87,7 +88,7 @@ export default function PagarPage() {
     if (payload.includes("|") || payload.includes(":")) {
       const parsed = parseQrPayload(payload);
       if (!parsed) {
-        setError("QR inválido o corrupto");
+        setError(t("invalidQR"));
         setStep("error");
         setIsProcessing(false);
         return;
@@ -123,7 +124,7 @@ export default function PagarPage() {
       setMerchantId(mId);
       setStep("checkout");
     } catch {
-      setError("No se pudo simular el financiamiento. Intenta de nuevo.");
+      setError(t("previewError"));
       setStep("error");
     } finally {
       setIsProcessing(false);
@@ -141,7 +142,7 @@ export default function PagarPage() {
     const amt = Number.parseFloat(amount);
     if (!amt || amt <= 0 || !merchantId) return;
     if (amt > 10000) {
-      setError("El monto no puede exceder $10,000");
+      setError(t("amountExceedsMax"));
       return;
     }
     setError(null);
@@ -176,7 +177,7 @@ export default function PagarPage() {
       setStep("success");
       setTimeout(() => router.push("/dashboard"), 1800);
     } catch {
-      setError("Error en el pago. Revisa tu límite disponible.");
+      setError(t("paymentError"));
       setStep("error");
     } finally {
       setIsProcessing(false);
@@ -198,14 +199,14 @@ export default function PagarPage() {
       <div className="max-w-lg mx-auto space-y-5">
         <button
           onClick={() => router.back()}
-          aria-label="Volver"
+          aria-label={t("back")}
           className="btn btn-ghost btn-sm -ml-2"
         >
-          <ArrowLeft className="w-4 h-4" /> Volver
+          <ArrowLeft className="w-4 h-4" /> {t("back")}
         </button>
 
         <h1 className="text-xl font-bold text-foreground">
-          Escanear QR
+          {t("scanQR")}
         </h1>
 
         {/* Camera viewport */}
@@ -241,18 +242,18 @@ export default function PagarPage() {
         <form onSubmit={handleManualSubmit} className="space-y-3">
           <div className="flex items-center gap-2 text-muted-foreground text-sm">
             <Keyboard className="w-4 h-4" />
-            <span>O pega el código QR manualmente:</span>
+            <span>{t("manualEntry")}</span>
           </div>
           <div className="flex gap-2">
             <input
               type="text"
               value={manualPayload}
               onChange={(e) => setManualPayload(e.target.value)}
-              placeholder="Pega aquí el código del QR"
+              placeholder={t("manualPlaceholder")}
               className="input input-bordered flex-1 text-sm"
             />
             <button type="submit" className="btn btn-primary btn-sm" disabled={isProcessing}>
-              Validar
+              {t("validate")}
             </button>
           </div>
         </form>
@@ -266,26 +267,26 @@ export default function PagarPage() {
       <div className="max-w-lg mx-auto space-y-6">
         <button
           onClick={resetToScan}
-          aria-label="Volver"
+          aria-label={t("back")}
           className="btn btn-ghost btn-sm -ml-2"
         >
-          <ArrowLeft className="w-4 h-4" /> Volver
+          <ArrowLeft className="w-4 h-4" /> {t("back")}
         </button>
 
         <div className="text-center pt-6">
           <Store className="w-12 h-12 text-primary mx-auto" />
           <h1 className="text-xl font-bold text-foreground mt-4">
-            Ingresar Monto
+            {t("enterAmount")}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Comercio: {merchantId}
+            {t("merchantLabel", { id: merchantId })}
           </p>
         </div>
 
         <form onSubmit={handleAmountSubmit} className="space-y-6">
           <div className="form-control">
             <label className="label justify-center">
-              <span className="label-text">Ingresa el monto de tu factura</span>
+              <span className="label-text">{t("invoiceAmount")}</span>
             </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-muted-foreground">
@@ -306,7 +307,7 @@ export default function PagarPage() {
 
           <div className="form-control">
             <label className="label">
-              <span className="label-text font-medium">Número de cuotas</span>
+              <span className="label-text font-medium">{t("installmentsCount")}</span>
             </label>
             <div className="grid grid-cols-4 gap-2">
               {[3, 6, 9, 12].map((n) => (
@@ -328,7 +329,7 @@ export default function PagarPage() {
             disabled={isProcessing || !amount}
           >
             {isProcessing ? <span className="loading loading-spinner loading-sm" /> : null}
-            Continuar
+            {t("continue")}
           </button>
         </form>
       </div>
@@ -341,14 +342,14 @@ export default function PagarPage() {
       <div className="max-w-lg mx-auto space-y-6">
         <button
           onClick={resetToScan}
-          aria-label="Volver"
+          aria-label={t("back")}
           className="btn btn-ghost btn-sm -ml-2"
         >
-          <ArrowLeft className="w-4 h-4" /> Volver
+          <ArrowLeft className="w-4 h-4" /> {t("back")}
         </button>
 
         <h1 className="text-xl font-bold text-foreground">
-          Resumen de Financiamiento
+          {t("financingSummary")}
         </h1>
 
         {/* Merchant card */}
@@ -365,14 +366,14 @@ export default function PagarPage() {
               (Bs. {new Intl.NumberFormat("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(preview.amountVES)})
             </p>
           ) : null}
-          <p className="text-sm text-muted-foreground mt-1">Monto Total a Financiar</p>
+          <p className="text-sm text-muted-foreground mt-1">{t("totalToFinance")}</p>
         </div>
 
         {/* Installment breakdown */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-foreground font-display">
-              Desglose de Pago ({preview.requestedInstallments} cuotas)
+              {t("paymentBreakdown", { count: preview.requestedInstallments })}
             </h2>
           </div>
 
@@ -394,7 +395,7 @@ export default function PagarPage() {
             {preview.installments.map((inst) => (
               <li key={inst.installmentNumber} className="flex justify-between py-2">
                 <span className="text-sm text-muted-foreground">
-                  Cuota {inst.installmentNumber} ({formatDate(inst.dueDate)})
+                  {t("installmentLine", { number: inst.installmentNumber, date: formatDate(inst.dueDate) })}
                 </span>
                 <div className="text-right">
                   <span className="text-sm font-semibold text-foreground font-display block">
@@ -417,7 +418,7 @@ export default function PagarPage() {
           className="btn btn-primary w-full text-base font-bold"
         >
           {isProcessing ? <span className="loading loading-spinner loading-sm" /> : null}
-          Confirmar y Pagar
+          {t("confirmAndPay")}
         </button>
       </div>
     );
@@ -431,10 +432,10 @@ export default function PagarPage() {
           <CheckCircle2 className="w-14 h-14 text-success" />
         </div>
         <h2 className="text-2xl font-bold text-foreground mt-6 font-display">
-          ¡Pago Exitoso!
+          {t("successTitle")}
         </h2>
         <p className="text-sm text-muted-foreground mt-2">
-          Tu financiamiento ha sido procesado correctamente.
+          {t("successDesc")}
         </p>
       </div>
     );
@@ -448,7 +449,7 @@ export default function PagarPage() {
       </div>
       <p className="text-base text-muted-foreground">{error}</p>
       <button onClick={resetToScan} className="btn btn-primary">
-        Intentar de nuevo
+        {t("tryAgain")}
       </button>
     </div>
   );

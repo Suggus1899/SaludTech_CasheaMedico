@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { Logo } from "@saludtech/ui";
-import { loginSchema } from "../../lib/validations";
+import { createLoginSchema } from "../../lib/validations";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost/api/v1";
 
@@ -14,6 +15,8 @@ function getApiUrl(path: string): string {
 
 export default function MerchantLoginPage() {
   const router = useRouter();
+  const t = useTranslations("Login");
+  const tVal = useTranslations("Validations");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,6 +26,12 @@ export default function MerchantLoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    const loginSchema = createLoginSchema({
+      emailRequired: tVal("emailRequired"),
+      emailInvalid: tVal("emailInvalid"),
+      passwordRequired: tVal("passwordRequired"),
+      passwordMinLength: tVal("passwordMinLength"),
+    });
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
       setError(result.error.issues[0].message);
@@ -38,7 +47,7 @@ export default function MerchantLoginPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.message ?? "Credenciales incorrectas");
+        throw new Error(data.message ?? t("invalidCredentials"));
       }
       const data = await res.json();
       // JWT is now stored in an httpOnly cookie by the backend.
@@ -47,7 +56,7 @@ export default function MerchantLoginPage() {
       document.cookie = `jwt_token=${data.token}; path=/; max-age=${60 * 60 * 24}; samesite=lax`;
       router.push("/");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
+      setError(err instanceof Error ? err.message : t("loginError"));
     } finally {
       setIsLoading(false);
     }
@@ -60,24 +69,24 @@ export default function MerchantLoginPage() {
         <div className="flex flex-col items-center mb-8">
           <Logo size="lg" className="mb-4" />
           <h1 className="text-2xl font-bold font-(family-name:--font-syne) text-foreground">
-            Portal Comercio
+            {t("title")}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">SaludTech — Plataforma BNPL Médica</p>
+          <p className="text-sm text-muted-foreground mt-1">{t("subtitle")}</p>
         </div>
 
         {/* Card */}
         <div className="bg-card border border-border rounded-2xl shadow-sm p-8">
           <h2 className="text-lg font-semibold font-(family-name:--font-syne) mb-6">
-            Inicia sesión
+            {t("signIn")}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="form-control gap-1">
-              <label htmlFor="email" className="label pb-0"><span className="label-text font-medium">Correo electrónico</span></label>
+              <label htmlFor="email" className="label pb-0"><span className="label-text font-medium">{t("email")}</span></label>
               <input
                 id="email"
                 type="email"
-                placeholder="comercio@example.com"
+                placeholder={t("emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -88,7 +97,7 @@ export default function MerchantLoginPage() {
             </div>
 
             <div className="form-control gap-1">
-              <label htmlFor="password" className="label pb-0"><span className="label-text font-medium">Contraseña</span></label>
+              <label htmlFor="password" className="label pb-0"><span className="label-text font-medium">{t("password")}</span></label>
               <div className="relative">
                 <input
                   id="password"
@@ -104,7 +113,7 @@ export default function MerchantLoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  aria-label={showPassword ? t("hidePassword") : t("showPassword")}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -121,15 +130,15 @@ export default function MerchantLoginPage() {
 
             <button type="submit" className="btn btn-primary w-full" disabled={isLoading}>
               {isLoading ? <span className="loading loading-spinner loading-sm" /> : null}
-              {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
+              {isLoading ? t("submitting") : t("submit")}
             </button>
           </form>
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          ¿Problemas para acceder? Contacta a{" "}
+          {t("supportPrefix")}{" "}
           <a href="mailto:soporte@saludtech.com" className="text-primary hover:underline">
-            soporte@saludtech.com
+            {t("supportEmail")}
           </a>
         </p>
       </div>

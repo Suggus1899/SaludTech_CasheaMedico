@@ -14,18 +14,21 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../lib/api";
+import { useTranslations } from "next-intl";
 import type { Merchant } from "../../../types/patient";
 
-const categoryConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  CLINIC: { label: "Clínicas", icon: Stethoscope, color: "#2563eb" },
-  LABORATORY: { label: "Laboratorios", icon: FlaskConical, color: "#0891b2" },
-  PHARMACY: { label: "Farmacias", icon: Pill, color: "#16a34a" },
-  DENTAL: { label: "Dentales", icon: Smile, color: "#7c3aed" },
-  OPTICS: { label: "Ópticas", icon: Eye, color: "#db2777" },
-  ELDER_CARE: { label: "Cuidado Mayor", icon: Home, color: "#ea580c" },
+const categoryConfig: Record<string, { labelKey: string; icon: React.ElementType; color: string }> = {
+  CLINIC: { labelKey: "catClinic", icon: Stethoscope, color: "#2563eb" },
+  LABORATORY: { labelKey: "catLaboratory", icon: FlaskConical, color: "#0891b2" },
+  PHARMACY: { labelKey: "catPharmacy", icon: Pill, color: "#16a34a" },
+  DENTAL: { labelKey: "catDental", icon: Smile, color: "#7c3aed" },
+  OPTICS: { labelKey: "catOptics", icon: Eye, color: "#db2777" },
+  ELDER_CARE: { labelKey: "catElderCare", icon: Home, color: "#ea580c" },
 };
 
 export default function ComerciosPage() {
+  const t = useTranslations("Merchants");
+  const tCommon = useTranslations("Common");
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("");
@@ -63,15 +66,15 @@ export default function ComerciosPage() {
         href="/dashboard"
         className="btn btn-ghost btn-sm -ml-2"
       >
-        <ArrowLeft className="w-4 h-4" /> Volver
+        <ArrowLeft className="w-4 h-4" /> {tCommon("back")}
       </Link>
 
       <div>
         <h1 className="text-xl font-bold text-foreground font-display">
-          Comercios Aliados
+          {t("title")}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Explora el catálogo de servicios e insumos médicos
+          {t("subtitle")}
         </p>
       </div>
 
@@ -82,7 +85,7 @@ export default function ComerciosPage() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar comercio..."
+          placeholder={t("searchPlaceholder")}
           className="input input-bordered w-full pl-10 text-sm"
         />
       </div>
@@ -93,7 +96,7 @@ export default function ComerciosPage() {
           onClick={() => setFilter("")}
           className={`btn btn-xs ${filter === "" ? "btn-primary" : "btn-outline"}`}
         >
-          Todos
+          {t("all")}
         </button>
         {Object.entries(categoryConfig).map(([key, cfg]) => (
           <button
@@ -101,7 +104,7 @@ export default function ComerciosPage() {
             onClick={() => setFilter(key)}
             className={`btn btn-xs ${filter === key ? "btn-primary" : "btn-outline"}`}
           >
-            {cfg.label}
+            {t(cfg.labelKey as any)}
           </button>
         ))}
       </div>
@@ -112,12 +115,12 @@ export default function ComerciosPage() {
         </div>
       ) : Object.keys(grouped).length === 0 ? (
         <p className="text-center text-muted-foreground py-8 text-sm">
-          No se encontraron comercios
+          {t("noMerchants")}
         </p>
       ) : (
         <div data-tour="merchant-list" className="space-y-6">
           {Object.entries(grouped).map(([category, items]) => {
-            const cfg = categoryConfig[category] || { label: category, icon: Heart, color: "#6b7280" };
+            const cfg = categoryConfig[category] || { labelKey: category, icon: Heart, color: "#6b7280" };
             const Icon = cfg.icon;
             return (
               <section key={category}>
@@ -129,7 +132,7 @@ export default function ComerciosPage() {
                     <Icon className="w-4 h-4" />
                   </div>
                   <h2 className="text-base font-bold text-foreground font-display">
-                    {cfg.label}
+                    {t(cfg.labelKey as any)}
                   </h2>
                   <span className="text-xs text-muted-foreground">({items.length})</span>
                 </div>
@@ -164,7 +167,7 @@ export default function ComerciosPage() {
                         </div>
                       </div>
                       <p className="text-xs font-semibold text-primary mt-3">
-                        Ver catálogo →
+                        {t("viewCatalog")}
                       </p>
                     </Link>
                   ))}

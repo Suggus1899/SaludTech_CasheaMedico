@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { getApiUrl, apiFetch, getStoredUser } from "../../../../lib/api";
 import { formatCurrency, formatWithVES, formatDate } from "../../../../lib/utils";
+import { useTranslations } from "next-intl";
 import type {
   MedicalService,
   MedicalSupply,
@@ -46,6 +47,8 @@ export default function MerchantDetailPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
+  const t = useTranslations("MerchantDetail");
+  const tCommon = useTranslations("Common");
 
   const [tab, setTab] = useState<Tab>("services");
   const [services, setServices] = useState<MedicalService[]>([]);
@@ -120,13 +123,13 @@ export default function MerchantDetailPage({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
-        throw new Error(data?.message ?? "Checkout failed");
+        throw new Error(data?.message ?? t("checkoutError"));
       }
       const data = (await res.json()) as CheckoutResponse;
       setCheckoutResult(data);
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error en el checkout");
+      setError(err instanceof Error ? err.message : t("checkoutError"));
     } finally {
       setIsProcessing(false);
     }
@@ -140,40 +143,40 @@ export default function MerchantDetailPage({
             <CheckCircle2 className="w-14 h-14 text-success" />
           </div>
           <h2 className="text-2xl font-bold text-foreground mt-6 font-display">
-            ¡Compra Exitosa!
+            {t("successTitle")}
           </h2>
           <p className="text-sm text-muted-foreground mt-2">
-            Tu financiamiento ha sido aprobado
+            {t("successDesc")}
           </p>
         </div>
 
         <div className="p-5 rounded-2xl border border-border bg-base-100 space-y-3">
           <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">Monto Total</span>
+            <span className="text-sm text-muted-foreground">{t("totalAmount")}</span>
             <span className="text-sm font-bold font-display">
               {formatWithVES(checkoutResult.totalAmount, checkoutResult.totalAmountVES)}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">Inicial (Down Payment)</span>
+            <span className="text-sm text-muted-foreground">{t("downPayment")}</span>
             <span className="text-sm font-bold font-display">
               {formatWithVES(checkoutResult.downPayment, checkoutResult.downPaymentVES)}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">Financiado</span>
+            <span className="text-sm text-muted-foreground">{t("financed")}</span>
             <span className="text-sm font-bold font-display">
               {formatWithVES(checkoutResult.financedAmount, checkoutResult.financedAmountVES)}
             </span>
           </div>
           <div className="border-t border-border pt-3">
             <p className="text-xs font-semibold text-foreground mb-2">
-              Cuotas ({checkoutResult.numInstallments})
+              {t("installmentsLabel", { count: checkoutResult.numInstallments })}
             </p>
             {checkoutResult.installments.map((inst) => (
               <div key={inst.installmentNumber} className="flex justify-between py-1">
                 <span className="text-xs text-muted-foreground">
-                  Cuota {inst.installmentNumber} · {formatDate(inst.dueDate)}
+                  {t("installmentLine", { number: inst.installmentNumber, date: formatDate(inst.dueDate) })}
                 </span>
                 <span className="text-xs font-semibold font-display">
                   {formatWithVES(inst.amount, inst.amountVES)}
@@ -188,13 +191,13 @@ export default function MerchantDetailPage({
             onClick={() => router.push("/cuotas")}
             className="btn btn-primary w-full"
           >
-            Ver mis cuotas
+            {t("viewInstallments")}
           </button>
           <button
             onClick={() => router.push("/dashboard")}
             className="btn btn-ghost w-full"
           >
-            Ir al dashboard
+            {t("goDashboard")}
           </button>
         </div>
       </div>
@@ -207,7 +210,7 @@ export default function MerchantDetailPage({
         onClick={() => router.back()}
         className="btn btn-ghost btn-sm -ml-2"
       >
-        <ArrowLeft className="w-4 h-4" /> Volver
+        <ArrowLeft className="w-4 h-4" /> {tCommon("back")}
       </button>
 
       {/* Tabs */}
@@ -217,14 +220,14 @@ export default function MerchantDetailPage({
           className={`tab ${tab === "services" ? "tab-active" : ""}`}
         >
           <Stethoscope className="w-4 h-4 mr-1.5 inline" />
-          Servicios ({services.length})
+          {t("services", { count: services.length })}
         </button>
         <button
           onClick={() => setTab("supplies")}
           className={`tab ${tab === "supplies" ? "tab-active" : ""}`}
         >
           <Pill className="w-4 h-4 mr-1.5 inline" />
-          Insumos ({supplies.length})
+          {t("supplies", { count: supplies.length })}
         </button>
       </div>
 
@@ -236,7 +239,7 @@ export default function MerchantDetailPage({
         <div className="space-y-3">
           {services.length === 0 ? (
             <p className="text-center text-muted-foreground py-8 text-sm">
-              No hay servicios disponibles
+              {t("noServices")}
             </p>
           ) : (
             services.map((svc, idx) => (
@@ -259,7 +262,7 @@ export default function MerchantDetailPage({
                       {svc.durationMin && (
                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="w-3 h-3" />
-                          {svc.durationMin} min
+                          {svc.durationMin} {tCommon("minutes")}
                         </span>
                       )}
                       {svc.subcategory && (
@@ -282,7 +285,7 @@ export default function MerchantDetailPage({
                       onClick={() => addToCart("SERVICE", svc)}
                       className="btn btn-primary btn-xs mt-2"
                     >
-                      <ShoppingCart className="w-3 h-3" /> Agregar
+                      <ShoppingCart className="w-3 h-3" /> {t("add")}
                     </button>
                   </div>
                 </div>
@@ -294,7 +297,7 @@ export default function MerchantDetailPage({
         <div className="space-y-3">
           {supplies.length === 0 ? (
             <p className="text-center text-muted-foreground py-8 text-sm">
-              No hay insumos disponibles
+              {t("noSupplies")}
             </p>
           ) : (
             supplies.map((sup) => (
@@ -311,7 +314,7 @@ export default function MerchantDetailPage({
                       {sup.requiresPrescription && (
                         <span className="badge badge-warning badge-xs gap-1">
                           <AlertTriangle className="w-2.5 h-2.5" />
-                          Receta
+                          {tCommon("receta")}
                         </span>
                       )}
                     </div>
@@ -323,13 +326,13 @@ export default function MerchantDetailPage({
                     <div className="flex items-center gap-3 mt-2">
                       {sup.unit && (
                         <span className="text-xs text-muted-foreground">
-                          Unidad: {sup.unit}
+                          {tCommon("unit")}: {sup.unit}
                         </span>
                       )}
                       {sup.stock != null && (
                         <span className={`flex items-center gap-1 text-xs ${sup.stock > 10 ? "text-success" : "text-warning"}`}>
                           <Package className="w-3 h-3" />
-                          Stock: {sup.stock}
+                          {tCommon("stock")}: {sup.stock}
                         </span>
                       )}
                     </div>
@@ -347,7 +350,7 @@ export default function MerchantDetailPage({
                       onClick={() => addToCart("SUPPLY", sup)}
                       className="btn btn-primary btn-xs mt-2"
                     >
-                      <ShoppingCart className="w-3 h-3" /> Agregar
+                      <ShoppingCart className="w-3 h-3" /> {t("add")}
                     </button>
                   </div>
                 </div>
@@ -363,7 +366,7 @@ export default function MerchantDetailPage({
           <div className="max-w-md mx-auto space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-foreground">
-                Carrito ({cart.length} items)
+                {t("cart", { count: cart.length })}
               </span>
               <span className="text-base font-bold text-foreground font-display">
                 {formatCurrency(cartTotal)}
@@ -375,13 +378,13 @@ export default function MerchantDetailPage({
                 className="btn btn-primary flex-1"
               >
                 <ShoppingCart className="w-4 h-4" />
-                Checkout
+                {t("checkout")}
               </button>
               <button
                 onClick={() => setCart([])}
                 className="btn btn-ghost btn-sm"
               >
-                Vaciar
+                {t("clear")}
               </button>
             </div>
           </div>
@@ -392,7 +395,7 @@ export default function MerchantDetailPage({
       {showCheckout && (
         <div className="modal modal-open" role="dialog" aria-modal="true">
           <div className="modal-box max-w-md">
-            <h3 className="text-lg font-bold font-display">Resumen de Compra</h3>
+            <h3 className="text-lg font-bold font-display">{t("checkoutTitle")}</h3>
 
             {/* Cart items */}
             <div className="py-4 space-y-2">
@@ -403,7 +406,7 @@ export default function MerchantDetailPage({
                       {item.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {formatCurrency(item.price)} c/u
+                      {formatCurrency(item.price)} {tCommon("each")}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -446,7 +449,7 @@ export default function MerchantDetailPage({
             {/* Total */}
             <div className="border-t border-border pt-3 space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Total</span>
+                <span className="text-sm text-muted-foreground">{tCommon("total")}</span>
                 <span className="text-lg font-bold font-display">
                   {formatCurrency(cartTotal)}
                 </span>
@@ -456,7 +459,7 @@ export default function MerchantDetailPage({
             {/* Credit line selector */}
             <div className="mt-4">
               <label className="label pb-1">
-                <span className="label-text font-medium text-sm">Línea de Crédito</span>
+                <span className="label-text font-medium text-sm">{t("creditLine")}</span>
               </label>
               <select
                 value={creditLineType}
@@ -468,9 +471,9 @@ export default function MerchantDetailPage({
                 }}
                 className="select select-bordered w-full text-sm"
               >
-                <option value="ESPECIALIDAD_PRINCIPAL">Especialidad Principal</option>
-                <option value="SALUD_COTIDIANA">Salud Cotidiana</option>
-                <option value="MAYOR_CUIDADO">Cuidado Mayor</option>
+                <option value="ESPECIALIDAD_PRINCIPAL">{t("lineEspecialidad")}</option>
+                <option value="SALUD_COTIDIANA">{t("lineCotidiana")}</option>
+                <option value="MAYOR_CUIDADO">{t("lineMayorCuidado")}</option>
               </select>
             </div>
 
@@ -478,12 +481,12 @@ export default function MerchantDetailPage({
             <div className="mt-3">
               <label className="label pb-1">
                 <span className="label-text font-medium text-sm">
-                  Cuotas {creditLineType === "SALUD_COTIDIANA" && "(Línea Cotidiana: 1 cuota)"}
+                  {t("installments")} {creditLineType === "SALUD_COTIDIANA" && t("cotidianaLabel")}
                 </span>
               </label>
               {creditLineType === "SALUD_COTIDIANA" ? (
                 <div className="alert alert-info text-xs py-2">
-                  La Línea Cotidiana usa 1 sola cuota a 14 días, sin interés.
+                  {t("cotidianaNote")}
                 </div>
               ) : (
                 <>
@@ -501,10 +504,10 @@ export default function MerchantDetailPage({
                           disabled={isDisabled}
                           title={
                             isLocked
-                              ? `Tu nivel (${userLevel}) permite máximo ${maxAllowed} cuotas`
+                              ? t("lockedLevel", { level: userLevel, max: maxAllowed })
                               : isAmountLow
-                              ? `Monto mínimo para ${n} cuotas: $${minAmount}`
-                              : `${n} cuotas quincenales`
+                              ? t("minAmount", { count: n, amount: minAmount })
+                              : t("biweeklyInstallments", { count: n })
                           }
                           className={`btn btn-sm ${
                             numInstallments === n ? "btn-primary" : isDisabled ? "btn-disabled opacity-40" : "btn-outline"
@@ -516,7 +519,7 @@ export default function MerchantDetailPage({
                     })}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Nivel {userLevel} · Máx {maxInstallmentsForLevel(userLevel)} cuotas
+                    {t("levelMaxInstallments", { level: userLevel, max: maxInstallmentsForLevel(userLevel) })}
                   </p>
                 </>
               )}
@@ -533,7 +536,7 @@ export default function MerchantDetailPage({
                 onClick={() => setShowCheckout(false)}
                 className="btn btn-ghost btn-sm"
               >
-                Cancelar
+                {tCommon("cancel")}
               </button>
               <button
                 onClick={handleCheckout}
@@ -541,7 +544,7 @@ export default function MerchantDetailPage({
                 className="btn btn-primary btn-sm"
               >
                 {isProcessing ? <span className="loading loading-spinner loading-xs" /> : null}
-                Confirmar Compra
+                {t("confirmPurchase")}
               </button>
             </div>
           </div>

@@ -7,6 +7,7 @@ import { Award, LogOut, Mail, Phone, CreditCard, Shield, GraduationCap, RotateCc
 import { clearSession, getStoredUser } from "../../../lib/api";
 import { profileGradient } from "../../../lib/creditLineStyles";
 import { useTour, tours } from "../../../lib/tours";
+import { useTranslations } from "next-intl";
 import type { UserResponse } from "../../../types/patient";
 
 const levelThresholds: Record<number, number> = {
@@ -19,6 +20,8 @@ const levelThresholds: Record<number, number> = {
 
 export default function PerfilPage() {
   const router = useRouter();
+  const t = useTranslations("Profile");
+  const tTours = useTranslations("Tours");
   const [user, setUser] = useState<UserResponse | null>(null);
   const { startTour, hasSeenTour, resetTours } = useTour();
 
@@ -39,7 +42,7 @@ export default function PerfilPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-bold text-foreground">
-        Mi Perfil
+        {t("title")}
       </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -57,18 +60,18 @@ export default function PerfilPage() {
           <Award className="w-12 h-12" />
         </div>
         <h2 className="text-3xl font-bold mt-4 font-display">
-          Nivel {level}
+          {t("level", { level })}
         </h2>
         <p className="text-sm text-white/90 mt-1">
-          Puntos actuales: {points} pts
+          {t("currentPoints", { points })}
         </p>
 
         {/* Progress to next level */}
         <div className="mt-5">
           <div className="flex justify-between text-xs text-white/80 mb-1.5">
-            <span>Progreso al nivel {level + 1}</span>
+            <span>{t("progressToNext", { level: level + 1 })}</span>
             <span>
-              {points}/{nextLevelPoints} pts
+              {t("progressPoints", { points, total: nextLevelPoints })}
             </span>
           </div>
           <div className="h-2 rounded-full bg-white/20 overflow-hidden">
@@ -86,27 +89,27 @@ export default function PerfilPage() {
       {/* User info */}
       <div className="p-5 rounded-2xl border border-border bg-base-100 space-y-3">
         <h3 className="text-base font-bold text-foreground font-display">
-          Datos Personales
+          {t("personalData")}
         </h3>
 
         <InfoRow
           icon={<Mail className="w-4 h-4" />}
-          label="Correo"
+          label={t("email")}
           value={user?.email ?? "—"}
         />
         <InfoRow
           icon={<Phone className="w-4 h-4" />}
-          label="Teléfono"
+          label={t("phone")}
           value={user?.phone ?? "—"}
         />
         <InfoRow
           icon={<CreditCard className="w-4 h-4" />}
-          label="Cédula"
+          label={t("nationalId")}
           value={user?.identityDocument ?? "—"}
         />
         <InfoRow
           icon={<Shield className="w-4 h-4" />}
-          label="KYC"
+          label={t("kyc")}
           value={user?.kycStatus ?? "—"}
         />
       </div>
@@ -121,8 +124,8 @@ export default function PerfilPage() {
             <Settings className="w-5 h-5" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-foreground">Configuración</p>
-            <p className="text-xs text-muted-foreground">Tema, notificaciones y seguridad</p>
+            <p className="text-sm font-semibold text-foreground">{t("settings")}</p>
+            <p className="text-xs text-muted-foreground">{t("settingsDesc")}</p>
           </div>
           <span className="text-muted-foreground">›</span>
         </div>
@@ -133,19 +136,19 @@ export default function PerfilPage() {
         <div className="flex items-center justify-between">
           <h3 className="text-base font-bold text-foreground font-display flex items-center gap-2">
             <GraduationCap className="w-5 h-5 text-primary" />
-            Tutoriales
+            {t("tutorials")}
           </h3>
           <button
             onClick={resetTours}
             className="btn btn-ghost btn-xs gap-1 text-muted-foreground"
-            aria-label="Reiniciar tutoriales"
+            aria-label={t("resetTutorials")}
           >
             <RotateCcw className="w-3 h-3" />
-            Reiniciar
+            {t("reset")}
           </button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Aprende a usar cada sección con un tour guiado paso a paso.
+          {t("tutorialsDesc")}
         </p>
         <div className="space-y-2">
           {tours.map((tour) => {
@@ -165,12 +168,12 @@ export default function PerfilPage() {
                 <div className="flex items-center gap-2.5">
                   <GraduationCap className="w-4 h-4 text-primary shrink-0" />
                   <span className="text-sm font-medium text-foreground">
-                    {tour.name}
+                    {tTours(tour.name as any)}
                   </span>
                 </div>
                 {seen && (
                   <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
-                    Visto
+                    {t("seen")}
                   </span>
                 )}
               </button>
@@ -185,7 +188,7 @@ export default function PerfilPage() {
         className="btn btn-error btn-outline w-full gap-2"
       >
         <LogOut className="w-4 h-4" />
-        Cerrar Sesión
+        {t("logout")}
       </button>
         </div>
       </div>

@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { Logo } from "@saludtech/ui";
 import { CheckCircle, ShieldCheck, Lightning, Globe } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
 export default function Descarga() {
   const [contact, setContact] = useState("");
   const [sent, setSent] = useState(false);
+  const t = useTranslations("Home.download");
 
   function handleNotify(e: React.FormEvent) {
     e.preventDefault();
@@ -26,16 +28,15 @@ export default function Descarga() {
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/30 mb-5">
           <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
           <span className="text-secondary text-xs font-bold tracking-widest uppercase">
-            Plataforma lista para usar
+            {t("badge")}
           </span>
         </div>
 
         <h2 className="font-display text-4xl sm:text-5xl font-bold text-dark mb-4">
-          Empieza hoy mismo
+          {t("title")}
         </h2>
         <p className="text-slate-500 text-lg mb-10 max-w-xl mx-auto">
-          Regístrate en nuestra página web y accede a tu línea de crédito médico
-          en minutos. Sin descargas, sin instalaciones, directo desde tu navegador.
+          {t("subtitle")}
         </p>
 
         {/* CTA buttons */}
@@ -46,8 +47,8 @@ export default function Descarga() {
           >
             <Globe className="w-6 h-6 shrink-0" weight="duotone" />
             <div className="text-left">
-              <p className="font-semibold text-sm leading-tight">Crear cuenta gratis</p>
-              <p className="text-xs text-white/80 leading-tight">Sin tarjeta de crédito</p>
+              <p className="font-semibold text-sm leading-tight">{t("createAccountTitle")}</p>
+              <p className="text-xs text-white/80 leading-tight">{t("createAccountSubtitle")}</p>
             </div>
           </a>
           <a
@@ -56,8 +57,8 @@ export default function Descarga() {
           >
             <CheckCircle className="w-6 h-6 shrink-0 text-secondary" weight="duotone" />
             <div className="text-left">
-              <p className="font-semibold text-sm leading-tight">Ya tengo cuenta</p>
-              <p className="text-xs text-slate-400 leading-tight">Iniciar sesión</p>
+              <p className="font-semibold text-sm leading-tight">{t("haveAccountTitle")}</p>
+              <p className="text-xs text-slate-400 leading-tight">{t("haveAccountSubtitle")}</p>
             </div>
           </a>
         </div>
@@ -67,13 +68,13 @@ export default function Descarga() {
           {sent ? (
             <div className="flex flex-col items-center gap-3 py-5 px-6 bg-secondary/10 border border-secondary/30 rounded-2xl">
               <CheckCircle className="w-8 h-8 text-secondary" weight="duotone" />
-              <p className="font-display font-bold text-dark text-base">¡Listo! Te avisamos novedades 🎉</p>
-              <p className="text-slate-400 text-xs">Eres parte de los primeros usuarios de SaludTech.</p>
+              <p className="font-display font-bold text-dark text-base">{t("successTitle")}</p>
+              <p className="text-slate-400 text-xs">{t("successDesc")}</p>
               <button
                 onClick={() => setSent(false)}
                 className="text-xs text-primary hover:underline mt-1"
               >
-                Registrar otro contacto
+                {t("registerAnother")}
               </button>
             </div>
           ) : (
@@ -82,14 +83,14 @@ export default function Descarga() {
                 type="text"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                placeholder="Déjanos tu teléfono o correo para novedades"
+                placeholder={t("placeholder")}
                 className="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-dark placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               />
               <button
                 type="submit"
                 className="shrink-0 px-5 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-dark transition-colors shadow-md shadow-primary/20"
               >
-                Avísame
+                {t("notifyMe")}
               </button>
             </form>
           )}
@@ -98,9 +99,9 @@ export default function Descarga() {
         {/* Trust row */}
         <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-slate-500">
           {[
-            { icon: ShieldCheck, text: "Datos protegidos" },
-            { icon: CheckCircle, text: "Sin cuotas ocultas" },
-            { icon: Lightning, text: "Aprobación en 3 min" },
+            { icon: ShieldCheck, text: t("trust1") },
+            { icon: CheckCircle, text: t("trust2") },
+            { icon: Lightning, text: t("trust3") },
           ].map((f) => (
             <div key={f.text} className="flex items-center gap-2">
               <f.icon className="w-4 h-4 text-secondary" />

@@ -6,9 +6,12 @@ import { Pill, RefreshCw, Store, Calendar, X, Plus, QrCode } from "lucide-react"
 import { useFetchData } from "@saludtech/shared";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { formatCurrency, formatDate } from "../../../lib/utils";
+import { useTranslations } from "next-intl";
 import type { Subscription } from "../../../types/patient";
 
 export default function SuscripcionesPage() {
+  const t = useTranslations("Subscriptions");
+  const tCommon = useTranslations("Common");
   const { data, loading, error, refetch } = useFetchData<Subscription[]>(
     getApiUrl("patient/subscriptions")
   );
@@ -34,11 +37,11 @@ export default function SuscripcionesPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-foreground">
-          Mis Suscripciones
+          {t("title")}
         </h1>
         <button
           onClick={() => refetch()}
-          aria-label="Recargar"
+          aria-label={t("reload")}
           className="btn btn-ghost btn-sm btn-square"
         >
           <RefreshCw className="w-4 h-4" />
@@ -51,7 +54,7 @@ export default function SuscripcionesPage() {
         </div>
       ) : error ? (
         <p className="text-center text-muted-foreground py-8">
-          No se pudieron cargar las suscripciones.
+          {t("loadError")}
         </p>
       ) : subscriptions.length === 0 ? (
         <div className="flex flex-col items-center py-16 text-center">
@@ -59,13 +62,13 @@ export default function SuscripcionesPage() {
             <Pill className="w-12 h-12 text-success" />
           </div>
           <h2 className="text-lg font-bold text-foreground mt-5">
-            Sin suscripciones de farmacia
+            {t("noSubscriptions")}
           </h2>
           <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-            Vincula tu farmacia preferida escaneando un código QR.
+            {t("noSubscriptionsDesc")}
           </p>
           <Link href="/pagar" className="btn btn-primary btn-sm mt-5 gap-2">
-            <QrCode className="w-4 h-4" /> Escanear QR
+            <QrCode className="w-4 h-4" /> {t("scanQR")}
           </Link>
         </div>
       ) : (
@@ -81,14 +84,14 @@ export default function SuscripcionesPage() {
               >
                 <div className="flex items-start justify-between">
                   <p className="text-sm font-bold text-foreground font-display">
-                    {sub.plan ?? "Medicina"}
+                    {sub.plan ?? t("medicine")}
                   </p>
                   <span
                     className={`badge badge-sm ${
                       isActive ? "badge-success" : "badge-ghost"
                     }`}
                   >
-                    {isActive ? "Activa" : "Cancelada"}
+                    {isActive ? t("active") : t("cancelled")}
                   </span>
                 </div>
 
@@ -99,7 +102,7 @@ export default function SuscripcionesPage() {
                   </span>
                   <span className="flex-1" />
                   <span className="text-sm font-bold text-success font-display">
-                    {formatCurrency(sub.monthlyAmount ?? 0)}/mes
+                    {formatCurrency(sub.monthlyAmount ?? 0)}{tCommon("perMonth")}
                   </span>
                 </div>
 
@@ -107,7 +110,7 @@ export default function SuscripcionesPage() {
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">
-                      Próximo cobro: {formatDate(sub.nextBilling)}
+                      {t("nextBilling", { date: formatDate(sub.nextBilling) })}
                     </span>
                   </div>
                 )}
@@ -119,7 +122,7 @@ export default function SuscripcionesPage() {
                       disabled={cancellingId === sub.id}
                       className="btn btn-ghost btn-xs text-error gap-1"
                     >
-                      <X className="w-3 h-3" /> Cancelar
+                      <X className="w-3 h-3" /> {t("cancel")}
                     </button>
                   </div>
                 )}
@@ -139,14 +142,14 @@ export default function SuscripcionesPage() {
         >
           <div className="modal-box">
             <h3 id="cancel-title" className="text-lg font-bold font-display">
-              Cancelar Suscripción
+              {t("cancelTitle")}
             </h3>
             <p className="py-4 text-sm text-muted-foreground">
-              ¿Estás seguro? El próximo cobro mensual no se realizará.
+              {t("cancelConfirm")}
             </p>
             <div className="modal-action">
               <button onClick={() => setConfirmId(null)} className="btn btn-ghost btn-sm">
-                No
+                {t("no")}
               </button>
               <button
                 onClick={() => handleCancel(confirmId)}
@@ -156,13 +159,13 @@ export default function SuscripcionesPage() {
                 {cancellingId === confirmId ? (
                   <span className="loading loading-spinner loading-xs" />
                 ) : null}
-                Sí, cancelar
+                {t("yesCancel")}
               </button>
             </div>
           </div>
           <button
             className="modal-backdrop"
-            aria-label="Cerrar"
+            aria-label={t("close")}
             onClick={() => setConfirmId(null)}
           />
         </div>

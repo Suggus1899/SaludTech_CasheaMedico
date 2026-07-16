@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AlertCircle, RotateCcw } from "lucide-react";
 
 export default function GlobalError({
@@ -9,6 +10,7 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("Errors");
   return (
     <html lang="es">
       <body>
@@ -21,10 +23,10 @@ export default function GlobalError({
             </div>
             <div className="space-y-2">
               <h1 className="text-xl font-bold text-foreground">
-                Error crítico
+                {t("criticalError")}
               </h1>
               <p className="text-sm text-muted-foreground">
-                {error.message || "La aplicación no pudo cargar correctamente."}
+                {error.message || t("appLoadError")}
               </p>
             </div>
             <button
@@ -32,7 +34,7 @@ export default function GlobalError({
               className="btn btn-primary gap-2"
             >
               <RotateCcw className="w-4 h-4" />
-              Reintentar
+              {t("retry")}
             </button>
           </div>
         </div>

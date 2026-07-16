@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Menu, Search, Sun, Moon, Bell, ChevronDown, User, Settings, HelpCircle, LogOut, AlertTriangle, X, CheckCircle2, Clock } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { NAV_ITEMS } from "../../lib/constants";
 import { getApiUrl, apiFetch } from "../../lib/api";
 import { OverdueInstallment } from "../../types/admin";
+
 
 export function Topbar({
   sidebarOpen,
@@ -17,12 +19,14 @@ export function Topbar({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const tNav = useTranslations("Nav");
+  const tCommon = useTranslations("Common");
   const [rawSearch, setSearch] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [overdueList, setOverdueList] = useState<OverdueInstallment[]>([]);
   const [notifLoading, setNotifLoading] = useState(false);
-  
+
   const adminUser = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("admin_user") ?? "null") : null;
 
   useEffect(() => {
@@ -65,12 +69,12 @@ export function Topbar({
   }, [router]);
 
   const activeItem = NAV_ITEMS.find(item => item.href === pathname || (item.href !== "/dashboard" && pathname.startsWith(item.href)));
-  const title = activeItem ? activeItem.label : "Dashboard";
+  const title = activeItem ? tNav(activeItem.id) : tNav("dashboard");
 
   return (
     <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4 md:px-6 shrink-0">
       <div className="flex items-center gap-3">
-        <button className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors" onClick={() => setSidebarOpen(true)} aria-label="Abrir menú">
+        <button className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors" onClick={() => setSidebarOpen(true)} aria-label={tNav("openMenu")}>
           <Menu className="w-5 h-5" />
         </button>
         <h1 className="text-lg font-semibold font-(family-name:--font-syne)">{title}</h1>
@@ -79,10 +83,11 @@ export function Topbar({
       <div className="flex items-center gap-2">
         <div className="relative hidden sm:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-          <input type="search" placeholder="Buscar..." value={rawSearch} onChange={(e) => setSearch(e.target.value)} aria-label="Buscar en el panel" className="pl-9 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
+          <input type="search" placeholder={tNav("search")} value={rawSearch} onChange={(e) => setSearch(e.target.value)} aria-label={tNav("searchPanel")} className="pl-9 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
         </div>
 
-        <button onClick={toggleDarkMode} aria-label={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"} className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+
+        <button onClick={toggleDarkMode} aria-label={isDarkMode ? tNav("switchLight") : tNav("switchDark")} className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
           {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
 
@@ -100,7 +105,7 @@ export function Topbar({
           {notifOpen && (
             <div className="absolute right-0 top-12 z-40 w-80 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                <span className="font-semibold text-sm font-(family-name:--font-syne)">Cuotas en Mora</span>
+                <span className="font-semibold text-sm font-(family-name:--font-syne)">{tNav("overdueInstallments")}</span>
                 <button onClick={() => setNotifOpen(false)} className="p-1 rounded hover:bg-muted">
                   <X className="w-4 h-4" />
                 </button>
@@ -108,12 +113,12 @@ export function Topbar({
               <div className="max-h-72 overflow-y-auto">
                 {notifLoading ? (
                   <div className="flex items-center justify-center py-8 text-muted-foreground gap-2 text-sm">
-                    <Clock className="w-4 h-4 animate-spin" /> Cargando...
+                    <Clock className="w-4 h-4 animate-spin" /> {tCommon("loading")}
                   </div>
                 ) : overdueList.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground text-sm">
                     <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-green-500" />
-                    Sin cuotas en mora
+                    {tNav("noOverdue")}
                   </div>
                 ) : (
                   overdueList.map((item) => (
@@ -122,8 +127,8 @@ export function Topbar({
                         <AlertTriangle className="w-4 h-4 text-destructive" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{item.user?.fullName ?? "Paciente"}</p>
-                        <p className="text-xs text-muted-foreground">Cuota vencida · ${item.amount?.toFixed(2) ?? "—"}</p>
+                        <p className="text-sm font-medium truncate">{item.user?.fullName ?? tNav("patient")}</p>
+                        <p className="text-xs text-muted-foreground">{tNav("overdueInstallment")} · ${item.amount?.toFixed(2) ?? "—"}</p>
                       </div>
                       <span className="text-xs text-destructive font-medium whitespace-nowrap">
                         {item.dueDate ? new Date(item.dueDate).toLocaleDateString("es-VE") : "—"}
@@ -145,11 +150,11 @@ export function Topbar({
           </button>
           <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box shadow-lg border border-base-300 w-56 z-50 p-1 mt-1">
             <li className="menu-title px-3 py-1">
-              <p className="text-sm font-semibold">{adminUser?.firstName ?? "Administrador"}</p>
+              <p className="text-sm font-semibold">{adminUser?.firstName ?? tNav("administrator")}</p>
               <p className="text-xs opacity-60">{adminUser?.email ?? "admin@saludtech.com"}</p>
             </li>
             <li><hr className="my-1 border-base-300" /></li>
-            <li><button onClick={handleLogout} className="text-error"><LogOut className="w-4 h-4" /> Cerrar Sesión</button></li>
+            <li><button onClick={handleLogout} className="text-error"><LogOut className="w-4 h-4" /> {tNav("logout")}</button></li>
           </ul>
         </div>
       </div>
