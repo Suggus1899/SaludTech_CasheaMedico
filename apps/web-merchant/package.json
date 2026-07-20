@@ -50,5 +50,6 @@
     "workerDirectory": [
       "public"
     ]
-  }
+  },
+  "license": "UNLICENSED"
 }
