@@ -324,6 +324,7 @@
     "installmentAmount": "Monto cuota",
     "totalToPay": "Total a pagar",
     "cardData": "Datos de la Tarjeta",
+    "securityNotice": "No te preocupes por tus datos. Utilizamos una API de simulación para procesar pagos y proteger tu información. Ningún dato real es almacenado.",
     "testCards": "Tarjetas de prueba (clic para autocompletar):",
     "cardNumber": "Número de Tarjeta",
     "cardHolder": "Nombre del Titular",

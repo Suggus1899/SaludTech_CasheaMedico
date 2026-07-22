@@ -324,6 +324,7 @@
     "installmentAmount": "Montant de la mensualité",
     "totalToPay": "Total à payer",
     "cardData": "Données de la carte",
+    "securityNotice": "Ne vous inquiétez pas pour vos données. Nous utilisons une API de simulation pour traiter les paiements et protéger vos informations. Aucune donnée réelle n'est stockée.",
     "testCards": "Cartes de test (cliquez pour remplir) :",
     "cardNumber": "Numéro de carte",
     "cardHolder": "Nom du titulaire",

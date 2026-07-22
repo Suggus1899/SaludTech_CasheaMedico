@@ -9,6 +9,7 @@ import {
   Info,
   AlertCircle,
   ArrowLeft,
+  ShieldCheck,
 } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../../lib/api";
 import { formatCurrency, formatWithVES, formatDate } from "../../../../lib/utils";
@@ -192,6 +193,14 @@ export default function PayInstallmentPage({
         <h2 className="text-base font-bold text-foreground mb-3 font-display">
           {t("cardData")}
         </h2>
+
+        {/* Security notice */}
+        <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-success/10 mb-4">
+          <ShieldCheck className="w-4 h-4 text-success shrink-0 mt-0.5" />
+          <p className="text-xs text-success leading-relaxed">
+            {t("securityNotice")}
+          </p>
+        </div>
 
         {/* Test card quick-select */}
         <div data-tour="test-cards" className="mb-4">

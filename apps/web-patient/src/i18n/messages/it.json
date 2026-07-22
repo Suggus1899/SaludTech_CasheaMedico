@@ -324,6 +324,7 @@
     "installmentAmount": "Importo rata",
     "totalToPay": "Totale da pagare",
     "cardData": "Dati Carta",
+    "securityNotice": "Non preoccuparti dei tuoi dati. Utilizziamo un'API di simulazione per elaborare i pagamenti e proteggere le tue informazioni. Nessun dato reale viene memorizzato.",
     "testCards": "Carte di test (clic per compilare):",
     "cardNumber": "Numero Carta",
     "cardHolder": "Nome Intestatario",
