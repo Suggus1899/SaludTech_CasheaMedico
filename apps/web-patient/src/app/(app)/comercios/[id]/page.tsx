@@ -151,6 +151,26 @@ export default function MerchantDetailPage({
         </div>
 
         <div className="p-5 rounded-2xl border border-border bg-base-100 space-y-3">
+          {/* Purchased items */}
+          {checkoutResult.items.length > 0 && (
+            <div className="border-b border-border pb-3">
+              <p className="text-xs font-semibold text-foreground mb-2">
+                {t("purchasedItems")}
+              </p>
+              <div className="space-y-1.5">
+                {checkoutResult.items.map((item, idx) => (
+                  <div key={idx} className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">
+                      {item.quantity}x {item.name}
+                    </span>
+                    <span className="font-semibold font-display">
+                      {formatCurrency(item.priceUsd * item.quantity)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="text-sm text-muted-foreground">{t("totalAmount")}</span>
             <span className="text-sm font-bold font-display">

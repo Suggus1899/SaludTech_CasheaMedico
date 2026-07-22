@@ -242,7 +242,7 @@ export default function PagarPage() {
         <form onSubmit={handleManualSubmit} className="space-y-3">
           <div className="flex items-center gap-2 text-muted-foreground text-sm">
             <Keyboard className="w-4 h-4" />
-            <span>{t("manualEntry")}</span>
+            <span>{t("manualEntryHint")}</span>
           </div>
           <div className="flex gap-2">
             <input
@@ -257,6 +257,20 @@ export default function PagarPage() {
             </button>
           </div>
         </form>
+
+        {/* Explore merchants fallback */}
+        <div className="pt-2 border-t border-border">
+          <p className="text-center text-sm text-muted-foreground mb-3">
+            {t("cantScan")}
+          </p>
+          <button
+            onClick={() => router.push("/comercios")}
+            className="btn btn-outline w-full gap-2"
+          >
+            <Store className="w-4 h-4" />
+            {t("exploreMerchants")}
+          </button>
+        </div>
       </div>
     );
   }
