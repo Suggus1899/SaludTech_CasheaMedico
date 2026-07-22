@@ -324,6 +324,7 @@
     "installmentAmount": "Montant de la mensualité",
     "totalToPay": "Total à payer",
     "cardData": "Données de la carte",
+    "testCards": "Cartes de test (cliquez pour remplir) :",
     "cardNumber": "Numéro de carte",
     "cardHolder": "Nom du titulaire",
     "expMonth": "Mois",

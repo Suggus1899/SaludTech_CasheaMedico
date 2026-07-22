@@ -324,6 +324,7 @@
     "installmentAmount": "Importo rata",
     "totalToPay": "Totale da pagare",
     "cardData": "Dati Carta",
+    "testCards": "Carte di test (clic per compilare):",
     "cardNumber": "Numero Carta",
     "cardHolder": "Nome Intestatario",
     "expMonth": "Mese",

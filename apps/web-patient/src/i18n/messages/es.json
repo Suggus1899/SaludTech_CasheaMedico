@@ -324,6 +324,7 @@
     "installmentAmount": "Monto cuota",
     "totalToPay": "Total a pagar",
     "cardData": "Datos de la Tarjeta",
+    "testCards": "Tarjetas de prueba (clic para autocompletar):",
     "cardNumber": "Número de Tarjeta",
     "cardHolder": "Nombre del Titular",
     "expMonth": "Mes",

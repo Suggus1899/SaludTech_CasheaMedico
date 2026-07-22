@@ -15,12 +15,12 @@ import { formatCurrency, formatWithVES, formatDate } from "../../../../lib/utils
 import { useTranslations } from "next-intl";
 import type { Installment } from "../../../../types/patient";
 
-const testCards = process.env.NODE_ENV === "development" ? [
+const testCards = [
   { label: "Visa", number: "4111111111111111" },
   { label: "Mastercard", number: "5555555555554444" },
   { label: "Amex", number: "378282246310005" },
   { label: "Discover", number: "6011111111111117" },
-] : [];
+];
 
 export default function PayInstallmentPage({
   params,
@@ -194,17 +194,20 @@ export default function PayInstallmentPage({
         </h2>
 
         {/* Test card quick-select */}
-        <div data-tour="test-cards" className="flex flex-wrap gap-2 mb-4">
-          {testCards.map((c) => (
-            <button
-              key={c.number}
-              type="button"
-              onClick={() => setCardNumber(c.number)}
-              className={`btn btn-xs ${cardNumber === c.number ? "btn-primary" : "btn-outline"}`}
-            >
-              {c.label}
-            </button>
-          ))}
+        <div data-tour="test-cards" className="mb-4">
+          <p className="text-xs text-muted-foreground mb-2">{t("testCards")}</p>
+          <div className="flex flex-wrap gap-2">
+            {testCards.map((c) => (
+              <button
+                key={c.number}
+                type="button"
+                onClick={() => setCardNumber(c.number)}
+                className={`btn btn-xs ${cardNumber === c.number ? "btn-primary" : "btn-outline"}`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="space-y-3">

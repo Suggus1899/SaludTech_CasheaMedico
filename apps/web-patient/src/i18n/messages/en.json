@@ -324,6 +324,7 @@
     "installmentAmount": "Installment amount",
     "totalToPay": "Total to pay",
     "cardData": "Card Details",
+    "testCards": "Test cards (click to autofill):",
     "cardNumber": "Card Number",
     "cardHolder": "Cardholder Name",
     "expMonth": "Month",
