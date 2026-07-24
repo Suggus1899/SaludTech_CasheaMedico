@@ -2,8 +2,10 @@ package patient
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -67,6 +69,64 @@ type HealthProfileRequest struct {
 	Notes                   string   `json:"notes"`
 }
 
+var validBloodTypes = map[string]bool{
+	"A+": true, "A-": true, "B+": true, "B-": true,
+	"AB+": true, "AB-": true, "O+": true, "O-": true,
+}
+
+func validateHealthProfile(req *HealthProfileRequest) string {
+	var errs []string
+
+	if req.BloodType != "" && !validBloodTypes[req.BloodType] {
+		errs = append(errs, "bloodType must be one of A+, A-, B+, B-, AB+, AB-, O+, O-")
+	}
+
+	if req.HeightCm != 0 && (req.HeightCm < 50 || req.HeightCm > 300) {
+		errs = append(errs, "heightCm must be between 50 and 300 cm")
+	}
+
+	if req.WeightKg != 0 && (req.WeightKg < 20 || req.WeightKg > 500) {
+		errs = append(errs, "weightKg must be between 20 and 500 kg")
+	}
+
+	for _, a := range req.Allergies {
+		if len(a) > 500 {
+			errs = append(errs, "each allergy must be at most 500 characters")
+			break
+		}
+	}
+	for _, c := range req.ChronicConditions {
+		if len(c) > 500 {
+			errs = append(errs, "each chronic condition must be at most 500 characters")
+			break
+		}
+	}
+	for _, m := range req.CurrentMedications {
+		if len(m) > 500 {
+			errs = append(errs, "each medication must be at most 500 characters")
+			break
+		}
+	}
+
+	if len(req.EmergencyContactName) > 100 {
+		errs = append(errs, "emergencyContactName must be at most 100 characters")
+	}
+	if len(req.EmergencyContactPhone) > 20 {
+		errs = append(errs, "emergencyContactPhone must be at most 20 characters")
+	}
+	if len(req.EmergencyContactRelation) > 50 {
+		errs = append(errs, "emergencyContactRelation must be at most 50 characters")
+	}
+	if len(req.Notes) > 1000 {
+		errs = append(errs, "notes must be at most 1000 characters")
+	}
+
+	if len(errs) == 0 {
+		return ""
+	}
+	return strings.Join(errs, "; ")
+}
+
 func (h *PatientHandler) UpsertHealthProfile(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userID := auth.GetUserID(ctx)
@@ -80,6 +140,11 @@ func (h *PatientHandler) UpsertHealthProfile(w http.ResponseWriter, r *http.Requ
 	var req HealthProfileRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, `{"error":"Invalid request body"}`, http.StatusBadRequest)
+		return
+	}
+
+	if errMsg := validateHealthProfile(&req); errMsg != "" {
+		http.Error(w, fmt.Sprintf(`{"error":"%s"}`, errMsg), http.StatusBadRequest)
 		return
 	}
 

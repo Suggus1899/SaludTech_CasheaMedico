@@ -5,12 +5,13 @@ import Link from "next/link";
 import { ArrowLeft, Users, UserPlus, Trash2, Check, X, AlertCircle, Phone, Mail } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { useTranslations } from "next-intl";
+import type { FamilyMember, Caregiver } from "../../../types/patient";
 
 export default function FamilyPage() {
   const t = useTranslations("Family");
   const tCommon = useTranslations("Common");
-  const [members, setMembers] = useState<any[]>([]);
-  const [caregivers, setCaregivers] = useState<any[]>([]);
+  const [members, setMembers] = useState<FamilyMember[]>([]);
+  const [caregivers, setCaregivers] = useState<Caregiver[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -167,7 +168,7 @@ export default function FamilyPage() {
                       {m.permissions && m.permissions.length > 0 && (
                         <div className="flex flex-wrap gap-1 pt-1">
                           {m.permissions.map((p: string) => (
-                            <span key={p} className="badge badge-xs badge-outline">{permissionLabelKeys[p] ? t(permissionLabelKeys[p] as any) : p}</span>
+                            <span key={p} className="badge badge-xs badge-outline">{permissionLabelKeys[p] ? t(permissionLabelKeys[p]) : p}</span>
                           ))}
                         </div>
                       )}
@@ -249,7 +250,7 @@ export default function FamilyPage() {
                   {Object.entries(permissionLabelKeys).map(([key, labelKey]) => (
                     <label key={key} className="flex items-center gap-2 cursor-pointer">
                       <input type="checkbox" checked={form.permissions.includes(key)} onChange={() => togglePermission(key)} className="checkbox checkbox-sm checkbox-primary" />
-                      <span className="text-sm">{t(labelKey as any)}</span>
+                      <span className="text-sm">{t(labelKey)}</span>
                     </label>
                   ))}
                 </div>

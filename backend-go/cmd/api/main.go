@@ -27,7 +27,6 @@ import (
 	appmw "github.com/saludtech/backend-go/internal/middleware"
 	"github.com/saludtech/backend-go/internal/merchant"
 	"github.com/saludtech/backend-go/internal/patient"
-	"github.com/saludtech/backend-go/internal/payment"
 	"github.com/saludtech/backend-go/internal/user"
 	"github.com/saludtech/backend-go/internal/worker"
 )
@@ -93,7 +92,7 @@ func main() {
 
 	// Rate limiters for sensitive endpoints
 	authLimiter := appmw.NewRateLimiter(5, time.Minute)   // 5 login/register attempts per minute per IP
-	payLimiter := appmw.NewRateLimiter(10, time.Minute)   // 10 payment attempts per minute per IP
+	adminLimiter := appmw.NewRateLimiter(30, time.Minute) // 30 admin requests per minute per IP
 
 	// Auth routes (public) — rate limited to prevent brute force
 	r.With(authLimiter.Middleware).Post("/api/v1/auth/login", authHandler.Login)
@@ -106,10 +105,6 @@ func main() {
 	patientHandler := &patient.PatientHandler{DB: queries, Pool: pool, BCVClient: bcvClient, FakePay: fakePayClient}
 	r.Route("/api/v1/patient", patientHandler.Routes())
 
-	// Payment routes (protected — legacy endpoint) — rate limited
-	paymentHandler := &payment.PaymentHandler{DB: queries}
-	r.With(auth.RequireAuth, payLimiter.Middleware).Post("/api/v1/payments", paymentHandler.ProcessPayment)
-
 	// Merchant routes (MERCHANT + ADMIN only)
 	merchantHandler := &merchant.MerchantHandler{DB: queries}
 	r.Group(func(mux chi.Router) {
@@ -117,10 +112,10 @@ func main() {
 		mux.Mount("/api/v1/merchant", merchantHandler.Routes())
 	})
 
-	// Admin routes (ADMIN only)
+	// Admin routes (ADMIN only) — rate limited
 	adminHandler := &admin.AdminHandler{DB: queries}
 	r.Group(func(mux chi.Router) {
-		mux.Use(auth.RequireAuth, auth.RequireRole("ADMIN"))
+		mux.Use(auth.RequireAuth, auth.RequireRole("ADMIN"), adminLimiter.Middleware)
 		mux.Mount("/api/v1/admin", adminHandler.Routes())
 	})
 

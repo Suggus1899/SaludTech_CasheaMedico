@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -51,15 +52,42 @@ func (h *AdminHandler) Routes() http.Handler {
 func (h *AdminHandler) GetDashboardStats(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 
-	totalUsers, _ := h.DB.CountUsers(ctx)
-	totalPatients, _ := h.DB.CountUsersByRole(ctx, "PATIENT")
-	totalMerchants, _ := h.DB.CountMerchants(ctx)
-	activeMerchants, _ := h.DB.CountActiveMerchants(ctx)
-	totalTransactions, _ := h.DB.CountTransactions(ctx)
-	totalRevenue, _ := h.DB.SumTotalTransactionAmount(ctx)
-	overdueCount, _ := h.DB.CountOverdueInstallments(ctx)
-	pendingAmount, _ := h.DB.SumPendingInstallments(ctx)
-	totalCreditLines, _ := h.DB.CountCreditLines(ctx)
+	totalUsers, err := h.DB.CountUsers(ctx)
+	if err != nil {
+		log.Printf("admin: CountUsers error: %v", err)
+	}
+	totalPatients, err := h.DB.CountUsersByRole(ctx, "PATIENT")
+	if err != nil {
+		log.Printf("admin: CountUsersByRole error: %v", err)
+	}
+	totalMerchants, err := h.DB.CountMerchants(ctx)
+	if err != nil {
+		log.Printf("admin: CountMerchants error: %v", err)
+	}
+	activeMerchants, err := h.DB.CountActiveMerchants(ctx)
+	if err != nil {
+		log.Printf("admin: CountActiveMerchants error: %v", err)
+	}
+	totalTransactions, err := h.DB.CountTransactions(ctx)
+	if err != nil {
+		log.Printf("admin: CountTransactions error: %v", err)
+	}
+	totalRevenue, err := h.DB.SumTotalTransactionAmount(ctx)
+	if err != nil {
+		log.Printf("admin: SumTotalTransactionAmount error: %v", err)
+	}
+	overdueCount, err := h.DB.CountOverdueInstallments(ctx)
+	if err != nil {
+		log.Printf("admin: CountOverdueInstallments error: %v", err)
+	}
+	pendingAmount, err := h.DB.SumPendingInstallments(ctx)
+	if err != nil {
+		log.Printf("admin: SumPendingInstallments error: %v", err)
+	}
+	totalCreditLines, err := h.DB.CountCreditLines(ctx)
+	if err != nil {
+		log.Printf("admin: CountCreditLines error: %v", err)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -90,7 +118,10 @@ func (h *AdminHandler) ListUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	total, _ := h.DB.CountUsers(ctx)
+	total, err := h.DB.CountUsers(ctx)
+	if err != nil {
+		log.Printf("admin: CountUsers error: %v", err)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -199,7 +230,10 @@ func (h *AdminHandler) ListMerchants(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	total, _ := h.DB.CountMerchants(ctx)
+	total, err := h.DB.CountMerchants(ctx)
+	if err != nil {
+		log.Printf("admin: CountMerchants error: %v", err)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -255,7 +289,10 @@ func (h *AdminHandler) ListCreditLines(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	total, _ := h.DB.CountCreditLines(ctx)
+	total, err := h.DB.CountCreditLines(ctx)
+	if err != nil {
+		log.Printf("admin: CountCreditLines error: %v", err)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -340,7 +377,10 @@ func (h *AdminHandler) ListPendingTriage(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	total, _ := h.DB.CountPendingTriage(ctx)
+	total, err := h.DB.CountPendingTriage(ctx)
+	if err != nil {
+		log.Printf("admin: CountPendingTriage error: %v", err)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -409,7 +449,10 @@ func (h *AdminHandler) ListAllSubscriptions(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	total, _ := h.DB.CountAllSubscriptions(ctx)
+	total, err := h.DB.CountAllSubscriptions(ctx)
+	if err != nil {
+		log.Printf("admin: CountAllSubscriptions error: %v", err)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -435,7 +478,10 @@ func (h *AdminHandler) ListAllElderCare(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	total, _ := h.DB.CountAllElderCareSubs(ctx)
+	total, err := h.DB.CountAllElderCareSubs(ctx)
+	if err != nil {
+		log.Printf("admin: CountAllElderCareSubs error: %v", err)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -450,12 +496,30 @@ func (h *AdminHandler) ListAllElderCare(w http.ResponseWriter, r *http.Request) 
 func (h *AdminHandler) GetAnalytics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	revenueByMonth, _ := h.DB.GetRevenueByMonth(ctx)
-	txnStatus, _ := h.DB.GetTransactionStatusBreakdown(ctx)
-	installmentStatus, _ := h.DB.GetInstallmentStatusBreakdown(ctx)
-	topMerchants, _ := h.DB.GetTopMerchantsByRevenue(ctx)
-	categoryDist, _ := h.DB.GetMerchantCategoryDistribution(ctx)
-	triageConversion, _ := h.DB.GetTriageConversion(ctx)
+	revenueByMonth, err := h.DB.GetRevenueByMonth(ctx)
+	if err != nil {
+		log.Printf("admin: GetRevenueByMonth error: %v", err)
+	}
+	txnStatus, err := h.DB.GetTransactionStatusBreakdown(ctx)
+	if err != nil {
+		log.Printf("admin: GetTransactionStatusBreakdown error: %v", err)
+	}
+	installmentStatus, err := h.DB.GetInstallmentStatusBreakdown(ctx)
+	if err != nil {
+		log.Printf("admin: GetInstallmentStatusBreakdown error: %v", err)
+	}
+	topMerchants, err := h.DB.GetTopMerchantsByRevenue(ctx)
+	if err != nil {
+		log.Printf("admin: GetTopMerchantsByRevenue error: %v", err)
+	}
+	categoryDist, err := h.DB.GetMerchantCategoryDistribution(ctx)
+	if err != nil {
+		log.Printf("admin: GetMerchantCategoryDistribution error: %v", err)
+	}
+	triageConversion, err := h.DB.GetTriageConversion(ctx)
+	if err != nil {
+		log.Printf("admin: GetTriageConversion error: %v", err)
+	}
 
 	// Reverse revenueByMonth so oldest is first (for line chart)
 	for i, j := 0, len(revenueByMonth)-1; i < j; i, j = i+1, j-1 {

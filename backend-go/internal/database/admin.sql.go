@@ -230,7 +230,13 @@ SELECT
 FROM installments i
 JOIN users u ON i.user_id = u.id
 ORDER BY i.due_date DESC
+LIMIT $1 OFFSET $2
 `
+
+type ExportAllInstallmentsParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
 
 type ExportAllInstallmentsRow struct {
 	ID              pgtype.UUID        `json:"id"`
@@ -246,8 +252,8 @@ type ExportAllInstallmentsRow struct {
 	UserEmail       pgtype.Text        `json:"user_email"`
 }
 
-func (q *Queries) ExportAllInstallments(ctx context.Context) ([]ExportAllInstallmentsRow, error) {
-	rows, err := q.db.Query(ctx, exportAllInstallments)
+func (q *Queries) ExportAllInstallments(ctx context.Context, arg ExportAllInstallmentsParams) ([]ExportAllInstallmentsRow, error) {
+	rows, err := q.db.Query(ctx, exportAllInstallments, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +294,13 @@ FROM transactions t
 JOIN users u ON t.user_id = u.id
 JOIN merchants m ON t.merchant_id = m.id
 ORDER BY t.created_at DESC
+LIMIT $1 OFFSET $2
 `
+
+type ExportAllTransactionsParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
 
 type ExportAllTransactionsRow struct {
 	ID               pgtype.UUID        `json:"id"`
@@ -306,8 +318,8 @@ type ExportAllTransactionsRow struct {
 	MerchantCategory string             `json:"merchant_category"`
 }
 
-func (q *Queries) ExportAllTransactions(ctx context.Context) ([]ExportAllTransactionsRow, error) {
-	rows, err := q.db.Query(ctx, exportAllTransactions)
+func (q *Queries) ExportAllTransactions(ctx context.Context, arg ExportAllTransactionsParams) ([]ExportAllTransactionsRow, error) {
+	rows, err := q.db.Query(ctx, exportAllTransactions, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -347,7 +359,13 @@ SELECT id, phone, email, full_name, national_id, role,
        created_at, updated_at
 FROM users
 ORDER BY created_at DESC
+LIMIT $1 OFFSET $2
 `
+
+type ExportAllUsersParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
 
 type ExportAllUsersRow struct {
 	ID                    pgtype.UUID        `json:"id"`
@@ -365,9 +383,9 @@ type ExportAllUsersRow struct {
 	UpdatedAt             pgtype.Timestamptz `json:"updated_at"`
 }
 
-// ─── Export queries (no pagination, for CSV) ────────────────────────────────
-func (q *Queries) ExportAllUsers(ctx context.Context) ([]ExportAllUsersRow, error) {
-	rows, err := q.db.Query(ctx, exportAllUsers)
+// ─── Export queries (paginated, for CSV) ────────────────────────────────────
+func (q *Queries) ExportAllUsers(ctx context.Context, arg ExportAllUsersParams) ([]ExportAllUsersRow, error) {
+	rows, err := q.db.Query(ctx, exportAllUsers, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

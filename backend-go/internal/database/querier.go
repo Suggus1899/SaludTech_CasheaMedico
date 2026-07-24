@@ -60,10 +60,10 @@ type Querier interface {
 	DeleteMedicalService(ctx context.Context, arg DeleteMedicalServiceParams) error
 	DeleteMedicalSupply(ctx context.Context, arg DeleteMedicalSupplyParams) error
 	DeleteMedicationReminder(ctx context.Context, arg DeleteMedicationReminderParams) error
-	ExportAllInstallments(ctx context.Context) ([]ExportAllInstallmentsRow, error)
-	ExportAllTransactions(ctx context.Context) ([]ExportAllTransactionsRow, error)
-	// ─── Export queries (no pagination, for CSV) ────────────────────────────────
-	ExportAllUsers(ctx context.Context) ([]ExportAllUsersRow, error)
+	ExportAllInstallments(ctx context.Context, arg ExportAllInstallmentsParams) ([]ExportAllInstallmentsRow, error)
+	ExportAllTransactions(ctx context.Context, arg ExportAllTransactionsParams) ([]ExportAllTransactionsRow, error)
+	// ─── Export queries (paginated, for CSV) ────────────────────────────────────
+	ExportAllUsers(ctx context.Context, arg ExportAllUsersParams) ([]ExportAllUsersRow, error)
 	FindUserByPhoneOrEmail(ctx context.Context, phone string) (FindUserByPhoneOrEmailRow, error)
 	GetAllActiveMerchants(ctx context.Context) ([]GetAllActiveMerchantsRow, error)
 	GetAppointment(ctx context.Context, arg GetAppointmentParams) (GetAppointmentRow, error)

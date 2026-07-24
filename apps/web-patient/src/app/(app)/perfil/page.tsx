@@ -289,7 +289,7 @@ export default function PerfilPage() {
                 <div className="flex items-center gap-2.5">
                   <GraduationCap className="w-4 h-4 text-primary shrink-0" />
                   <span className="text-sm font-medium text-foreground">
-                    {tTours(tour.name as any)}
+                    {tTours(tour.name)}
                   </span>
                 </div>
                 {seen && (

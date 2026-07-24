@@ -12,7 +12,7 @@ import {
   ArrowLeft,
   Keyboard,
 } from "lucide-react";
-import { BrowserMultiFormatReader } from "@zxing/browser";
+import type { BrowserMultiFormatReader } from "@zxing/browser";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { parseQrPayload, formatCurrency, formatWithVES, formatDate } from "../../../lib/utils";
 import { useTranslations } from "next-intl";
@@ -46,7 +46,8 @@ export default function PagarPage() {
 
     const startCamera = async () => {
       try {
-        const reader = new BrowserMultiFormatReader();
+        const { BrowserMultiFormatReader: Reader } = await import("@zxing/browser");
+        const reader = new Reader();
         readerRef.current = reader;
         const controls = await reader.decodeFromVideoDevice(
           undefined,

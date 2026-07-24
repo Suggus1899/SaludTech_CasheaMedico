@@ -93,6 +93,83 @@ export interface CheckoutPreview {
   total: number;
 }
 
+// ─── Health Features ──────────────────────────────────────────────────────
+
+export interface MedicalRecord {
+  id: string;
+  user_id: string;
+  transaction_id: string | null;
+  merchant_id: string | null;
+  service_id: string | null;
+  record_type: string;
+  diagnosis: string | null;
+  prescription: string | null;
+  doctor_name: string | null;
+  notes: string | null;
+  record_date: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Appointment {
+  id: string;
+  user_id: string;
+  merchant_id: string;
+  service_id: string | null;
+  appointment_date: string;
+  appointment_time: string;
+  duration_min: number;
+  status: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  merchant_name: string | null;
+  service_name: string | null;
+}
+
+export interface MedicationReminder {
+  id: string;
+  user_id: string;
+  medication_name: string;
+  dosage: string | null;
+  frequency: string;
+  times: string[];
+  start_date: string;
+  end_date: string | null;
+  is_active: boolean;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FamilyMember {
+  id: string;
+  caregiver_id: string;
+  patient_id: string;
+  relation: string | null;
+  status: string;
+  permissions: string[];
+  created_at: string;
+  updated_at: string;
+  patient_name: string;
+  patient_phone: string;
+  patient_email: string | null;
+}
+
+export interface Caregiver {
+  id: string;
+  caregiver_id: string;
+  patient_id: string;
+  relation: string | null;
+  status: string;
+  permissions: string[];
+  created_at: string;
+  updated_at: string;
+  caregiver_name: string;
+  caregiver_phone: string;
+  caregiver_email: string | null;
+}
+
 export interface FetchState<T> {
   data: T | null;
   loading: boolean;

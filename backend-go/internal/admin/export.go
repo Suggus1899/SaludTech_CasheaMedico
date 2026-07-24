@@ -8,14 +8,35 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/saludtech/backend-go/internal/database"
 )
 
 // ─── CSV Export endpoints ────────────────────────────────────────────────────
 
+func parseExportPagination(r *http.Request) (int32, int32) {
+	limit := 1000
+	offset := 0
+	if l := r.URL.Query().Get("limit"); l != "" {
+		if v, err := strconv.Atoi(l); err == nil && v > 0 && v <= 10000 {
+			limit = v
+		}
+	}
+	if o := r.URL.Query().Get("offset"); o != "" {
+		if v, err := strconv.Atoi(o); err == nil && v >= 0 {
+			offset = v
+		}
+	}
+	return int32(limit), int32(offset)
+}
+
 func (h *AdminHandler) ExportUsersCSV(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	limit, offset := parseExportPagination(r)
 
-	users, err := h.DB.ExportAllUsers(ctx)
+	users, err := h.DB.ExportAllUsers(ctx, database.ExportAllUsersParams{
+		Limit:  limit,
+		Offset: offset,
+	})
 	if err != nil {
 		http.Error(w, `{"error":"Failed to export users"}`, http.StatusInternalServerError)
 		return
@@ -49,8 +70,12 @@ func (h *AdminHandler) ExportUsersCSV(w http.ResponseWriter, r *http.Request) {
 
 func (h *AdminHandler) ExportTransactionsCSV(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	limit, offset := parseExportPagination(r)
 
-	txns, err := h.DB.ExportAllTransactions(ctx)
+	txns, err := h.DB.ExportAllTransactions(ctx, database.ExportAllTransactionsParams{
+		Limit:  limit,
+		Offset: offset,
+	})
 	if err != nil {
 		http.Error(w, `{"error":"Failed to export transactions"}`, http.StatusInternalServerError)
 		return
@@ -85,8 +110,12 @@ func (h *AdminHandler) ExportTransactionsCSV(w http.ResponseWriter, r *http.Requ
 
 func (h *AdminHandler) ExportInstallmentsCSV(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	limit, offset := parseExportPagination(r)
 
-	installs, err := h.DB.ExportAllInstallments(ctx)
+	installs, err := h.DB.ExportAllInstallments(ctx, database.ExportAllInstallmentsParams{
+		Limit:  limit,
+		Offset: offset,
+	})
 	if err != nil {
 		http.Error(w, `{"error":"Failed to export installments"}`, http.StatusInternalServerError)
 		return

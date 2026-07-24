@@ -1,60 +1,88 @@
-name: SaludTech CI
+name: CI
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "**/docs/**"
+      - "LICENSE"
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "**/docs/**"
+      - "LICENSE"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  node-apps-ci:
-    name: Web Apps (Next.js)
+  backend:
+    name: Backend (Go)
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: backend-go
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend-go/go.mod
+          cache-dependency-path: backend-go/go.sum
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test ./...
+
+  frontend:
+    name: Frontend (Node.js)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9.12.0
-          run_install: false
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-      - name: Install dependencies
-        run: pnpm install
-      - name: Build
-        run: pnpm turbo build
-      - name: Lint
-        run: pnpm turbo lint
-      - name: Test
-        run: pnpm turbo test --continue
+          node-version: 22
+          cache: pnpm
 
-  backend-ci:
-    name: Backend (Go)
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+        timeout-minutes: 10
+
+  i18n-parity:
+    name: i18n Parity Check
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend-go
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Go
-        uses: actions/setup-go@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          go-version: '1.26'
-          cache: true
-      - name: Build
-        run: go build ./...
-      - name: Vet
-        run: go vet ./...
+          node-version: 22
+
+      - name: Validate i18n parity
+        run: node scripts/validate-i18n-parity.js

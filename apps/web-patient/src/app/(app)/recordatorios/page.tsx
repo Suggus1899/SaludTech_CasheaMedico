@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Pill, Plus, Trash2, Clock, Bell, X, AlertCircle } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { useTranslations } from "next-intl";
+import type { MedicationReminder } from "../../../types/patient";
 
 const frequencyConfig: Record<string, string> = {
   DAILY: "freqDaily",
@@ -17,7 +18,7 @@ const frequencyConfig: Record<string, string> = {
 export default function MedicationRemindersPage() {
   const t = useTranslations("Reminders");
   const tCommon = useTranslations("Common");
-  const [reminders, setReminders] = useState<any[]>([]);
+  const [reminders, setReminders] = useState<MedicationReminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -143,7 +144,7 @@ export default function MedicationRemindersPage() {
                   </button>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap pt-1">
-                  <span className="badge badge-sm badge-outline">{frequencyConfig[r.frequency] ? t(frequencyConfig[r.frequency] as any) : r.frequency}</span>
+                  <span className="badge badge-sm badge-outline">{frequencyConfig[r.frequency] ? t(frequencyConfig[r.frequency]) : r.frequency}</span>
                   {(r.times || []).map((t: string, i: number) => (
                     <span key={i} className="badge badge-sm badge-primary gap-1">
                       <Clock className="w-3 h-3" /> {String(t).slice(0, 5)}
@@ -175,7 +176,7 @@ export default function MedicationRemindersPage() {
                 <div className="form-control gap-1">
                   <label className="label pb-0"><span className="label-text font-medium">{t("frequency")}</span></label>
                   <select value={form.frequency} onChange={(e) => setForm({ ...form, frequency: e.target.value })} className="select select-bordered w-full text-sm">
-                    {Object.entries(frequencyConfig).map(([k, v]) => <option key={k} value={k}>{t(v as any)}</option>)}
+                    {Object.entries(frequencyConfig).map(([k, v]) => <option key={k} value={k}>{t(v)}</option>)}
                   </select>
                 </div>
               </div>

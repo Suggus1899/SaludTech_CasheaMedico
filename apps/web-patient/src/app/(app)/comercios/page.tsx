@@ -104,7 +104,7 @@ export default function ComerciosPage() {
             onClick={() => setFilter(key)}
             className={`btn btn-xs ${filter === key ? "btn-primary" : "btn-outline"}`}
           >
-            {t(cfg.labelKey as any)}
+            {t(cfg.labelKey)}
           </button>
         ))}
       </div>
@@ -132,7 +132,7 @@ export default function ComerciosPage() {
                     <Icon className="w-4 h-4" />
                   </div>
                   <h2 className="text-base font-bold text-foreground font-display">
-                    {t(cfg.labelKey as any)}
+                    {t(cfg.labelKey)}
                   </h2>
                   <span className="text-xs text-muted-foreground">({items.length})</span>
                 </div>

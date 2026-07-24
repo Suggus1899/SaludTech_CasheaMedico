@@ -1,15 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Clock, QrCode, Wallet, Shield, Stethoscope, LogOut, Package } from "lucide-react";
-import { Logo } from "@saludtech/ui";
+import { Clock, QrCode, Wallet, Shield, Stethoscope, Package } from "lucide-react";
+import { Sidebar as SharedSidebar } from "@saludtech/ui";
 import { useCallback, useEffect, useState } from "react";
 import { getApiUrl } from "../../lib/api";
 
 export function Sidebar() {
-  const pathname = usePathname();
   const router = useRouter();
   const t = useTranslations("Nav");
   const [merchantUser, setMerchantUser] = useState<any>(null);
@@ -21,13 +19,11 @@ export function Sidebar() {
   }, []);
 
   const handleLogout = useCallback(() => {
-    // JWT cookie is cleared by the backend logout endpoint.
     fetch(getApiUrl("auth/logout"), {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
     }).catch(() => {});
-    // Also clear the client-side cookie for Next.js middleware
     document.cookie = "jwt_token=; path=/; max-age=0";
     localStorage.removeItem("merchant_user");
     router.push("/login");
@@ -43,55 +39,24 @@ export function Sidebar() {
     { href: "/suscripciones-ec", icon: Shield, label: t("elderCare") },
   ];
 
+  const user = {
+    href: "/perfil",
+    avatar: (
+      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+        <Stethoscope className="w-4 h-4 text-primary-foreground" />
+      </div>
+    ),
+    name: merchantUser?.firstName ?? t("merchant"),
+    subtitle: `ID: ${merchantUser?.id?.slice(0, 8) ?? "M-992"}`,
+  };
+
   return (
-    <>
-      <div className="p-6 flex-1">
-        <div className="mb-10">
-          <Logo size="md" />
-        </div>
-        <nav className="space-y-1" aria-label={t("navAriaLabel")}>
-          {navItems.map((item) => {
-            const active = pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  active
-                    ? "bg-primary/10 text-primary border-l-2 border-primary pl-[10px]"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                <item.icon className="w-4 h-4 shrink-0" /> {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-      <div className="p-4 border-t border-border">
-        <Link
-          href="/perfil"
-          className={`flex items-center gap-3 px-3 py-2 mb-2 rounded-lg transition-all ${
-            pathname === "/perfil"
-              ? "bg-primary/10 text-primary"
-              : "hover:bg-muted"
-          }`}
-        >
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-            <Stethoscope className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold leading-none truncate">{merchantUser?.firstName ?? t("merchant")}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">ID: {merchantUser?.id?.slice(0, 8) ?? "M-992"}</p>
-          </div>
-        </Link>
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-all"
-        >
-          <LogOut className="w-4 h-4" /> {t("logout")}
-        </button>
-      </div>
-    </>
+    <SharedSidebar
+      navItems={navItems}
+      navAriaLabel={t("navAriaLabel")}
+      user={user}
+      onLogout={handleLogout}
+      logoutLabel={t("logout")}
+    />
   );
 }

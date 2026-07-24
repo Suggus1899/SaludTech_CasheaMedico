@@ -6,6 +6,7 @@ import { ArrowLeft, FileText, Plus, Trash2, Stethoscope, FlaskConical, Syringe, 
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { formatDate } from "../../../lib/utils";
 import { useTranslations } from "next-intl";
+import type { MedicalRecord } from "../../../types/patient";
 
 const recordTypeConfig: Record<string, { labelKey: string; icon: React.ElementType; color: string }> = {
   CONSULTATION: { labelKey: "typeConsultation", icon: Stethoscope, color: "primary" },
@@ -20,7 +21,7 @@ const recordTypeConfig: Record<string, { labelKey: string; icon: React.ElementTy
 export default function MedicalRecordsPage() {
   const t = useTranslations("History");
   const tCommon = useTranslations("Common");
-  const [records, setRecords] = useState<any[]>([]);
+  const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -126,7 +127,7 @@ export default function MedicalRecordsPage() {
                         <Icon className={`w-4 h-4 text-${cfg.color}`} />
                       </div>
                       <div>
-                        <h3 className="text-sm font-semibold font-display">{t(cfg.labelKey as any)}</h3>
+                        <h3 className="text-sm font-semibold font-display">{t(cfg.labelKey)}</h3>
                         <p className="text-xs text-muted-foreground">{formatDate(r.record_date)}</p>
                       </div>
                     </div>
@@ -172,7 +173,7 @@ export default function MedicalRecordsPage() {
                 <div className="form-control gap-1">
                   <label className="label pb-0"><span className="label-text font-medium">{t("type")}</span></label>
                   <select value={form.recordType} onChange={(e) => setForm({ ...form, recordType: e.target.value })} className="select select-bordered w-full text-sm">
-                    {Object.entries(recordTypeConfig).map(([k, v]) => <option key={k} value={k}>{t(v.labelKey as any)}</option>)}
+                    {Object.entries(recordTypeConfig).map(([k, v]) => <option key={k} value={k}>{t(v.labelKey)}</option>)}
                   </select>
                 </div>
                 <div className="form-control gap-1">

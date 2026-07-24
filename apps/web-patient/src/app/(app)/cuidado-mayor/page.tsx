@@ -221,9 +221,9 @@ export default function CuidadoMayorPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-foreground font-display">
-                      {t(s.labelKey as any)}
+                      {t(s.labelKey)}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{t(s.descKey as any)}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t(s.descKey)}</p>
                     <p
                       className="text-sm font-bold mt-1 font-display"
                       style={{ color: style.color }}
@@ -286,7 +286,7 @@ export default function CuidadoMayorPage() {
                     <div className="flex items-center gap-1.5 mt-2">
                       <Activity className="w-3.5 h-3.5 text-muted-foreground" />
                       <span className="text-xs text-muted-foreground">
-                        {serviceLabelKeys[sub.serviceType ?? ""] ? t(serviceLabelKeys[sub.serviceType ?? ""] as any) : sub.serviceType}
+                        {serviceLabelKeys[sub.serviceType ?? ""] ? t(serviceLabelKeys[sub.serviceType ?? ""]) : sub.serviceType}
                       </span>
                       <span className="flex-1" />
                       <span
@@ -329,7 +329,7 @@ export default function CuidadoMayorPage() {
             <div className="flex items-center gap-2">
               <confirmService.icon className="w-5 h-5" style={{ color: elderCareServiceStyles[confirmService.type].color }} />
               <h3 className="text-lg font-bold font-display">
-                {t(confirmService.labelKey as any)}
+                {t(confirmService.labelKey)}
               </h3>
             </div>
             <p className="py-4 text-sm">

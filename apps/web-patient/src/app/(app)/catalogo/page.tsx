@@ -129,7 +129,7 @@ export default function CatalogoPage() {
             onClick={() => setCategory(c.value)}
             className={`btn btn-xs ${category === c.value ? "btn-primary" : "btn-outline"}`}
           >
-            {t(c.labelKey as any)}
+            {t(c.labelKey)}
           </button>
         ))}
       </div>

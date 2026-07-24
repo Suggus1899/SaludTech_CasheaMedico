@@ -164,7 +164,7 @@ export default function TriajePage() {
                     isSelected ? "badge-primary" : "badge-ghost"
                   }`}
                 >
-                  {t(cat.key as any)}
+                  {t(cat.key)}
                 </button>
               );
             })}
@@ -264,10 +264,10 @@ export default function TriajePage() {
                 >
                   <div className="flex justify-between">
                     <span className={`badge badge-sm ${urgency.className}`}>
-                      {urgencyLabelKeys[triage.priority ?? ""] ? t(urgency.key as any) : triage.priority ?? "—"}
+                      {urgencyLabelKeys[triage.priority ?? ""] ? t(urgency.key) : triage.priority ?? "—"}
                     </span>
                     <span className={`badge badge-sm ${status.className}`}>
-                      {statusLabelKeys[triage.status ?? ""] ? t(status.key as any) : triage.status ?? "—"}
+                      {statusLabelKeys[triage.status ?? ""] ? t(status.key) : triage.status ?? "—"}
                     </span>
                   </div>
 

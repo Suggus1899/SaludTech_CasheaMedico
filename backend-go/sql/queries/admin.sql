@@ -188,14 +188,15 @@ SELECT
   COUNT(DISTINCT CASE WHEN status = 'COMPLETED' THEN id END) AS completed_count
 FROM triage;
 
--- ─── Export queries (no pagination, for CSV) ────────────────────────────────
+-- ─── Export queries (paginated, for CSV) ────────────────────────────────────
 
 -- name: ExportAllUsers :many
 SELECT id, phone, email, full_name, national_id, role,
        level, points, total_paid, installments_paid_count, is_active,
        created_at, updated_at
 FROM users
-ORDER BY created_at DESC;
+ORDER BY created_at DESC
+LIMIT $1 OFFSET $2;
 
 -- name: ExportAllTransactions :many
 SELECT
@@ -206,7 +207,8 @@ SELECT
 FROM transactions t
 JOIN users u ON t.user_id = u.id
 JOIN merchants m ON t.merchant_id = m.id
-ORDER BY t.created_at DESC;
+ORDER BY t.created_at DESC
+LIMIT $1 OFFSET $2;
 
 -- name: ExportAllInstallments :many
 SELECT
@@ -215,4 +217,5 @@ SELECT
   u.full_name AS user_name, u.email AS user_email
 FROM installments i
 JOIN users u ON i.user_id = u.id
-ORDER BY i.due_date DESC;
+ORDER BY i.due_date DESC
+LIMIT $1 OFFSET $2;

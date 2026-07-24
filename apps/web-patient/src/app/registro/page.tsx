@@ -74,7 +74,7 @@ export default function PatientRegisterPage() {
     });
     const result = registerSchema.safeParse(form);
     if (!result.success) {
-      setError(tVal(result.error.issues[0].message as any));
+      setError(tVal(result.error.issues[0].message));
       return;
     }
     setIsLoading(true);
@@ -152,7 +152,7 @@ export default function PatientRegisterPage() {
             value={form.firstName}
             onChange={(v) => update("firstName", v)}
             onBlur={() => markTouched("firstName")}
-            error={getFieldError("firstName") ? tVal(getFieldError("firstName") as any) : undefined}
+            error={getFieldError("firstName") ? tVal(getFieldError("firstName") as string) : undefined}
             required
           />
           <Field
@@ -162,7 +162,7 @@ export default function PatientRegisterPage() {
             value={form.lastName}
             onChange={(v) => update("lastName", v)}
             onBlur={() => markTouched("lastName")}
-            error={getFieldError("lastName") ? tVal(getFieldError("lastName") as any) : undefined}
+            error={getFieldError("lastName") ? tVal(getFieldError("lastName") as string) : undefined}
             required
           />
           <Field
@@ -173,7 +173,7 @@ export default function PatientRegisterPage() {
             value={form.email}
             onChange={(v) => update("email", v)}
             onBlur={() => markTouched("email")}
-            error={getFieldError("email") ? tVal(getFieldError("email") as any) : undefined}
+            error={getFieldError("email") ? tVal(getFieldError("email") as string) : undefined}
             required
           />
           <Field
@@ -184,7 +184,7 @@ export default function PatientRegisterPage() {
             value={form.phone}
             onChange={(v) => update("phone", v)}
             onBlur={() => markTouched("phone")}
-            error={getFieldError("phone") ? tVal(getFieldError("phone") as any) : undefined}
+            error={getFieldError("phone") ? tVal(getFieldError("phone") as string) : undefined}
             required
           />
           <Field
@@ -194,7 +194,7 @@ export default function PatientRegisterPage() {
             value={form.nationalId}
             onChange={(v) => update("nationalId", v)}
             onBlur={() => markTouched("nationalId")}
-            error={getFieldError("nationalId") ? tVal(getFieldError("nationalId") as any) : undefined}
+            error={getFieldError("nationalId") ? tVal(getFieldError("nationalId") as string) : undefined}
             required
           />
 
@@ -206,7 +206,7 @@ export default function PatientRegisterPage() {
             onToggle={() => setObscure((v) => !v)}
             onChange={(v) => update("password", v)}
             onBlur={() => markTouched("password")}
-            error={getFieldError("password") ? tVal(getFieldError("password") as any) : undefined}
+            error={getFieldError("password") ? tVal(getFieldError("password") as string) : undefined}
           />
 
           <PasswordField
@@ -217,7 +217,7 @@ export default function PatientRegisterPage() {
             onToggle={() => setObscureConfirm((v) => !v)}
             onChange={(v) => update("confirmPassword", v)}
             onBlur={() => markTouched("confirmPassword")}
-            error={getFieldError("confirmPassword") ? tVal(getFieldError("confirmPassword") as any) : undefined}
+            error={getFieldError("confirmPassword") ? tVal(getFieldError("confirmPassword") as string) : undefined}
           />
 
           {/* Password strength indicator */}

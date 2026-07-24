@@ -24,7 +24,7 @@ export default function PatientLoginPage() {
     setError(null);
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
-      setError(tVal(result.error.issues[0].message as any));
+      setError(tVal(result.error.issues[0].message));
       return;
     }
     setIsLoading(true);

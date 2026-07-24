@@ -6,6 +6,7 @@ import { ArrowLeft, CalendarPlus, Calendar, Clock, Store, X, CheckCircle2, Alert
 import { getApiUrl, apiFetch } from "../../../lib/api";
 import { formatDate } from "../../../lib/utils";
 import { useTranslations } from "next-intl";
+import type { Appointment, Merchant, MedicalService } from "../../../types/patient";
 
 const statusConfig: Record<string, { labelKey: string; badge: string }> = {
   PENDING: { labelKey: "statusPending", badge: "badge-warning" },
@@ -18,9 +19,9 @@ const statusConfig: Record<string, { labelKey: string; badge: string }> = {
 export default function AppointmentsPage() {
   const t = useTranslations("Appointments");
   const tCommon = useTranslations("Common");
-  const [appointments, setAppointments] = useState<any[]>([]);
-  const [merchants, setMerchants] = useState<any[]>([]);
-  const [merchantServices, setMerchantServices] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [merchants, setMerchants] = useState<Merchant[]>([]);
+  const [merchantServices, setMerchantServices] = useState<MedicalService[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -160,7 +161,7 @@ export default function AppointmentsPage() {
                         {a.service_name && <p className="text-xs text-muted-foreground">{a.service_name}</p>}
                       </div>
                     </div>
-                    <span className={`badge badge-sm ${cfg.badge}`}>{t(cfg.labelKey as any)}</span>
+                    <span className={`badge badge-sm ${cfg.badge}`}>{t(cfg.labelKey)}</span>
                   </div>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground pt-1">
                     <span className="flex items-center gap-1">
@@ -202,7 +203,7 @@ export default function AppointmentsPage() {
                   required
                 >
                   <option value="">{tCommon("select")}</option>
-                  {merchants.map((m: any) => <option key={m.id} value={m.id}>{m.trade_name}</option>)}
+                  {merchants.map((m) => <option key={m.id} value={m.id}>{m.tradeName}</option>)}
                 </select>
               </div>
               {merchantServices.length > 0 && (
@@ -214,7 +215,7 @@ export default function AppointmentsPage() {
                     className="select select-bordered w-full text-sm"
                   >
                     <option value="">{t("noSpecificService")}</option>
-                    {merchantServices.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    {merchantServices.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
                 </div>
               )}
