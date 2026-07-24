@@ -9,10 +9,11 @@ import {
   CalendarCheck,
   CheckCircle2,
   WifiOff,
+  ChevronRight,
 } from "lucide-react";
 import { useFetchData } from "@saludtech/shared";
 import { getApiUrl } from "../../../lib/api";
-import { formatWithVES, formatDate } from "../../../lib/utils";
+import { formatWithVES, formatCurrency, formatVES, formatDate } from "../../../lib/utils";
 import { useTranslations } from "next-intl";
 import type { Installment } from "../../../types/patient";
 
@@ -112,7 +113,12 @@ export default function CuotasPage() {
                     <tr key={inst.id} data-tour={idx === 0 ? "installment-card" : undefined}>
                       <td className="font-semibold">#{inst.installmentNumber ?? "—"}</td>
                       <td>{merchant}</td>
-                      <td className="font-semibold">{formatWithVES(inst.amount, inst.amountVES)}</td>
+                      <td>
+                        <div className="font-semibold">{formatCurrency(inst.amount)}</div>
+                        {inst.amountVES && inst.amountVES > 0 && (
+                          <div className="text-xs text-muted-foreground">(Bs. {formatVES(inst.amountVES)})</div>
+                        )}
+                      </td>
                       <td className="text-sm">{formatDate(inst.dueDate)}</td>
                       <td>
                         <span className={`badge badge-sm ${isOverdue ? "badge-error" : "badge-warning"}`}>
@@ -144,9 +150,9 @@ export default function CuotasPage() {
                       isOverdue ? "border-error/30" : "border-border"
                     }`}
                   >
-                    <div className="flex items-center gap-3.5">
+                    <div className="flex items-start gap-3">
                       <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                        className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
                           isOverdue ? "bg-error/10 text-error" : "bg-primary/10 text-primary"
                         }`}
                       >
@@ -157,22 +163,36 @@ export default function CuotasPage() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-foreground font-display">
-                          {t("installmentNumber")}{inst.installmentNumber ?? "—"} · {merchant}
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-bold text-foreground font-display truncate">
+                            #{inst.installmentNumber ?? "—"}
+                          </p>
+                          <span className={`badge badge-xs ${isOverdue ? "badge-error" : "badge-warning"}`}>
+                            {isOverdue ? t("overdue") : t("pending")}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          {merchant}
                         </p>
                         <p className="text-xs text-muted-foreground mt-0.5">
                           {t("dueLabel", { date: formatDate(inst.dueDate) })}
                         </p>
+                        <div className="flex items-baseline gap-1.5 mt-2">
+                          <span
+                            className={`text-lg font-bold font-display ${
+                              isOverdue ? "text-error" : "text-foreground"
+                            }`}
+                          >
+                            {formatCurrency(inst.amount)}
+                          </span>
+                          {inst.amountVES && inst.amountVES > 0 && (
+                            <span className="text-xs text-muted-foreground">
+                              (Bs. {formatVES(inst.amountVES)})
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-right shrink-0">
-                        <p
-                          className={`text-base font-bold font-display ${
-                            isOverdue ? "text-error" : "text-foreground"
-                          }`}
-                        >
-                          {formatWithVES(inst.amount, inst.amountVES)}
-                        </p>
-                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 mt-1" />
                     </div>
                   </Link>
                 </li>
