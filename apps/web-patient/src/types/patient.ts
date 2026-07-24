@@ -25,6 +25,7 @@ export interface CreditLine {
 export interface Installment {
   id: string;
   dueDate: string;
+  paidAt?: string;
   amount: number;
   amountVES?: number;
   bcvRate?: number;

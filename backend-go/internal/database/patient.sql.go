@@ -459,6 +459,84 @@ func (q *Queries) GetPendingInstallmentsWithDetails(ctx context.Context, userID 
 	return items, nil
 }
 
+const getPaidInstallmentsWithDetails = `-- name: GetPaidInstallmentsWithDetails :many
+SELECT
+    i.id AS installment_id,
+    i.transaction_id,
+    i.user_id,
+    i.installment_num,
+    i.amount,
+    i.due_date,
+    i.paid_at,
+    i.status,
+    i.reactivation_fee,
+    i.days_overdue,
+    t.id AS transaction_id,
+    t.total_amount,
+    t.num_installments,
+    t.merchant_id,
+    m.trade_name AS merchant_name
+FROM installments i
+JOIN transactions t ON i.transaction_id = t.id
+LEFT JOIN merchants m ON t.merchant_id = m.id
+WHERE i.user_id = $1 AND i.status = 'PAID'
+ORDER BY i.paid_at DESC
+`
+
+type GetPaidInstallmentsWithDetailsRow struct {
+	InstallmentID   pgtype.UUID        `json:"installment_id"`
+	TransactionID   pgtype.UUID        `json:"transaction_id"`
+	UserID          pgtype.UUID        `json:"user_id"`
+	InstallmentNum  int16              `json:"installment_num"`
+	Amount          pgtype.Numeric     `json:"amount"`
+	DueDate         pgtype.Date        `json:"due_date"`
+	PaidAt          pgtype.Timestamptz `json:"paid_at"`
+	Status          string             `json:"status"`
+	ReactivationFee pgtype.Numeric     `json:"reactivation_fee"`
+	DaysOverdue     int32              `json:"days_overdue"`
+	TransactionID_2 pgtype.UUID        `json:"transaction_id_2"`
+	TotalAmount     pgtype.Numeric     `json:"total_amount"`
+	NumInstallments int16              `json:"num_installments"`
+	MerchantID      pgtype.UUID        `json:"merchant_id"`
+	MerchantName    pgtype.Text        `json:"merchant_name"`
+}
+
+func (q *Queries) GetPaidInstallmentsWithDetails(ctx context.Context, userID pgtype.UUID) ([]GetPaidInstallmentsWithDetailsRow, error) {
+	rows, err := q.db.Query(ctx, getPaidInstallmentsWithDetails, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetPaidInstallmentsWithDetailsRow
+	for rows.Next() {
+		var i GetPaidInstallmentsWithDetailsRow
+		if err := rows.Scan(
+			&i.InstallmentID,
+			&i.TransactionID,
+			&i.UserID,
+			&i.InstallmentNum,
+			&i.Amount,
+			&i.DueDate,
+			&i.PaidAt,
+			&i.Status,
+			&i.ReactivationFee,
+			&i.DaysOverdue,
+			&i.TransactionID_2,
+			&i.TotalAmount,
+			&i.NumInstallments,
+			&i.MerchantID,
+			&i.MerchantName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getSubscriptionsByUser = `-- name: GetSubscriptionsByUser :many
 SELECT
     s.id, s.user_id, s.merchant_id, s.credit_line_id, s.amount,

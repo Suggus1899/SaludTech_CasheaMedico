@@ -36,6 +36,7 @@ func (h *PatientHandler) Routes() func(r chi.Router) {
 
 		r.Get("/credit-lines", h.GetCreditLines)
 		r.Get("/transactions/my/installments/pending", h.GetPendingInstallments)
+		r.Get("/transactions/my/installments/paid", h.GetPaidInstallments)
 		r.Post("/transactions/preview", h.PreviewTransaction)
 		r.With(payLimiter.Middleware).Post("/transactions", h.CreateTransaction)
 

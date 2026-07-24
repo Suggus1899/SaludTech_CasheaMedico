@@ -294,10 +294,10 @@
     "title": "Mis Cuotas",
     "reload": "Recargar",
     "tabPending": "Pendientes ({count})",
-    "tabOverdue": "En mora ({count})",
+    "tabPaid": "Completadas ({count})",
     "loadError": "No se pudieron cargar las cuotas.",
     "retry": "Reintentar",
-    "noOverdue": "Sin cuotas en mora",
+    "noPaid": "Sin cuotas completadas",
     "noPending": "Sin cuotas pendientes",
     "colNumber": "#",
     "colMerchant": "Comercio",
@@ -310,7 +310,10 @@
     "installmentNumber": "Cuota #",
     "dueLabel": "Vence: {date}",
     "overdue": "En mora",
-    "pending": "Pendiente"
+    "pending": "Pendiente",
+    "paid": "Completada",
+    "paidLabel": "Pagada: {date}",
+    "colPaid": "Pagada"
   },
   "PayInstallment": {
     "back": "Volver",

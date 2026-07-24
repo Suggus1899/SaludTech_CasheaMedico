@@ -294,10 +294,10 @@
     "title": "Le mie Rate",
     "reload": "Ricarica",
     "tabPending": "In attesa ({count})",
-    "tabOverdue": "In ritardo ({count})",
+    "tabPaid": "Completate ({count})",
     "loadError": "Impossibile caricare le rate.",
     "retry": "Riprova",
-    "noOverdue": "Nessuna rata in ritardo",
+    "noPaid": "Nessuna rata completata",
     "noPending": "Nessuna rata in attesa",
     "colNumber": "N°",
     "colMerchant": "Esercente",
@@ -310,7 +310,10 @@
     "installmentNumber": "Rata n°",
     "dueLabel": "Scadenza: {date}",
     "overdue": "In ritardo",
-    "pending": "In attesa"
+    "pending": "In attesa",
+    "paid": "Completata",
+    "paidLabel": "Pagata: {date}",
+    "colPaid": "Pagata"
   },
   "PayInstallment": {
     "back": "Indietro",

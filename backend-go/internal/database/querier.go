@@ -91,6 +91,7 @@ type Querier interface {
 	GetOverdueInstallments(ctx context.Context) ([]Installment, error)
 	GetPaymentByReference(ctx context.Context, referenceCode pgtype.Text) (Payment, error)
 	GetPendingInstallmentsWithDetails(ctx context.Context, userID pgtype.UUID) ([]GetPendingInstallmentsWithDetailsRow, error)
+	GetPaidInstallmentsWithDetails(ctx context.Context, userID pgtype.UUID) ([]GetPaidInstallmentsWithDetailsRow, error)
 	GetQRToken(ctx context.Context, token string) (QrToken, error)
 	// ─── Analytics queries ──────────────────────────────────────────────────────
 	GetRevenueByMonth(ctx context.Context) ([]GetRevenueByMonthRow, error)

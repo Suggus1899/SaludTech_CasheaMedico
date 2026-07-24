@@ -21,6 +21,29 @@ LEFT JOIN merchants m ON t.merchant_id = m.id
 WHERE i.user_id = $1 AND i.status IN ('PENDING', 'OVERDUE')
 ORDER BY i.due_date ASC;
 
+-- name: GetPaidInstallmentsWithDetails :many
+SELECT
+    i.id AS installment_id,
+    i.transaction_id,
+    i.user_id,
+    i.installment_num,
+    i.amount,
+    i.due_date,
+    i.paid_at,
+    i.status,
+    i.reactivation_fee,
+    i.days_overdue,
+    t.id AS transaction_id,
+    t.total_amount,
+    t.num_installments,
+    t.merchant_id,
+    m.trade_name AS merchant_name
+FROM installments i
+JOIN transactions t ON i.transaction_id = t.id
+LEFT JOIN merchants m ON t.merchant_id = m.id
+WHERE i.user_id = $1 AND i.status = 'PAID'
+ORDER BY i.paid_at DESC;
+
 -- name: GetInstallmentWithDetails :one
 SELECT
     i.id AS installment_id,

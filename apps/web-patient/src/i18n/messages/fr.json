@@ -294,10 +294,10 @@
     "title": "Mes mensualités",
     "reload": "Recharger",
     "tabPending": "En attente ({count})",
-    "tabOverdue": "En retard ({count})",
+    "tabPaid": "Complétées ({count})",
     "loadError": "Impossible de charger les mensualités.",
     "retry": "Réessayer",
-    "noOverdue": "Aucune mensualité en retard",
+    "noPaid": "Aucune mensualité complétée",
     "noPending": "Aucune mensualité en attente",
     "colNumber": "N°",
     "colMerchant": "Commerçant",
@@ -310,7 +310,10 @@
     "installmentNumber": "Mensualité n°",
     "dueLabel": "Échéance : {date}",
     "overdue": "En retard",
-    "pending": "En attente"
+    "pending": "En attente",
+    "paid": "Complétée",
+    "paidLabel": "Payée : {date}",
+    "colPaid": "Payée"
   },
   "PayInstallment": {
     "back": "Retour",

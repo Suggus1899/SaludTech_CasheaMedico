@@ -294,10 +294,10 @@
     "title": "My Installments",
     "reload": "Reload",
     "tabPending": "Pending ({count})",
-    "tabOverdue": "Overdue ({count})",
+    "tabPaid": "Completed ({count})",
     "loadError": "Could not load installments.",
     "retry": "Retry",
-    "noOverdue": "No overdue installments",
+    "noPaid": "No completed installments",
     "noPending": "No pending installments",
     "colNumber": "#",
     "colMerchant": "Merchant",
@@ -310,7 +310,10 @@
     "installmentNumber": "Installment #",
     "dueLabel": "Due: {date}",
     "overdue": "Overdue",
-    "pending": "Pending"
+    "pending": "Pending",
+    "paid": "Completed",
+    "paidLabel": "Paid: {date}",
+    "colPaid": "Paid"
   },
   "PayInstallment": {
     "back": "Back",
