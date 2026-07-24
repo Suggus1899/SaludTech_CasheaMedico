@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use, useEffect } from "react";
+import { useState, use, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   CreditCard,
@@ -10,17 +10,53 @@ import {
   AlertCircle,
   ArrowLeft,
   ShieldCheck,
+  Building2,
+  Wallet,
+  Globe,
+  Check,
 } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../../lib/api";
 import { formatCurrency, formatWithVES, formatDate } from "../../../../lib/utils";
 import { useTranslations } from "next-intl";
 import type { Installment } from "../../../../types/patient";
+import {
+  detectBrand,
+  formatCardNumber,
+  isValidCardNumber,
+  isValidCvv,
+  isValidExpiration,
+  brandLabels,
+  type CardBrand,
+} from "../../../../lib/cardValidation";
 
 const testCards = [
   { label: "Visa", number: "4111111111111111" },
   { label: "Mastercard", number: "5555555555554444" },
   { label: "Amex", number: "378282246310005" },
   { label: "Discover", number: "6011111111111117" },
+];
+
+type BankOption = {
+  id: string;
+  icon: "building" | "globe" | "wallet";
+  supportedCards: string;
+};
+
+const bankOptions: BankOption[] = [
+  { id: "bankBanesco", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "bankBDV", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "bankMercantil", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "bankProvincial", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "bankBNC", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "bankCaroni", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "bankBancaribe", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "bankTesoro", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "bankBancamiga", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "bankBangente", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "bank100", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "zinli", icon: "wallet", supportedCards: "Visa / Mastercard / Discover" },
+  { id: "paypal", icon: "globe", supportedCards: "Visa / Mastercard / Discover" },
+  { id: "stripe", icon: "globe", supportedCards: "Visa / Mastercard / Discover" },
 ];
 
 export default function PayInstallmentPage({
@@ -44,6 +80,8 @@ export default function PayInstallmentPage({
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedBank, setSelectedBank] = useState<string>("");
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     (async () => {
@@ -60,6 +98,48 @@ export default function PayInstallmentPage({
     })();
   }, [id]);
 
+  const brand = useMemo<CardBrand>(() => detectBrand(cardNumber), [cardNumber]);
+  const cardNumberError = useMemo(() => {
+    if (!touched.cardNumber || !cardNumber) return null;
+    return isValidCardNumber(cardNumber) ? null : t("cardNumberInvalid");
+  }, [cardNumber, touched.cardNumber]);
+  const cvvError = useMemo(() => {
+    if (!touched.cvv || !cvv) return null;
+    return isValidCvv(cvv, brand) ? null : t("cvvInvalid");
+  }, [cvv, brand, touched.cvv]);
+  const expError = useMemo(() => {
+    if (!touched.expMonth || !touched.expYear) return null;
+    if (!expMonth || !expYear) return null;
+    return isValidExpiration(expMonth, expYear) ? null : t("expInvalid");
+  }, [expMonth, expYear, touched.expMonth, touched.expYear]);
+
+  const isFormValid =
+    !!selectedBank &&
+    !!fullName.trim() &&
+    isValidCardNumber(cardNumber) &&
+    isValidCvv(cvv, brand) &&
+    isValidExpiration(expMonth, expYear);
+
+  const handleCardNumberChange = (v: string) => {
+    setCardNumber(formatCardNumber(v));
+  };
+
+  const handleCvvChange = (v: string) => {
+    const digits = v.replace(/\D/g, "");
+    const maxLen = brand === "amex" ? 4 : 3;
+    setCvv(digits.slice(0, maxLen));
+  };
+
+  const handleExpMonthChange = (v: string) => {
+    const digits = v.replace(/\D/g, "").slice(0, 2);
+    setExpMonth(digits);
+  };
+
+  const handleExpYearChange = (v: string) => {
+    const digits = v.replace(/\D/g, "").slice(0, 4);
+    setExpYear(digits);
+  };
+
   const handleConfirm = async () => {
     if (!installment) return;
     setError(null);
@@ -71,6 +151,7 @@ export default function PayInstallmentPage({
         body: JSON.stringify({
           installmentId: installment.id,
           method: "CARD",
+          bankName: selectedBank ? t(selectedBank) : undefined,
           cardNumber,
           cvv,
           expirationMonth: expMonth,
@@ -128,6 +209,7 @@ export default function PayInstallmentPage({
 
   const isOverdue = installment.status === "OVERDUE";
   const merchant = installment.transaction?.merchant?.tradeName ?? t("merchant");
+  const selectedBankOption = bankOptions.find((b) => b.id === selectedBank);
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
@@ -202,6 +284,52 @@ export default function PayInstallmentPage({
           </p>
         </div>
 
+        {/* Payment method / bank selector */}
+        <div className="mb-4">
+          <label className="label pb-1">
+            <span className="label-text font-medium">{t("paymentMethod")}</span>
+          </label>
+          <select
+            value={selectedBank}
+            onChange={(e) => setSelectedBank(e.target.value)}
+            className="select select-bordered w-full"
+          >
+            <option value="">{t("selectBank")}</option>
+            <optgroup label={t("venezuelanBanks")}>
+              {bankOptions
+                .filter((b) => b.icon === "building")
+                .map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {t(b.id)}
+                  </option>
+                ))}
+            </optgroup>
+            <optgroup label={t("international")}>
+              {bankOptions
+                .filter((b) => b.icon !== "building")
+                .map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {t(b.id)}
+                  </option>
+                ))}
+            </optgroup>
+          </select>
+          {selectedBankOption && (
+            <div className="mt-2 flex items-center gap-2 flex-wrap">
+              <span className="badge badge-primary gap-1 py-3">
+                {selectedBankOption.icon === "building" && <Building2 className="w-3.5 h-3.5" />}
+                {selectedBankOption.icon === "wallet" && <Wallet className="w-3.5 h-3.5" />}
+                {selectedBankOption.icon === "globe" && <Globe className="w-3.5 h-3.5" />}
+                {t(selectedBankOption.id)}
+              </span>
+              <span className="badge badge-outline gap-1 py-3">
+                <span className="text-xs text-muted-foreground">{t("supportedCards")}:</span>
+                {selectedBankOption.supportedCards}
+              </span>
+            </div>
+          )}
+        </div>
+
         {/* Test card quick-select */}
         <div data-tour="test-cards" className="mb-4">
           <p className="text-xs text-muted-foreground mb-2">{t("testCards")}</p>
@@ -210,8 +338,11 @@ export default function PayInstallmentPage({
               <button
                 key={c.number}
                 type="button"
-                onClick={() => setCardNumber(c.number)}
-                className={`btn btn-xs ${cardNumber === c.number ? "btn-primary" : "btn-outline"}`}
+                onClick={() => {
+                  setCardNumber(formatCardNumber(c.number));
+                  setTouched((p) => ({ ...p, cardNumber: true }));
+                }}
+                className={`btn btn-xs ${cardNumber === formatCardNumber(c.number) ? "btn-primary" : "btn-outline"}`}
               >
                 {c.label}
               </button>
@@ -220,13 +351,91 @@ export default function PayInstallmentPage({
         </div>
 
         <div className="space-y-3">
-          <Input label={t("cardNumber")} value={cardNumber} onChange={setCardNumber} type="text" placeholder="4111 1111 1111 1111" />
+          <div className="form-control gap-1">
+            <label className="label pb-0">
+              <span className="label-text font-medium">{t("cardNumber")}</span>
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={cardNumber}
+                onChange={(e) => handleCardNumberChange(e.target.value)}
+                onBlur={() => setTouched((p) => ({ ...p, cardNumber: true }))}
+                placeholder="4111 1111 1111 1111"
+                className={`input input-bordered w-full pr-20 ${
+                  cardNumberError ? "input-error" : touched.cardNumber && !cardNumberError && cardNumber ? "input-success" : ""
+                }`}
+              />
+              {brand !== "unknown" && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground flex items-center gap-1">
+                  {touched.cardNumber && !cardNumberError && cardNumber && (
+                    <Check className="w-4 h-4 text-success" />
+                  )}
+                  {brandLabels[brand]}
+                </span>
+              )}
+            </div>
+            {cardNumberError && (
+              <p className="text-xs text-error mt-0.5">{cardNumberError}</p>
+            )}
+            {brand !== "unknown" && touched.cardNumber && !cardNumberError && cardNumber && (
+              <p className="text-xs text-success mt-0.5">{t("cardDetected")}: {brandLabels[brand]}</p>
+            )}
+          </div>
           <Input label={t("cardHolder")} value={fullName} onChange={setFullName} type="text" placeholder="APPROVED" />
           <div className="grid grid-cols-3 gap-3">
-            <Input label={t("expMonth")} value={expMonth} onChange={setExpMonth} type="text" placeholder="01" />
-            <Input label={t("expYear")} value={expYear} onChange={setExpYear} type="text" placeholder="2027" />
-            <Input label={t("cvv")} value={cvv} onChange={setCvv} type="text" placeholder="123" />
+            <div className="form-control gap-1">
+              <label className="label pb-0">
+                <span className="label-text font-medium">{t("expMonth")}</span>
+              </label>
+              <input
+                type="text"
+                value={expMonth}
+                onChange={(e) => handleExpMonthChange(e.target.value)}
+                onBlur={() => setTouched((p) => ({ ...p, expMonth: true, expYear: true }))}
+                placeholder="01"
+                className={`input input-bordered w-full ${
+                  expError ? "input-error" : touched.expMonth && !expError && expMonth && expYear ? "input-success" : ""
+                }`}
+              />
+            </div>
+            <div className="form-control gap-1">
+              <label className="label pb-0">
+                <span className="label-text font-medium">{t("expYear")}</span>
+              </label>
+              <input
+                type="text"
+                value={expYear}
+                onChange={(e) => handleExpYearChange(e.target.value)}
+                onBlur={() => setTouched((p) => ({ ...p, expMonth: true, expYear: true }))}
+                placeholder="2027"
+                className={`input input-bordered w-full ${
+                  expError ? "input-error" : touched.expYear && !expError && expMonth && expYear ? "input-success" : ""
+                }`}
+              />
+            </div>
+            <div className="form-control gap-1">
+              <label className="label pb-0">
+                <span className="label-text font-medium">{t("cvv")}</span>
+              </label>
+              <input
+                type="text"
+                value={cvv}
+                onChange={(e) => handleCvvChange(e.target.value)}
+                onBlur={() => setTouched((p) => ({ ...p, cvv: true }))}
+                placeholder={brand === "amex" ? "1234" : "123"}
+                className={`input input-bordered w-full ${
+                  cvvError ? "input-error" : touched.cvv && !cvvError && cvv ? "input-success" : ""
+                }`}
+              />
+            </div>
           </div>
+          {expError && (
+            <p className="text-xs text-error -mt-2">{expError}</p>
+          )}
+          {cvvError && (
+            <p className="text-xs text-error -mt-2">{cvvError}</p>
+          )}
         </div>
       </section>
 
@@ -250,7 +459,7 @@ export default function PayInstallmentPage({
 
       <button
         onClick={() => setShowConfirm(true)}
-        disabled={isPaying || !cardNumber || !cvv || !expMonth || !expYear || !fullName}
+        disabled={isPaying || !isFormValid}
         className="btn btn-primary w-full text-base font-bold"
       >
         {isPaying ? <span className="loading loading-spinner loading-sm" /> : null}

@@ -43,7 +43,7 @@ interface TourContextValue {
   prevStep: () => void;
   /** End the tour and mark it as seen */
   endTour: () => void;
-  /** Skip the tour without marking as seen */
+  /** Skip the tour and mark it as seen */
   skipTour: () => void;
   /** Whether a tour has been completed before (from localStorage) */
   hasSeenTour: (tourId: string) => boolean;
@@ -109,9 +109,14 @@ export function TourProvider({ children }: { children: ReactNode }) {
   }, [activeTourId, seenTours]);
 
   const skipTour = useCallback(() => {
+    if (activeTourId) {
+      const updated = { ...seenTours, [activeTourId]: true };
+      setSeenTours(updated);
+      saveSeenTours(updated);
+    }
     setActiveTourId(null);
     setCurrentStep(0);
-  }, []);
+  }, [activeTourId, seenTours]);
 
   const hasSeenTour = useCallback(
     (tourId: string) => !!seenTours[tourId],

@@ -12,6 +12,7 @@ export interface UserResponse {
   kycStatus?: string;
   isActive?: boolean;
   active?: boolean;
+  profilePhotoUrl?: string;
 }
 
 export interface CreditLine {

@@ -114,6 +114,7 @@ type Querier interface {
 	GetUserByIDAdmin(ctx context.Context, id pgtype.UUID) (GetUserByIDAdminRow, error)
 	GetUserByPhone(ctx context.Context, phone string) (User, error)
 	GetUserForTriageEmail(ctx context.Context, id pgtype.UUID) (GetUserForTriageEmailRow, error)
+	IncrementUserTotalPaid(ctx context.Context, arg IncrementUserTotalPaidParams) error
 	ListAllCreditLines(ctx context.Context, arg ListAllCreditLinesParams) ([]ListAllCreditLinesRow, error)
 	// ════════════════════════════════════════════════════════════
 	// Admin: All elder care subscriptions
@@ -176,6 +177,7 @@ type Querier interface {
 	UpdateQRTokenStatus(ctx context.Context, arg UpdateQRTokenStatusParams) error
 	UpdateUserGamification(ctx context.Context, arg UpdateUserGamificationParams) (User, error)
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error
+	UpdateUserProfilePhoto(ctx context.Context, arg UpdateUserProfilePhotoParams) (User, error)
 	UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) error
 	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (UpdateUserStatusRow, error)
 	UpsertHealthProfile(ctx context.Context, arg UpsertHealthProfileParams) (HealthProfile, error)

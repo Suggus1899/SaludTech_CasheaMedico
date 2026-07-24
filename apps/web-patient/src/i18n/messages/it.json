@@ -340,7 +340,30 @@
     "cancel": "Annulla",
     "yesPay": "Sì, paga",
     "close": "Chiudi",
-    "paymentError": "Impossibile elaborare il pagamento."
+    "paymentError": "Impossibile elaborare il pagamento.",
+    "paymentMethod": "Metodo di pagamento",
+    "selectBank": "Seleziona la tua banca o piattaforma",
+    "venezuelanBanks": "Banche venezuelane",
+    "international": "Internazionale",
+    "bankBanesco": "Banesco",
+    "bankBDV": "Banco de Venezuela",
+    "bankMercantil": "Banco Mercantil",
+    "bankProvincial": "BBVA Provincial",
+    "bankBNC": "Banco Nacional de Crédito",
+    "bankCaroni": "Banco Caroní",
+    "bankBancaribe": "Bancaribe",
+    "bankTesoro": "Banco del Tesoro",
+    "bankBancamiga": "Bancamiga",
+    "bankBangente": "Bangente",
+    "bank100": "100% Banco",
+    "zinli": "Zinli",
+    "paypal": "PayPal",
+    "stripe": "Stripe",
+    "supportedCards": "Carte supportate",
+    "cardNumberInvalid": "Numero di carta non valido",
+    "cvvInvalid": "CVV non valido",
+    "expInvalid": "Data di scadenza non valida",
+    "cardDetected": "Carta rilevata"
   },
   "Family": {
     "title": "Famiglia e Caregiver",
@@ -426,7 +449,11 @@
     "tryAgain": "Riprova",
     "amountExceedsMax": "L'importo non può superare $10.000",
     "previewError": "Impossibile simulare il finanziamento. Riprova.",
-    "paymentError": "Errore nel pagamento. Verifica il tuo limite disponibile."
+    "paymentError": "Errore nel pagamento. Verifica il tuo limite disponibile.",
+    "transactionCreated": "Transazione Creata!",
+    "transactionCreatedDesc": "Il tuo finanziamento è stato approvato. Paga la prima rata per completare l'acquisto.",
+    "payFirstInstallment": "Paga la prima rata",
+    "viewInstallments": "Vedi le mie rate"
   },
   "Profile": {
     "title": "Il mio Profilo",
@@ -452,7 +479,12 @@
     "reset": "Reimposta",
     "tutorialsDesc": "Impara a usare ogni sezione con un tour guidato passo dopo passo.",
     "seen": "Visto",
-    "logout": "Esci"
+    "logout": "Esci",
+    "changePhoto": "Cambia foto",
+    "photoUpdated": "Foto aggiornata",
+    "photoError": "Errore durante l'aggiornamento della foto",
+    "photoTooLarge": "L'immagine non può superare 2 MB",
+    "photoInvalidFormat": "Formato non valido. Usa JPG, PNG o WebP"
   },
   "Settings": {
     "back": "Indietro",

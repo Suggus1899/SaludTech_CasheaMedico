@@ -340,7 +340,30 @@
     "cancel": "Annuler",
     "yesPay": "Oui, payer",
     "close": "Fermer",
-    "paymentError": "Impossible de traiter le paiement."
+    "paymentError": "Impossible de traiter le paiement.",
+    "paymentMethod": "Méthode de paiement",
+    "selectBank": "Sélectionnez votre banque ou plateforme",
+    "venezuelanBanks": "Banques vénézuéliennes",
+    "international": "International",
+    "bankBanesco": "Banesco",
+    "bankBDV": "Banco de Venezuela",
+    "bankMercantil": "Banco Mercantil",
+    "bankProvincial": "BBVA Provincial",
+    "bankBNC": "Banco Nacional de Crédito",
+    "bankCaroni": "Banco Caroní",
+    "bankBancaribe": "Bancaribe",
+    "bankTesoro": "Banco del Tesoro",
+    "bankBancamiga": "Bancamiga",
+    "bankBangente": "Bangente",
+    "bank100": "100% Banco",
+    "zinli": "Zinli",
+    "paypal": "PayPal",
+    "stripe": "Stripe",
+    "supportedCards": "Cartes prises en charge",
+    "cardNumberInvalid": "Numéro de carte invalide",
+    "cvvInvalid": "CVV invalide",
+    "expInvalid": "Date d'expiration invalide",
+    "cardDetected": "Carte détectée"
   },
   "Family": {
     "title": "Famille et aidants",
@@ -426,7 +449,11 @@
     "tryAgain": "Réessayer",
     "amountExceedsMax": "Le montant ne peut pas dépasser 10 000 $",
     "previewError": "Impossible de simuler le financement. Réessayez.",
-    "paymentError": "Erreur de paiement. Vérifiez votre limite disponible."
+    "paymentError": "Erreur de paiement. Vérifiez votre limite disponible.",
+    "transactionCreated": "Transaction Créée !",
+    "transactionCreatedDesc": "Votre financement a été approuvé. Payez votre première échéance pour finaliser l'achat.",
+    "payFirstInstallment": "Payer la première échéance",
+    "viewInstallments": "Voir mes échéances"
   },
   "Profile": {
     "title": "Mon profil",
@@ -452,7 +479,12 @@
     "reset": "Réinitialiser",
     "tutorialsDesc": "Apprenez à utiliser chaque section avec une visite guidée étape par étape.",
     "seen": "Vu",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "changePhoto": "Changer la photo",
+    "photoUpdated": "Photo mise à jour",
+    "photoError": "Erreur lors de la mise à jour de la photo",
+    "photoTooLarge": "L'image ne peut pas dépasser 2 Mo",
+    "photoInvalidFormat": "Format non valide. Utilisez JPG, PNG ou WebP"
   },
   "Settings": {
     "back": "Retour",

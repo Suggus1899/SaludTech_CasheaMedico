@@ -340,7 +340,30 @@
     "cancel": "Cancel",
     "yesPay": "Yes, pay",
     "close": "Close",
-    "paymentError": "Could not process the payment."
+    "paymentError": "Could not process the payment.",
+    "paymentMethod": "Payment method",
+    "selectBank": "Select your bank or platform",
+    "venezuelanBanks": "Venezuelan banks",
+    "international": "International",
+    "bankBanesco": "Banesco",
+    "bankBDV": "Banco de Venezuela",
+    "bankMercantil": "Banco Mercantil",
+    "bankProvincial": "BBVA Provincial",
+    "bankBNC": "Banco Nacional de Crédito",
+    "bankCaroni": "Banco Caroní",
+    "bankBancaribe": "Bancaribe",
+    "bankTesoro": "Banco del Tesoro",
+    "bankBancamiga": "Bancamiga",
+    "bankBangente": "Bangente",
+    "bank100": "100% Banco",
+    "zinli": "Zinli",
+    "paypal": "PayPal",
+    "stripe": "Stripe",
+    "supportedCards": "Supported cards",
+    "cardNumberInvalid": "Invalid card number",
+    "cvvInvalid": "Invalid CVV",
+    "expInvalid": "Invalid expiration date",
+    "cardDetected": "Card detected"
   },
   "Family": {
     "title": "Family and Caregivers",
@@ -426,7 +449,11 @@
     "tryAgain": "Try again",
     "amountExceedsMax": "The amount cannot exceed $10,000",
     "previewError": "Could not simulate the financing. Try again.",
-    "paymentError": "Payment error. Check your available limit."
+    "paymentError": "Payment error. Check your available limit.",
+    "transactionCreated": "Transaction Created!",
+    "transactionCreatedDesc": "Your financing has been approved. Pay your first installment to complete the purchase.",
+    "payFirstInstallment": "Pay first installment",
+    "viewInstallments": "View my installments"
   },
   "Profile": {
     "title": "My Profile",
@@ -452,7 +479,12 @@
     "reset": "Reset",
     "tutorialsDesc": "Learn to use each section with a step-by-step guided tour.",
     "seen": "Seen",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "changePhoto": "Change photo",
+    "photoUpdated": "Photo updated",
+    "photoError": "Error updating photo",
+    "photoTooLarge": "Image cannot exceed 2MB",
+    "photoInvalidFormat": "Invalid format. Use JPG, PNG or WebP"
   },
   "Settings": {
     "back": "Back",

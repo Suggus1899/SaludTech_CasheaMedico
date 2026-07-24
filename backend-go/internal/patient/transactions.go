@@ -229,6 +229,8 @@ func (h *PatientHandler) CreateTransaction(w http.ResponseWriter, r *http.Reques
 
 	// Create installments
 	installmentAmount := math.Round((financedAmount/float64(numInst))*100) / 100
+	bcvRate := h.getBCVRateCached(r)
+	installments := make([]map[string]interface{}, 0, numInst)
 	for i := 1; i <= numInst; i++ {
 		var numAmt pgtype.Numeric
 		numAmt.Scan(fmt.Sprintf("%.2f", installmentAmount))
@@ -237,7 +239,7 @@ func (h *PatientHandler) CreateTransaction(w http.ResponseWriter, r *http.Reques
 		var pgDate pgtype.Date
 		pgDate.Scan(dueDate)
 
-		_, err = h.DB.CreateInstallment(ctx, database.CreateInstallmentParams{
+		inst, err := h.DB.CreateInstallment(ctx, database.CreateInstallmentParams{
 			TransactionID:  trx.ID,
 			UserID:         uid,
 			InstallmentNum: int16(i),
@@ -248,6 +250,17 @@ func (h *PatientHandler) CreateTransaction(w http.ResponseWriter, r *http.Reques
 			http.Error(w, fmt.Sprintf("Failed to create installment %d: %v", i, err), http.StatusInternalServerError)
 			return
 		}
+
+		entry := map[string]interface{}{
+			"id":                inst.ID.String(),
+			"installmentNumber": i,
+			"amount":            installmentAmount,
+			"dueDate":           dueDate.Format("2006-01-02"),
+		}
+		if bcvRate > 0 {
+			entry["amountVES"] = math.Round(installmentAmount*bcvRate*100) / 100
+		}
+		installments = append(installments, entry)
 	}
 
 	// Update credit line usage
@@ -264,12 +277,22 @@ func (h *PatientHandler) CreateTransaction(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	resp := map[string]interface{}{
+		"id":              trx.ID.String(),
+		"status":          "APPROVED",
+		"installments":    installments,
+		"numInstallments": numInst,
+	}
+	if len(installments) > 0 {
+		resp["firstInstallmentId"] = installments[0]["id"]
+	}
+	if bcvRate > 0 {
+		resp["bcvRate"] = bcvRate
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"id":     trx.ID.String(),
-		"status": "APPROVED",
-	})
+	json.NewEncoder(w).Encode(resp)
 }
 
 // ─── Checkout (multi-item purchase) ──────────────────────────────────────

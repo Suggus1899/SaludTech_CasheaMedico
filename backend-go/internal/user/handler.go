@@ -49,6 +49,10 @@ func (h *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 	if user.NationalID.Valid {
 		nationalID = user.NationalID.String
 	}
+	profilePhotoUrl := ""
+	if user.ProfilePhotoUrl.Valid {
+		profilePhotoUrl = user.ProfilePhotoUrl.String
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -64,6 +68,7 @@ func (h *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 		"totalPaid":        user.TotalPaid,
 		"isActive":         user.IsActive,
 		"kycStatus":        "APPROVED",
+		"profilePhotoUrl":  profilePhotoUrl,
 	})
 }
 
@@ -131,4 +136,56 @@ func (h *UserHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Password updated successfully"})
+}
+
+type UpdateProfilePhotoRequest struct {
+	ProfilePhotoUrl string `json:"profilePhotoUrl"`
+}
+
+func (h *UserHandler) UpdateProfilePhoto(w http.ResponseWriter, r *http.Request) {
+	userID := auth.GetUserID(r.Context())
+	if userID == "" {
+		http.Error(w, `{"error":"Unauthorized"}`, http.StatusUnauthorized)
+		return
+	}
+
+	var uuid pgtype.UUID
+	if err := uuid.Scan(userID); err != nil {
+		http.Error(w, `{"error":"Invalid user ID"}`, http.StatusBadRequest)
+		return
+	}
+
+	var req UpdateProfilePhotoRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, `{"error":"Invalid request body"}`, http.StatusBadRequest)
+		return
+	}
+
+	if req.ProfilePhotoUrl == "" {
+		http.Error(w, `{"error":"profilePhotoUrl is required"}`, http.StatusBadRequest)
+		return
+	}
+
+	photoText := pgtype.Text{String: req.ProfilePhotoUrl, Valid: true}
+
+	user, err := h.DB.UpdateUserProfilePhoto(context.Background(), database.UpdateUserProfilePhotoParams{
+		ID:              uuid,
+		ProfilePhotoUrl: photoText,
+	})
+	if err != nil {
+		http.Error(w, `{"error":"Failed to update profile photo"}`, http.StatusInternalServerError)
+		return
+	}
+
+	profilePhotoUrl := ""
+	if user.ProfilePhotoUrl.Valid {
+		profilePhotoUrl = user.ProfilePhotoUrl.String
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"id":              user.ID.String(),
+		"profilePhotoUrl": profilePhotoUrl,
+	})
 }

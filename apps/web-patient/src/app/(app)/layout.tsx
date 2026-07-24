@@ -143,8 +143,12 @@ export default function AppLayout({
                   : "hover:bg-base-200"
               }`}
             >
-              <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0">
-                {user?.firstName?.[0]?.toUpperCase() ?? "?"}
+              <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0 overflow-hidden">
+                {user?.profilePhotoUrl ? (
+                  <img src={user.profilePhotoUrl} alt={user?.firstName ?? ""} className="w-full h-full object-cover" />
+                ) : (
+                  (user?.firstName?.[0]?.toUpperCase() ?? "?")
+                )}
               </div>
               <p className="flex-1 min-w-0 text-sm font-semibold truncate">
                 {user?.firstName ?? "—"}
@@ -226,8 +230,12 @@ export default function AppLayout({
                       : "hover:bg-base-200"
                   }`}
                 >
-                  <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0">
-                    {user?.firstName?.[0]?.toUpperCase() ?? "?"}
+                  <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0 overflow-hidden">
+                    {user?.profilePhotoUrl ? (
+                      <img src={user.profilePhotoUrl} alt={user?.firstName ?? ""} className="w-full h-full object-cover" />
+                    ) : (
+                      (user?.firstName?.[0]?.toUpperCase() ?? "?")
+                    )}
                   </div>
                   <p className="flex-1 min-w-0 text-sm font-semibold truncate">
                     {user?.firstName ?? "—"}
@@ -268,8 +276,12 @@ export default function AppLayout({
 
             {/* User avatar (mobile — desktop has it in sidebar) */}
             <div className="lg:hidden flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-xs">
-                {user?.firstName?.[0]?.toUpperCase() ?? "?"}
+              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-xs overflow-hidden">
+                {user?.profilePhotoUrl ? (
+                  <img src={user.profilePhotoUrl} alt={user?.firstName ?? ""} className="w-full h-full object-cover" />
+                ) : (
+                  (user?.firstName?.[0]?.toUpperCase() ?? "?")
+                )}
               </div>
             </div>
           </header>

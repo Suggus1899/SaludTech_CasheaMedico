@@ -220,6 +220,16 @@ func (h *PatientHandler) ProcessPayment(w http.ResponseWriter, r *http.Request) 
 		log.Printf("ReleaseCreditLineUsage failed for line %s: %v", inst.CreditLineID, err)
 	}
 
+	// 5c. Increment total_paid and installments_paid_count
+	amountNumeric := pgtype.Numeric{}
+	amountNumeric.Scan(fmt.Sprintf("%.2f", amountUSD))
+	if err := txQueries.IncrementUserTotalPaid(ctx, database.IncrementUserTotalPaidParams{
+		ID:        uid,
+		TotalPaid: amountNumeric,
+	}); err != nil {
+		log.Printf("IncrementUserTotalPaid failed for user %s: %v", uid, err)
+	}
+
 	// 5d. Gamification: +10 points + level-up check
 	if err := txQueries.AddUserPoints(ctx, database.AddUserPointsParams{
 		ID:     uid,

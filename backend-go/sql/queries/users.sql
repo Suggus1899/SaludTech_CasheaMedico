@@ -31,6 +31,19 @@ SET
 WHERE id = $1
 RETURNING *;
 
+-- name: UpdateUserProfilePhoto :one
+UPDATE users
+SET profile_photo_url = $2
+WHERE id = $1
+RETURNING *;
+
+-- name: IncrementUserTotalPaid :exec
+UPDATE users
+SET
+    total_paid = total_paid + $2,
+    installments_paid_count = installments_paid_count + 1
+WHERE id = $1;
+
 -- name: UpdateUserPassword :exec
 UPDATE users
 SET password_hash = $2

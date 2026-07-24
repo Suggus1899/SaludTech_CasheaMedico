@@ -340,7 +340,30 @@
     "cancel": "Cancelar",
     "yesPay": "Sí, pagar",
     "close": "Cerrar",
-    "paymentError": "No se pudo procesar el pago."
+    "paymentError": "No se pudo procesar el pago.",
+    "paymentMethod": "Método de pago",
+    "selectBank": "Selecciona tu banco o plataforma",
+    "venezuelanBanks": "Bancos venezolanos",
+    "international": "Internacional",
+    "bankBanesco": "Banesco",
+    "bankBDV": "Banco de Venezuela",
+    "bankMercantil": "Banco Mercantil",
+    "bankProvincial": "BBVA Provincial",
+    "bankBNC": "Banco Nacional de Crédito",
+    "bankCaroni": "Banco Caroní",
+    "bankBancaribe": "Bancaribe",
+    "bankTesoro": "Banco del Tesoro",
+    "bankBancamiga": "Bancamiga",
+    "bankBangente": "Bangente",
+    "bank100": "100% Banco",
+    "zinli": "Zinli",
+    "paypal": "PayPal",
+    "stripe": "Stripe",
+    "supportedCards": "Tarjetas soportadas",
+    "cardNumberInvalid": "Número de tarjeta inválido",
+    "cvvInvalid": "CVV inválido",
+    "expInvalid": "Fecha de vencimiento inválida",
+    "cardDetected": "Tarjeta detectada"
   },
   "Family": {
     "title": "Familia y Cuidadores",
@@ -426,7 +449,11 @@
     "tryAgain": "Intentar de nuevo",
     "amountExceedsMax": "El monto no puede exceder $10,000",
     "previewError": "No se pudo simular el financiamiento. Intenta de nuevo.",
-    "paymentError": "Error en el pago. Revisa tu límite disponible."
+    "paymentError": "Error en el pago. Revisa tu límite disponible.",
+    "transactionCreated": "¡Transacción Creada!",
+    "transactionCreatedDesc": "Tu financiamiento ha sido aprobado. Paga tu primera cuota para completar la compra.",
+    "payFirstInstallment": "Pagar primera cuota",
+    "viewInstallments": "Ver mis cuotas"
   },
   "Profile": {
     "title": "Mi Perfil",
@@ -452,7 +479,12 @@
     "reset": "Reiniciar",
     "tutorialsDesc": "Aprende a usar cada sección con un tour guiado paso a paso.",
     "seen": "Visto",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "changePhoto": "Cambiar foto",
+    "photoUpdated": "Foto actualizada",
+    "photoError": "Error al actualizar la foto",
+    "photoTooLarge": "La imagen no puede superar 2MB",
+    "photoInvalidFormat": "Formato no válido. Usa JPG, PNG o WebP"
   },
   "Settings": {
     "back": "Volver",

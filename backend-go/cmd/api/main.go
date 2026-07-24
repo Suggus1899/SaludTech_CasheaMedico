@@ -128,6 +128,7 @@ func main() {
 	userHandler := &user.UserHandler{DB: queries}
 	r.With(auth.RequireAuth).Get("/api/v1/auth/me", userHandler.GetProfile)
 	r.With(auth.RequireAuth).Get("/api/v1/users/profile", userHandler.GetProfile)
+	r.With(auth.RequireAuth).Put("/api/v1/users/profile-photo", userHandler.UpdateProfilePhoto)
 	r.With(auth.RequireAuth).Patch("/api/v1/users/password", userHandler.ChangePassword)
 
 	addr := fmt.Sprintf(":%d", cfg.Port)

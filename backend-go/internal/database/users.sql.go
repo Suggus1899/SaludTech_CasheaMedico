@@ -16,7 +16,7 @@ INSERT INTO users (
     phone, email, password_hash, full_name, national_id, role
 ) VALUES (
     $1, $2, $3, $4, $5, $6
-) RETURNING id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified
+) RETURNING id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, profile_photo_url
 `
 
 type CreateUserParams struct {
@@ -56,12 +56,13 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.IsPhoneVerified,
 		&i.IsCreditFrozenForElectives,
 		&i.IsEmailVerified,
+		&i.ProfilePhotoUrl,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified FROM users WHERE email = $1
+SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, profile_photo_url FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email pgtype.Text) (User, error) {
@@ -85,12 +86,13 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email pgtype.Text) (User, 
 		&i.IsPhoneVerified,
 		&i.IsCreditFrozenForElectives,
 		&i.IsEmailVerified,
+		&i.ProfilePhotoUrl,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified FROM users WHERE id = $1
+SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, profile_photo_url FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error) {
@@ -114,12 +116,13 @@ func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
 		&i.IsPhoneVerified,
 		&i.IsCreditFrozenForElectives,
 		&i.IsEmailVerified,
+		&i.ProfilePhotoUrl,
 	)
 	return i, err
 }
 
 const getUserByPhone = `-- name: GetUserByPhone :one
-SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified FROM users WHERE phone = $1
+SELECT id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, profile_photo_url FROM users WHERE phone = $1
 `
 
 func (q *Queries) GetUserByPhone(ctx context.Context, phone string) (User, error) {
@@ -143,8 +146,27 @@ func (q *Queries) GetUserByPhone(ctx context.Context, phone string) (User, error
 		&i.IsPhoneVerified,
 		&i.IsCreditFrozenForElectives,
 		&i.IsEmailVerified,
+		&i.ProfilePhotoUrl,
 	)
 	return i, err
+}
+
+const incrementUserTotalPaid = `-- name: IncrementUserTotalPaid :exec
+UPDATE users
+SET
+    total_paid = total_paid + $2,
+    installments_paid_count = installments_paid_count + 1
+WHERE id = $1
+`
+
+type IncrementUserTotalPaidParams struct {
+	ID        pgtype.UUID    `json:"id"`
+	TotalPaid pgtype.Numeric `json:"total_paid"`
+}
+
+func (q *Queries) IncrementUserTotalPaid(ctx context.Context, arg IncrementUserTotalPaidParams) error {
+	_, err := q.db.Exec(ctx, incrementUserTotalPaid, arg.ID, arg.TotalPaid)
+	return err
 }
 
 const updateUserGamification = `-- name: UpdateUserGamification :one
@@ -155,7 +177,7 @@ SET
     total_paid = total_paid + $4,
     installments_paid_count = installments_paid_count + $5
 WHERE id = $1
-RETURNING id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified
+RETURNING id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, profile_photo_url
 `
 
 type UpdateUserGamificationParams struct {
@@ -193,6 +215,7 @@ func (q *Queries) UpdateUserGamification(ctx context.Context, arg UpdateUserGami
 		&i.IsPhoneVerified,
 		&i.IsCreditFrozenForElectives,
 		&i.IsEmailVerified,
+		&i.ProfilePhotoUrl,
 	)
 	return i, err
 }
@@ -211,6 +234,44 @@ type UpdateUserPasswordParams struct {
 func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
 	_, err := q.db.Exec(ctx, updateUserPassword, arg.ID, arg.PasswordHash)
 	return err
+}
+
+const updateUserProfilePhoto = `-- name: UpdateUserProfilePhoto :one
+UPDATE users
+SET profile_photo_url = $2
+WHERE id = $1
+RETURNING id, phone, email, password_hash, full_name, national_id, role, level, points, total_paid, installments_paid_count, is_active, created_at, updated_at, is_phone_verified, is_credit_frozen_for_electives, is_email_verified, profile_photo_url
+`
+
+type UpdateUserProfilePhotoParams struct {
+	ID              pgtype.UUID `json:"id"`
+	ProfilePhotoUrl pgtype.Text `json:"profile_photo_url"`
+}
+
+func (q *Queries) UpdateUserProfilePhoto(ctx context.Context, arg UpdateUserProfilePhotoParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUserProfilePhoto, arg.ID, arg.ProfilePhotoUrl)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Phone,
+		&i.Email,
+		&i.PasswordHash,
+		&i.FullName,
+		&i.NationalID,
+		&i.Role,
+		&i.Level,
+		&i.Points,
+		&i.TotalPaid,
+		&i.InstallmentsPaidCount,
+		&i.IsActive,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.IsPhoneVerified,
+		&i.IsCreditFrozenForElectives,
+		&i.IsEmailVerified,
+		&i.ProfilePhotoUrl,
+	)
+	return i, err
 }
 
 const verifyEmail = `-- name: VerifyEmail :exec

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Award, LogOut, Mail, Phone, CreditCard, Shield, GraduationCap, RotateCcw, Settings, User, Hash, DollarSign, Activity } from "lucide-react";
+import { Award, LogOut, Mail, Phone, CreditCard, Shield, GraduationCap, RotateCcw, Settings, User, Camera, DollarSign, Activity } from "lucide-react";
 import { clearSession, getStoredUser, getApiUrl, apiFetch } from "../../../lib/api";
 import { profileGradient } from "../../../lib/creditLineStyles";
 import { useTour, tours } from "../../../lib/tours";
@@ -24,6 +24,9 @@ export default function PerfilPage() {
   const tTours = useTranslations("Tours");
   const [user, setUser] = useState<UserResponse | null>(null);
   const { startTour, hasSeenTour, resetTours } = useTour();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoMessage, setPhotoMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     // Fetch fresh data from /auth/me, fall back to localStorage
@@ -45,6 +48,49 @@ export default function PerfilPage() {
   const handleLogout = async () => {
     await clearSession();
     router.push("/login");
+  };
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setPhotoMessage({ type: "error", text: t("photoInvalidFormat") });
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setPhotoMessage({ type: "error", text: t("photoTooLarge") });
+      e.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result as string;
+      setPhotoUploading(true);
+      setPhotoMessage(null);
+      try {
+        const res = await apiFetch(getApiUrl("users/profile-photo"), {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ profilePhotoUrl: dataUrl }),
+        });
+        if (res.ok) {
+          setUser((prev) => (prev ? { ...prev, profilePhotoUrl: dataUrl } : prev));
+          setPhotoMessage({ type: "success", text: t("photoUpdated") });
+        } else {
+          setPhotoMessage({ type: "error", text: t("photoError") });
+        }
+      } catch {
+        setPhotoMessage({ type: "error", text: t("photoError") });
+      } finally {
+        setPhotoUploading(false);
+        e.target.value = "";
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const level = user?.level ?? 1;
@@ -107,15 +153,55 @@ export default function PerfilPage() {
           {t("personalData")}
         </h3>
 
+        {/* Profile photo */}
+        <div className="flex flex-col items-center gap-2 pb-2">
+          <div className="relative">
+            <div className="w-20 h-20 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-2xl overflow-hidden">
+              {user?.profilePhotoUrl ? (
+                <img
+                  src={user.profilePhotoUrl}
+                  alt={fullName || ""}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                (user?.firstName?.[0]?.toUpperCase() ?? "?")
+              )}
+            </div>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={photoUploading}
+              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-primary-content flex items-center justify-center shadow-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+              aria-label={t("changePhoto")}
+            >
+              {photoUploading ? (
+                <span className="loading loading-spinner loading-xs" />
+              ) : (
+                <Camera className="w-4 h-4" />
+              )}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handlePhotoChange}
+              className="hidden"
+            />
+          </div>
+          {photoMessage && (
+            <p
+              className={`text-xs text-center ${
+                photoMessage.type === "success" ? "text-success" : "text-error"
+              }`}
+            >
+              {photoMessage.text}
+            </p>
+          )}
+        </div>
+
         <InfoRow
           icon={<User className="w-4 h-4" />}
           label={t("fullName")}
           value={fullName || "—"}
-        />
-        <InfoRow
-          icon={<Hash className="w-4 h-4" />}
-          label={t("userId")}
-          value={user?.id ? user.id.slice(0, 8) : "—"}
         />
         <InfoRow
           icon={<Mail className="w-4 h-4" />}

@@ -37,6 +37,7 @@ export default function PagarPage() {
   const [preview, setPreview] = useState<CheckoutPreview | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [firstInstallmentId, setFirstInstallmentId] = useState<string | null>(null);
 
   // Start camera on mount
   useEffect(() => {
@@ -174,8 +175,18 @@ export default function PagarPage() {
         }),
       });
       if (!res.ok) throw new Error("payment failed");
+      const data = (await res.json()) as {
+        id: string;
+        firstInstallmentId?: string;
+        installments?: { id: string; installmentNumber: number }[];
+      };
+      const firstId =
+        data.firstInstallmentId ?? data.installments?.[0]?.id ?? null;
+      setFirstInstallmentId(firstId);
       setStep("success");
-      setTimeout(() => router.push("/dashboard"), 1800);
+      setTimeout(() => {
+        router.push(firstId ? `/cuotas/${firstId}` : "/cuotas");
+      }, 3000);
     } catch {
       setError(t("paymentError"));
       setStep("error");
@@ -441,16 +452,34 @@ export default function PagarPage() {
   // ─── Success step ──────────────────────────────────────────────────────
   if (step === "success") {
     return (
-      <div className="max-w-lg mx-auto flex flex-col items-center py-20 px-6 text-center">
+      <div className="max-w-lg mx-auto flex flex-col items-center py-20 px-6 text-center space-y-6">
         <div className="p-6 rounded-full bg-success/10">
           <CheckCircle2 className="w-14 h-14 text-success" />
         </div>
-        <h2 className="text-2xl font-bold text-foreground mt-6 font-display">
-          {t("successTitle")}
+        <h2 className="text-2xl font-bold text-foreground font-display">
+          {t("transactionCreated")}
         </h2>
-        <p className="text-sm text-muted-foreground mt-2">
-          {t("successDesc")}
+        <p className="text-sm text-muted-foreground">
+          {t("transactionCreatedDesc")}
         </p>
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          <button
+            onClick={() =>
+              router.push(
+                firstInstallmentId ? `/cuotas/${firstInstallmentId}` : "/cuotas"
+              )
+            }
+            className="btn btn-primary w-full text-base font-bold"
+          >
+            {t("payFirstInstallment")}
+          </button>
+          <button
+            onClick={() => router.push("/cuotas")}
+            className="btn btn-outline w-full"
+          >
+            {t("viewInstallments")}
+          </button>
+        </div>
       </div>
     );
   }

@@ -313,6 +313,7 @@ type User struct {
 	IsPhoneVerified            bool               `json:"is_phone_verified"`
 	IsCreditFrozenForElectives bool               `json:"is_credit_frozen_for_electives"`
 	IsEmailVerified            bool               `json:"is_email_verified"`
+	ProfilePhotoUrl            pgtype.Text        `json:"profile_photo_url"`
 }
 
 type UserGamificationHistory struct {
