@@ -102,8 +102,8 @@ export default function FinanciamientosPage() {
             <option value="SALUD_COTIDIANA">{t("typeDailyHealth")}</option>
             <option value="MAYOR_CUIDADO">{t("typeGreaterCare")}</option>
           </select>
-          <div className="relative hidden sm:block">
-            <input type="search" placeholder={t("searchPlaceholder")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-64 transition-all" />
+          <div className="relative">
+            <input type="search" placeholder={t("searchPlaceholder")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-full sm:w-64 transition-all" />
           </div>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default function FinanciamientosPage() {
       {/* Edit modal */}
       {editing && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-sm">
+          <div className="modal-box w-full max-w-sm mx-2">
             <h3 className="text-lg font-bold font-(family-name:--font-syne)">{t("adjustLimitTitle")}</h3>
             <p className="text-sm text-muted-foreground mt-1">
               {editing.user_name} · {lineTypeLabels[editing.type] || editing.type}

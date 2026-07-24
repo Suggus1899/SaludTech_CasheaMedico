@@ -414,7 +414,7 @@ export default function MerchantDetailPage({
       {/* Checkout modal */}
       {showCheckout && (
         <div className="modal modal-open" role="dialog" aria-modal="true">
-          <div className="modal-box max-w-md">
+          <div className="modal-box w-full max-w-md mx-2">
             <h3 className="text-lg font-bold font-display">{t("checkoutTitle")}</h3>
 
             {/* Cart items */}
@@ -434,7 +434,7 @@ export default function MerchantDetailPage({
                       <>
                         <button
                           onClick={() => updateQty(item.id, -1)}
-                          className="btn btn-ghost btn-xs btn-circle"
+                          className="btn btn-ghost btn-sm btn-circle"
                         >
                           −
                         </button>
@@ -443,7 +443,7 @@ export default function MerchantDetailPage({
                         </span>
                         <button
                           onClick={() => updateQty(item.id, 1)}
-                          className="btn btn-ghost btn-xs btn-circle"
+                          className="btn btn-ghost btn-sm btn-circle"
                         >
                           +
                         </button>

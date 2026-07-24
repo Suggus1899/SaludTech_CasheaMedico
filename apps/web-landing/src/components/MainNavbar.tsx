@@ -67,7 +67,7 @@ export default function MainNavbar() {
             </div>
             <button
               type="button"
-              className="md:hidden p-2 rounded-lg hover:bg-slate-100 active:bg-slate-200 transition-colors relative z-10"
+              className="md:hidden p-2.5 min-h-11 min-w-11 rounded-lg hover:bg-slate-100 active:bg-slate-200 transition-colors relative z-10 flex items-center justify-center"
               onClick={() => setOpen((v) => !v)}
               aria-label={open ? t("closeMenu") : t("openMenu")}
               aria-expanded={open}
@@ -81,7 +81,7 @@ export default function MainNavbar() {
         <div
           className="md:hidden overflow-hidden transition-all duration-300 ease-in-out"
           style={{
-            maxHeight: open ? "400px" : "0px",
+            maxHeight: open ? "480px" : "0px",
             opacity: open ? 1 : 0,
           }}
         >
@@ -91,7 +91,7 @@ export default function MainNavbar() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="block px-3 py-2.5 text-sm font-medium text-slate-700 hover:text-primary hover:bg-primary-50 rounded-lg transition-colors"
+                className="block px-3 py-3 min-h-11 text-sm font-medium text-slate-700 hover:text-primary hover:bg-primary-50 rounded-lg transition-colors"
               >
                 {l.label}
               </a>

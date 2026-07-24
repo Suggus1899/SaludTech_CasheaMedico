@@ -104,7 +104,7 @@ export default function LiquidacionesPage() {
       {/* ── Modal Detalle Liquidación ──────────────────────────────────────── */}
       {!!selectedPayout && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-md p-6">
+          <div className="modal-box w-full max-w-md mx-2 p-6">
             <h3 className="font-bold text-lg font-(family-name:--font-syne)">{t("detailTitle")}</h3>
             <p className="text-sm opacity-60 mb-4">{t("detailPeriod", { start: selectedPayout?.period_start, end: selectedPayout?.period_end })}</p>
             {selectedPayout && (

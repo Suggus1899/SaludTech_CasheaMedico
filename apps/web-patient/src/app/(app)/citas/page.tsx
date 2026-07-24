@@ -187,7 +187,7 @@ export default function AppointmentsPage() {
       {/* Add modal */}
       {showAdd && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-md">
+          <div className="modal-box w-full max-w-md mx-2">
             <h3 className="text-lg font-bold font-display">{t("scheduleTitle")}</h3>
             <form onSubmit={handleCreate} className="space-y-4 mt-4">
               <div className="form-control gap-1">
@@ -218,7 +218,7 @@ export default function AppointmentsPage() {
                   </select>
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="form-control gap-1">
                   <label className="label pb-0"><span className="label-text font-medium">{tCommon("date")}</span></label>
                   <input type="date" value={form.appointmentDate} onChange={(e) => setForm({ ...form, appointmentDate: e.target.value })} className="input input-bordered w-full text-sm" required />

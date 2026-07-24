@@ -305,5 +305,11 @@
   "Metadata": {
     "title": "SaludTech - Admin",
     "description": "Backoffice per l'amministrazione di SaludTech"
+  },
+  "ServiceWorker": {
+    "newVersion": "Nuova versione disponibile",
+    "reloadToUpdate": "Ricarica per aggiornare l'app.",
+    "update": "Aggiorna",
+    "close": "Chiudi"
   }
 }

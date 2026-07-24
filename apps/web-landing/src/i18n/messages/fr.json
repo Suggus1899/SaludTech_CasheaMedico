@@ -594,5 +594,11 @@
     "clubSaludTech": "Club SaludTech",
     "elderCare": "Elder Care",
     "saludTech": "SaludTech"
+  },
+  "ServiceWorker": {
+    "newVersion": "Nouvelle version disponible",
+    "reloadToUpdate": "Rechargez pour mettre à jour l'application.",
+    "update": "Mettre à jour",
+    "close": "Fermer"
   }
 }

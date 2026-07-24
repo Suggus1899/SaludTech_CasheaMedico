@@ -244,6 +244,8 @@
 }
 
 @layer utilities {
+  .modal-box { padding-top: env(safe-area-inset-top); }
+
   /* Background helpers (identidad visual de landing) */
   .bg-hero-gradient {
     background-image: var(--background-image-hero-gradient);

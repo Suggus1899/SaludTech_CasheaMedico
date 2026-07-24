@@ -165,10 +165,10 @@ export default function MedicalRecordsPage() {
       {/* Add modal */}
       {showAdd && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-md">
+          <div className="modal-box w-full max-w-md mx-2">
             <h3 className="text-lg font-bold font-display">{t("newRecordTitle")}</h3>
             <form onSubmit={handleCreate} className="space-y-4 mt-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="form-control gap-1">
                   <label className="label pb-0"><span className="label-text font-medium">{t("type")}</span></label>
                   <select value={form.recordType} onChange={(e) => setForm({ ...form, recordType: e.target.value })} className="select select-bordered w-full text-sm">

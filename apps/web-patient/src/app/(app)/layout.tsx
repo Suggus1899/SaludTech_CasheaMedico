@@ -285,6 +285,34 @@ export default function AppLayout({
           </main>
         </div>
 
+        {/* ─── Mobile bottom navigation ──────────────────────────── */}
+        <nav
+          className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-base-100 border-t border-border grid grid-cols-3"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
+          {[
+            { href: "/dashboard", labelKey: "dashboard", icon: Home },
+            { href: "/pagar", labelKey: "pagar", icon: QrCode },
+            { href: "/cuotas", labelKey: "cuotas", icon: CalendarDays },
+          ].map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                className={`flex flex-col items-center justify-center gap-0.5 py-2 text-xs font-medium transition-colors ${
+                  isActive ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                {t(item.labelKey)}
+              </Link>
+            );
+          })}
+        </nav>
+
         {/* Guided tour overlay */}
         <TourOverlay />
       </div>

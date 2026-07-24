@@ -23,8 +23,8 @@ export default function SuscripcionesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">{t("count", { count: filtered.length })}</p>
-        <div className="relative hidden sm:block mr-2">
-          <input type="search" placeholder={t("searchPlaceholder")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-52 transition-all" />
+        <div className="relative">
+          <input type="search" placeholder={t("searchPlaceholder")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-full sm:w-52 transition-all" />
         </div>
       </div>
       <div className="card bg-base-100 border border-base-300 shadow-sm">

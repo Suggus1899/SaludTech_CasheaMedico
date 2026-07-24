@@ -222,7 +222,7 @@ export default function FamilyPage() {
       {/* Add modal */}
       {showAdd && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-md">
+          <div className="modal-box w-full max-w-md mx-2">
             <h3 className="text-lg font-bold font-display">{t("inviteTitle")}</h3>
             <p className="text-sm text-muted-foreground mt-1 mb-4">
               {t("inviteDesc")}

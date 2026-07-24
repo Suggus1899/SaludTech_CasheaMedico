@@ -281,6 +281,12 @@
     "cancelled": "Cancelada",
     "skipToContent": "Saltar al contenido principal"
   },
+  "ServiceWorker": {
+    "newVersion": "Nueva versión disponible",
+    "reloadToUpdate": "Recarga para actualizar la app.",
+    "update": "Actualizar",
+    "close": "Cerrar"
+  },
   "Errors": {
     "systemError": "Error del sistema",
     "unexpectedError": "Ocurrió un error inesperado.",

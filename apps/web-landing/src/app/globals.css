@@ -94,6 +94,7 @@
   body {
     font-family: "DM Sans", system-ui, sans-serif;
     @apply text-slate-800 bg-white antialiased;
+    padding-top: env(safe-area-inset-top);
   }
 
   h1,

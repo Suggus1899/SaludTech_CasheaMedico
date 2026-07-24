@@ -94,8 +94,8 @@ export default function PacientesPage() {
             <option value="ACTIVE">{t("active")}</option>
             <option value="INACTIVE">{t("inactive")}</option>
           </select>
-          <div className="relative hidden sm:block">
-            <input type="search" placeholder={t("searchPlaceholder")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-64 transition-all" />
+          <div className="relative">
+            <input type="search" placeholder={t("searchPlaceholder")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-full sm:w-64 transition-all" />
           </div>
           <button className="btn btn-primary btn-sm gap-2" onClick={() => setIsAddPatientOpen(true)}>
             <Users className="w-4 h-4" /> {t("addPatient")}
@@ -178,7 +178,7 @@ export default function PacientesPage() {
       {/* Modal: Agregar Paciente */}
       {isAddPatientOpen && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-md p-6">
+          <div className="modal-box w-full max-w-md mx-2 p-6">
             <h3 className="font-bold text-lg font-(family-name:--font-syne)">{t("addPatientTitle")}</h3>
             <p className="text-sm opacity-60 mb-4">{t("addPatientDescription")}</p>
             {patientSuccess ? (
@@ -188,7 +188,7 @@ export default function PacientesPage() {
               </div>
             ) : (
               <form onSubmit={handleAddPatient} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="form-control gap-1">
                     <label htmlFor="firstName" className="label pb-0"><span className="label-text font-medium">{t("firstName")}</span></label>
                     <input id="firstName" className="input input-bordered w-full" required value={patientForm.firstName} onChange={(e) => setPatientForm({ ...patientForm, firstName: e.target.value })} />
@@ -206,7 +206,7 @@ export default function PacientesPage() {
                   <label htmlFor="patEmail" className="label pb-0"><span className="label-text font-medium">{t("email")}</span></label>
                   <input id="patEmail" type="email" className="input input-bordered w-full" required value={patientForm.email} onChange={(e) => setPatientForm({ ...patientForm, email: e.target.value })} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="form-control gap-1">
                     <label htmlFor="phone" className="label pb-0"><span className="label-text font-medium">{t("phone")}</span></label>
                     <input id="phone" type="tel" className="input input-bordered w-full" required value={patientForm.phone} onChange={(e) => setPatientForm({ ...patientForm, phone: e.target.value })} />

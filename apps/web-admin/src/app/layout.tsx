@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Syne } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
+import ServiceWorkerRegister from "../components/ServiceWorkerRegister";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,8 +21,22 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t("title"),
     description: t("description"),
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "SaludTech Admin",
+    },
   };
 }
+
+export const viewport: Viewport = {
+  themeColor: "#1a6b8a",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export default async function RootLayout({
   children,
@@ -39,7 +54,6 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <meta name="theme-color" content="#1a6b8a" />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var m=localStorage.getItem('theme');if(m==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
@@ -51,6 +65,7 @@ export default async function RootLayout({
           <a href="#main-content" className="skip-link">
             {tCommon("skipToContent")}
           </a>
+          <ServiceWorkerRegister />
           {children}
         </NextIntlClientProvider>
       </body>

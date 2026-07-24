@@ -69,10 +69,10 @@ export default function Hero() {
           </div>
 
           {/* Visual card mockup */}
-          <div className="hidden md:flex justify-center items-center">
+          <div className="flex justify-center items-center mt-8 md:mt-0">
             <div className="relative">
               {/* Main platform card */}
-              <div className="w-64 md:w-72 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 shadow-2xl">
+              <div className="w-full max-w-xs md:w-72 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-5">
                   <div>
                     <p className="text-white/60 text-xs">{t("availableLine")}</p>
@@ -106,7 +106,7 @@ export default function Hero() {
               </div>
 
               {/* Floating QR badge */}
-              <div className="absolute -bottom-6 -left-8 bg-white rounded-2xl p-4 shadow-2xl border border-slate-100">
+              <div className="hidden sm:flex absolute -bottom-6 -left-8 bg-white rounded-2xl p-4 shadow-2xl border border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
                     <QrCode className="w-5 h-5 text-primary" weight="duotone" />
@@ -119,7 +119,7 @@ export default function Hero() {
               </div>
 
               {/* Floating approval badge */}
-              <div className="absolute -top-4 -right-8 bg-white rounded-2xl px-4 py-3 shadow-2xl border border-slate-100">
+              <div className="hidden sm:flex absolute -top-4 -right-8 bg-white rounded-2xl px-4 py-3 shadow-2xl border border-slate-100">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-secondary" weight="duotone" />
                   <span className="text-sm font-bold text-dark">{t("approved")}</span>

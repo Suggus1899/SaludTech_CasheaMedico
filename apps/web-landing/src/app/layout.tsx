@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit, Syne } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
+import ServiceWorkerRegister from "../components/ServiceWorkerRegister";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -33,8 +34,22 @@ export async function generateMetadata(): Promise<Metadata> {
       title: t("twitterTitle"),
       description: t("twitterDescription"),
     },
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "SaludTech",
+    },
   };
 }
+
+export const viewport: Viewport = {
+  themeColor: "#1a6b8a",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export default async function RootLayout({
   children,
@@ -48,6 +63,7 @@ export default async function RootLayout({
     <html lang={locale} className={`${outfit.variable} ${syne.variable}`} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
+          <ServiceWorkerRegister />
           {children}
         </NextIntlClientProvider>
       </body>

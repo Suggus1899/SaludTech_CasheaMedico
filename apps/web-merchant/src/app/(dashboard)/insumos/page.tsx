@@ -207,7 +207,7 @@ export default function MerchantSuppliesPage() {
       {/* Form modal */}
       {showForm && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-md">
+          <div className="modal-box w-full max-w-md mx-2">
             <h3 className="text-lg font-bold font-(family-name:--font-syne)">
               {editingId ? t("editTitle") : t("newTitle")}
             </h3>
@@ -220,7 +220,7 @@ export default function MerchantSuppliesPage() {
                 <label className="label pb-0"><span className="label-text font-medium">{t("fieldDescription")}</span></label>
                 <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className="textarea textarea-bordered w-full text-sm" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="form-control gap-1">
                   <label className="label pb-0"><span className="label-text font-medium">{t("fieldCategory")}</span></label>
                   <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="select select-bordered w-full text-sm">
@@ -232,7 +232,7 @@ export default function MerchantSuppliesPage() {
                   <input value={form.subcategory} onChange={(e) => setForm({ ...form, subcategory: e.target.value })} placeholder={t("fieldSubcategoryPlaceholder")} className="input input-bordered w-full text-sm" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="form-control gap-1">
                   <label className="label pb-0"><span className="label-text font-medium">{t("fieldPrice")}</span></label>
                   <input type="number" step="0.01" min="0" value={form.priceUSD} onChange={(e) => setForm({ ...form, priceUSD: e.target.value })} placeholder="5.00" className="input input-bordered w-full text-sm" required />
@@ -242,7 +242,7 @@ export default function MerchantSuppliesPage() {
                   <input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} placeholder={t("fieldUnitPlaceholder")} className="input input-bordered w-full text-sm" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="form-control gap-1">
                   <label className="label pb-0"><span className="label-text font-medium">{t("fieldStock")}</span></label>
                   <input type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className="input input-bordered w-full text-sm" />

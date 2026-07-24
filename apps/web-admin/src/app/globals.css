@@ -194,3 +194,5 @@
     }
   }
 }
+
+.modal-box { padding-top: env(safe-area-inset-top); }

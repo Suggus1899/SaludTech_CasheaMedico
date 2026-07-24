@@ -95,8 +95,8 @@ export default function ComerciosPage() {
             <option value="ACTIVE">{t("active")}</option>
             <option value="INACTIVE">{t("inactive")}</option>
           </select>
-          <div className="relative hidden sm:block">
-            <input type="search" placeholder={t("searchPlaceholder")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-64 transition-all" />
+          <div className="relative">
+            <input type="search" placeholder={t("searchPlaceholder")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-4 pr-4 py-2 bg-muted rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary w-full sm:w-64 transition-all" />
           </div>
           <button className="btn btn-primary btn-sm gap-2" onClick={() => setIsAddMerchantOpen(true)}>
             <Store className="w-4 h-4" /> {t("addMerchant")}
@@ -150,7 +150,7 @@ export default function ComerciosPage() {
       {/* Modal: Agregar Comercio */}
       {isAddMerchantOpen && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-md p-6 max-h-[90vh] overflow-y-auto">
+          <div className="modal-box w-full max-w-md mx-2 p-6 max-h-[90vh] overflow-y-auto">
             <h3 className="font-bold text-lg font-(family-name:--font-syne)">{t("affiliateMerchant")}</h3>
             <p className="text-sm opacity-60 mb-4">{t("affiliateDescription")}</p>
             {merchantSuccess ? (
@@ -168,7 +168,7 @@ export default function ComerciosPage() {
                   <label htmlFor="tradeName" className="label pb-0"><span className="label-text font-medium">{t("tradeName")}</span></label>
                   <input id="tradeName" className="input input-bordered w-full" required value={merchantForm.tradeName} onChange={(e) => setMerchantForm({ ...merchantForm, tradeName: e.target.value })} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="form-control gap-1">
                     <label htmlFor="rif" className="label pb-0"><span className="label-text font-medium">{t("rif")}</span></label>
                     <input id="rif" className="input input-bordered w-full" required value={merchantForm.rif} onChange={(e) => setMerchantForm({ ...merchantForm, rif: e.target.value })} />
@@ -188,7 +188,7 @@ export default function ComerciosPage() {
                   <label htmlFor="emailMerch" className="label pb-0"><span className="label-text font-medium">{t("contactEmail")}</span></label>
                   <input id="emailMerch" type="email" className="input input-bordered w-full" required value={merchantForm.email} onChange={(e) => setMerchantForm({ ...merchantForm, email: e.target.value })} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="form-control gap-1">
                     <label htmlFor="phoneMerch" className="label pb-0"><span className="label-text font-medium">{t("phone")}</span></label>
                     <input id="phoneMerch" type="tel" className="input input-bordered w-full" required value={merchantForm.phone} onChange={(e) => setMerchantForm({ ...merchantForm, phone: e.target.value })} />

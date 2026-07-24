@@ -160,14 +160,14 @@ export default function MedicationRemindersPage() {
       {/* Add modal */}
       {showAdd && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-md">
+          <div className="modal-box w-full max-w-md mx-2">
             <h3 className="text-lg font-bold font-display">{t("newTitle")}</h3>
             <form onSubmit={handleCreate} className="space-y-4 mt-4">
               <div className="form-control gap-1">
                 <label className="label pb-0"><span className="label-text font-medium">{t("medication")}</span></label>
                 <input value={form.medicationName} onChange={(e) => setForm({ ...form, medicationName: e.target.value })} placeholder={t("medicationPlaceholder")} className="input input-bordered w-full text-sm" required />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="form-control gap-1">
                   <label className="label pb-0"><span className="label-text font-medium">{t("dosage")}</span></label>
                   <input value={form.dosage} onChange={(e) => setForm({ ...form, dosage: e.target.value })} placeholder={t("dosagePlaceholder")} className="input input-bordered w-full text-sm" />
