@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 import ServiceWorkerRegister from "../components/ServiceWorkerRegister";
+import { QueryProvider } from "@saludtech/shared";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -65,11 +66,13 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <a href="#main-content" className="skip-link">
-            {t("skipToContent")}
-          </a>
-          <ServiceWorkerRegister />
-          {children}
+          <QueryProvider>
+            <a href="#main-content" className="skip-link">
+              {t("skipToContent")}
+            </a>
+            <ServiceWorkerRegister />
+            {children}
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>
