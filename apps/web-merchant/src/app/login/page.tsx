@@ -50,7 +50,9 @@ export default function MerchantLoginPage() {
         throw new Error(data.message ?? t("invalidCredentials"));
       }
       const data = await res.json();
-      // JWT is now stored in an httpOnly cookie by the backend.
+      // Set non-httpOnly cookie for Next.js middleware (cross-origin)
+      const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      document.cookie = `jwt_token=${data.token}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
       localStorage.setItem("merchant_user", JSON.stringify(data.user));
       router.push("/");
     } catch (err: unknown) {

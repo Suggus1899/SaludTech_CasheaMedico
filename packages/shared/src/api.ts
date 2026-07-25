@@ -64,10 +64,17 @@ export interface MinimalUser {
 export function createSessionHelpers(storageKey: string) {
   return {
     /**
-     * Stores only minimal user data (id, firstName, role, level) in localStorage.
+     * Stores minimal user data in localStorage and sets a non-httpOnly
+     * jwt_token cookie on the frontend domain so the Next.js middleware
+     * (proxy.ts) can read it for route protection.
+     *
+     * The backend ALSO sets an httpOnly jwt_token cookie on its own domain
+     * for API calls via credentials: include. Both cookies coexist because
+     * they belong to different domains.
+     *
      * Sensitive PII (email, phone, national_id) is NOT persisted.
      */
-    setSession(_token: string, user: unknown): void {
+    setSession(token: string, user: unknown): void {
       try {
         const minimal: MinimalUser = {
           id: (user as Record<string, string>)?.id ?? "",
@@ -76,8 +83,12 @@ export function createSessionHelpers(storageKey: string) {
           level: (user as Record<string, number>)?.level,
         };
         localStorage.setItem(storageKey, JSON.stringify(minimal));
+        // Set non-httpOnly cookie for Next.js middleware (same-domain)
+        // Expires in 7 days to match typical JWT expiry
+        const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        document.cookie = `jwt_token=${token}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
       } catch {
-        // localStorage may be unavailable in private browsing
+        // localStorage/document may be unavailable in private browsing
       }
     },
 

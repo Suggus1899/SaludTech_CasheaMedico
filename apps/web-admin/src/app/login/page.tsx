@@ -44,8 +44,9 @@ export default function AdminLoginPage() {
         throw new Error(data.message ?? t("errorInvalidCredentials"));
       }
       const data = await res.json();
-      // JWT is now stored in an httpOnly cookie by the backend.
-      // We only keep the user object in localStorage for UI display.
+      // Set non-httpOnly cookie for Next.js middleware (cross-origin)
+      const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      document.cookie = `jwt_token=${data.token}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
       localStorage.setItem("admin_user", JSON.stringify(data.user));
       router.push("/");
     } catch (err: unknown) {
