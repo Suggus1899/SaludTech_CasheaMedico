@@ -38,20 +38,21 @@ type BankOption = {
   id: string;
   icon: "building" | "globe" | "wallet";
   supportedCards: string;
+  code?: string;
 };
 
 const bankOptions: BankOption[] = [
-  { id: "bankBanesco", icon: "building", supportedCards: "Visa / Mastercard" },
-  { id: "bankBDV", icon: "building", supportedCards: "Visa / Mastercard" },
-  { id: "bankMercantil", icon: "building", supportedCards: "Visa / Mastercard" },
-  { id: "bankProvincial", icon: "building", supportedCards: "Visa / Mastercard" },
-  { id: "bankBNC", icon: "building", supportedCards: "Visa / Mastercard" },
-  { id: "bankCaroni", icon: "building", supportedCards: "Visa / Mastercard" },
-  { id: "bankBancaribe", icon: "building", supportedCards: "Visa / Mastercard" },
-  { id: "bankTesoro", icon: "building", supportedCards: "Visa / Mastercard" },
-  { id: "bankBancamiga", icon: "building", supportedCards: "Visa / Mastercard" },
-  { id: "bankBangente", icon: "building", supportedCards: "Visa / Mastercard" },
-  { id: "bank100", icon: "building", supportedCards: "Visa / Mastercard" },
+  { id: "bankBDV", icon: "building", supportedCards: "Visa / Mastercard", code: "0102" },
+  { id: "bankBanesco", icon: "building", supportedCards: "Visa / Mastercard", code: "0134" },
+  { id: "bankMercantil", icon: "building", supportedCards: "Visa / Mastercard", code: "0105" },
+  { id: "bankProvincial", icon: "building", supportedCards: "Visa / Mastercard", code: "0108" },
+  { id: "bankBNC", icon: "building", supportedCards: "Visa / Mastercard", code: "0191" },
+  { id: "bankBancaribe", icon: "building", supportedCards: "Visa / Mastercard", code: "0114" },
+  { id: "bankTesoro", icon: "building", supportedCards: "Visa / Mastercard", code: "0163" },
+  { id: "bankCaroni", icon: "building", supportedCards: "Visa / Mastercard", code: "0128" },
+  { id: "bankBancamiga", icon: "building", supportedCards: "Visa / Mastercard", code: "0171" },
+  { id: "bankBangente", icon: "building", supportedCards: "Visa / Mastercard", code: "0174" },
+  { id: "bank100", icon: "building", supportedCards: "Visa / Mastercard", code: "0156" },
   { id: "zinli", icon: "wallet", supportedCards: "Visa / Mastercard / Discover" },
   { id: "paypal", icon: "globe", supportedCards: "Visa / Mastercard / Discover" },
   { id: "stripe", icon: "globe", supportedCards: "Visa / Mastercard / Discover" },
@@ -288,58 +289,95 @@ export default function PayInstallmentPage({
             <span className="label-text font-medium">{t("paymentMethod")}</span>
           </label>
 
-          {/* Venezuelan banks grid */}
-          <p className="text-xs text-muted-foreground mt-2 mb-1.5">{t("venezuelanBanks")}</p>
-          <div className="grid grid-cols-2 min-[400px]:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 mb-3">
-            {bankOptions
-              .filter((b) => b.icon === "building")
-              .map((b) => (
-                <button
-                  key={b.id}
-                  type="button"
-                  onClick={() => setSelectedBank(b.id)}
-                  className={`flex flex-col items-center gap-1.5 p-2 sm:p-2.5 rounded-xl border-2 transition-all ${
-                    selectedBank === b.id
-                      ? "border-primary bg-primary/5 shadow-sm"
-                      : "border-border hover:border-primary/40 hover:bg-base-200"
-                  }`}
-                >
-                  <BankLogo bankId={b.id} className="w-9 h-9 sm:w-10 sm:h-10" />
-                  <span className="text-[10px] font-medium text-center leading-tight line-clamp-2">
-                    {t(b.id)}
-                  </span>
-                </button>
-              ))}
+          {/* ─── Mobile: cascading dropdown with logo + code + name ─── */}
+          <div className="sm:hidden">
+            <select
+              value={selectedBank}
+              onChange={(e) => setSelectedBank(e.target.value)}
+              className="select select-bordered w-full text-sm h-12"
+            >
+              <option value="">{t("selectBank")}</option>
+              <optgroup label={t("venezuelanBanks")}>
+                {bankOptions
+                  .filter((b) => b.icon === "building")
+                  .map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.code ? `${b.code} — ` : ""}{t(b.id)}
+                    </option>
+                  ))}
+              </optgroup>
+              <optgroup label={t("international")}>
+                {bankOptions
+                  .filter((b) => b.icon !== "building")
+                  .map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {t(b.id)}
+                    </option>
+                  ))}
+              </optgroup>
+            </select>
           </div>
 
-          {/* International methods grid */}
-          <p className="text-xs text-muted-foreground mb-1.5">{t("international")}</p>
-          <div className="grid grid-cols-3 gap-2">
-            {bankOptions
-              .filter((b) => b.icon !== "building")
-              .map((b) => (
-                <button
-                  key={b.id}
-                  type="button"
-                  onClick={() => setSelectedBank(b.id)}
-                  className={`flex flex-col items-center gap-1.5 p-2 sm:p-2.5 rounded-xl border-2 transition-all ${
-                    selectedBank === b.id
-                      ? "border-primary bg-primary/5 shadow-sm"
-                      : "border-border hover:border-primary/40 hover:bg-base-200"
-                  }`}
-                >
-                  <BankLogo bankId={b.id} className="w-9 h-9 sm:w-10 sm:h-10" />
-                  <span className="text-[10px] font-medium text-center leading-tight">
-                    {t(b.id)}
-                  </span>
-                </button>
-              ))}
+          {/* ─── Desktop: grid with logos ─── */}
+          <div className="hidden sm:block">
+            <p className="text-xs text-muted-foreground mt-2 mb-1.5">{t("venezuelanBanks")}</p>
+            <div className="grid grid-cols-4 md:grid-cols-5 gap-2 mb-3">
+              {bankOptions
+                .filter((b) => b.icon === "building")
+                .map((b) => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => setSelectedBank(b.id)}
+                    className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 transition-all ${
+                      selectedBank === b.id
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-border hover:border-primary/40 hover:bg-base-200"
+                    }`}
+                  >
+                    <BankLogo bankId={b.id} className="w-10 h-10" />
+                    <span className="text-[10px] font-medium text-center leading-tight line-clamp-2">
+                      {t(b.id)}
+                    </span>
+                    {b.code && (
+                      <span className="text-[9px] text-muted-foreground font-mono">{b.code}</span>
+                    )}
+                  </button>
+                ))}
+            </div>
+
+            <p className="text-xs text-muted-foreground mb-1.5">{t("international")}</p>
+            <div className="grid grid-cols-3 gap-2">
+              {bankOptions
+                .filter((b) => b.icon !== "building")
+                .map((b) => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => setSelectedBank(b.id)}
+                    className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 transition-all ${
+                      selectedBank === b.id
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-border hover:border-primary/40 hover:bg-base-200"
+                    }`}
+                  >
+                    <BankLogo bankId={b.id} className="w-10 h-10" />
+                    <span className="text-[10px] font-medium text-center leading-tight">
+                      {t(b.id)}
+                    </span>
+                  </button>
+                ))}
+            </div>
           </div>
 
+          {/* Selected bank badge — visible on both */}
           {selectedBankOption && (
             <div className="mt-3 flex items-center gap-2 flex-wrap">
               <span className="badge badge-primary gap-1.5 py-3">
                 <BankLogo bankId={selectedBankOption.id} className="w-5 h-5 !text-[8px]" />
+                {selectedBankOption.code && (
+                  <span className="font-mono text-xs">{selectedBankOption.code}</span>
+                )}
                 {t(selectedBankOption.id)}
               </span>
               <span className="badge badge-outline gap-1 py-3">
