@@ -52,8 +52,6 @@ export default function MerchantLoginPage() {
       const data = await res.json();
       // JWT is now stored in an httpOnly cookie by the backend.
       localStorage.setItem("merchant_user", JSON.stringify(data.user));
-      // Set a client-side cookie so Next.js middleware can read it on navigation
-      document.cookie = `jwt_token=${data.token}; path=/; max-age=${60 * 60 * 24}; samesite=lax`;
       router.push("/");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t("loginError"));

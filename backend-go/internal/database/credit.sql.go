@@ -209,7 +209,11 @@ UPDATE credit_lines
 SET
     used_usd = used_usd + $3,
     status = $4
-WHERE user_id = $1 AND type = $2
+WHERE id = (
+    SELECT id FROM credit_lines
+    WHERE user_id = $1 AND type = $2
+    FOR UPDATE
+)
 RETURNING id, user_id, type, limit_usd, used_usd, status, paused_at, reactivated_at, created_at, updated_at, blocked_at
 `
 

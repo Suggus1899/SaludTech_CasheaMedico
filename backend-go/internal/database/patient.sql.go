@@ -660,3 +660,91 @@ func (q *Queries) GetTransactionsByUser(ctx context.Context, userID pgtype.UUID)
 	}
 	return items, nil
 }
+
+const listUserConsents = `-- name: ListUserConsents :many
+SELECT id, user_id, consent_type, consent_version, granted, granted_at, revoked_at, created_at, updated_at
+FROM user_consents
+WHERE user_id = $1
+ORDER BY created_at DESC
+`
+
+func (q *Queries) ListUserConsents(ctx context.Context, userID pgtype.UUID) ([]UserConsent, error) {
+	rows, err := q.db.Query(ctx, listUserConsents, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UserConsent
+	for rows.Next() {
+		var i UserConsent
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.ConsentType,
+			&i.ConsentVersion,
+			&i.Granted,
+			&i.GrantedAt,
+			&i.RevokedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const createUserConsent = `-- name: CreateUserConsent :one
+INSERT INTO user_consents (user_id, consent_type, consent_version, granted, granted_at)
+VALUES ($1, $2, $3, $4, NOW())
+RETURNING id, user_id, consent_type, consent_version, granted, granted_at, revoked_at, created_at, updated_at
+`
+
+type CreateUserConsentParams struct {
+	UserID         pgtype.UUID `json:"user_id"`
+	ConsentType    string      `json:"consent_type"`
+	ConsentVersion string      `json:"consent_version"`
+	Granted        bool        `json:"granted"`
+}
+
+func (q *Queries) CreateUserConsent(ctx context.Context, arg CreateUserConsentParams) (UserConsent, error) {
+	row := q.db.QueryRow(ctx, createUserConsent,
+		arg.UserID,
+		arg.ConsentType,
+		arg.ConsentVersion,
+		arg.Granted,
+	)
+	var i UserConsent
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ConsentType,
+		&i.ConsentVersion,
+		&i.Granted,
+		&i.GrantedAt,
+		&i.RevokedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const revokeUserConsent = `-- name: RevokeUserConsent :exec
+UPDATE user_consents
+SET granted = false, revoked_at = NOW(), updated_at = NOW()
+WHERE id = $1 AND user_id = $2
+`
+
+type RevokeUserConsentParams struct {
+	ID     pgtype.UUID `json:"id"`
+	UserID pgtype.UUID `json:"user_id"`
+}
+
+func (q *Queries) RevokeUserConsent(ctx context.Context, arg RevokeUserConsentParams) error {
+	_, err := q.db.Exec(ctx, revokeUserConsent, arg.ID, arg.UserID)
+	return err
+}

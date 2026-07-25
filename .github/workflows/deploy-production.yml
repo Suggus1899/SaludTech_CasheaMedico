@@ -1,0 +1,26 @@
+name: Deploy Production
+
+on:
+  release:
+    types: [published]
+
+concurrency:
+  group: deploy-production-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy backend to Render
+        run: curl -f -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}" || exit 1
+
+      - name: Deploy web-patient to Vercel
+        run: curl -f -X POST "${{ secrets.VERCEL_PATIENT_DEPLOY_HOOK }}" || exit 1
+
+      - name: Deploy web-landing to Vercel
+        run: curl -f -X POST "${{ secrets.VERCEL_LANDING_DEPLOY_HOOK }}" || exit 1

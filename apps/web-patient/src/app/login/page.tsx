@@ -41,9 +41,6 @@ export default function PatientLoginPage() {
       }
       const data = await res.json();
       setSession(data.token, data.user as UserResponse);
-      // Set a client-side cookie so Next.js middleware can read it on navigation
-      // (the httpOnly cookie from Render is cross-origin and not visible to middleware)
-      document.cookie = `jwt_token=${data.token}; path=/; max-age=${60 * 60 * 24}; samesite=lax`;
       router.push("/dashboard");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t("loginError"));

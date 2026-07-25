@@ -60,7 +60,7 @@ func (q *Queries) CountAppointments(ctx context.Context, userID pgtype.UUID) (in
 }
 
 const countMedicalRecords = `-- name: CountMedicalRecords :one
-SELECT COUNT(*) FROM medical_records WHERE user_id = $1
+SELECT COUNT(*) FROM medical_records WHERE user_id = $1 AND deleted_at IS NULL
 `
 
 func (q *Queries) CountMedicalRecords(ctx context.Context, userID pgtype.UUID) (int64, error) {
@@ -321,7 +321,8 @@ func (q *Queries) DeleteFamilyMember(ctx context.Context, arg DeleteFamilyMember
 }
 
 const deleteMedicalRecord = `-- name: DeleteMedicalRecord :exec
-DELETE FROM medical_records WHERE id = $1 AND user_id = $2
+UPDATE medical_records SET deleted_at = NOW()
+WHERE id = $1 AND user_id = $2
 `
 
 type DeleteMedicalRecordParams struct {
@@ -473,7 +474,7 @@ func (q *Queries) GetHealthProfile(ctx context.Context, userID pgtype.UUID) (Hea
 }
 
 const getMedicalRecord = `-- name: GetMedicalRecord :one
-SELECT id, user_id, transaction_id, merchant_id, service_id, record_type, diagnosis, prescription, doctor_name, notes, record_date, created_at, updated_at FROM medical_records WHERE id = $1 AND user_id = $2
+SELECT id, user_id, transaction_id, merchant_id, service_id, record_type, diagnosis, prescription, doctor_name, notes, record_date, created_at, updated_at FROM medical_records WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL
 `
 
 type GetMedicalRecordParams struct {
@@ -716,7 +717,7 @@ func (q *Queries) ListFamilyMembers(ctx context.Context, caregiverID pgtype.UUID
 const listMedicalRecords = `-- name: ListMedicalRecords :many
 
 SELECT id, user_id, transaction_id, merchant_id, service_id, record_type, diagnosis, prescription, doctor_name, notes, record_date, created_at, updated_at FROM medical_records
-WHERE user_id = $1
+WHERE user_id = $1 AND deleted_at IS NULL
 ORDER BY record_date DESC, created_at DESC
 LIMIT $2 OFFSET $3
 `

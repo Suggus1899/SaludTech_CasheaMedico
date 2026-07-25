@@ -210,7 +210,21 @@ func (h *PatientHandler) CreateTransaction(w http.ResponseWriter, r *http.Reques
 	numericFin.Scan(fmt.Sprintf("%.2f", financedAmount))
 	numericMDR.Scan(fmt.Sprintf("%.2f", mdrFee))
 
-	trx, err := h.DB.CreateTransaction(ctx, database.CreateTransactionParams{
+	tx, err := h.Pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		http.Error(w, "Failed to start transaction", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback(ctx)
+
+	q, ok := h.DB.(*database.Queries)
+	if !ok {
+		http.Error(w, "DB layer does not support transactions", http.StatusInternalServerError)
+		return
+	}
+	txQueries := q.WithTx(tx)
+
+	trx, err := txQueries.CreateTransaction(ctx, database.CreateTransactionParams{
 		UserID:          uid,
 		MerchantID:      merchantUUID,
 		CreditLineID:    line.ID,
@@ -239,7 +253,7 @@ func (h *PatientHandler) CreateTransaction(w http.ResponseWriter, r *http.Reques
 		var pgDate pgtype.Date
 		pgDate.Scan(dueDate)
 
-		inst, err := h.DB.CreateInstallment(ctx, database.CreateInstallmentParams{
+		inst, err := txQueries.CreateInstallment(ctx, database.CreateInstallmentParams{
 			TransactionID:  trx.ID,
 			UserID:         uid,
 			InstallmentNum: int16(i),
@@ -266,7 +280,7 @@ func (h *PatientHandler) CreateTransaction(w http.ResponseWriter, r *http.Reques
 	// Update credit line usage
 	var newUsed pgtype.Numeric
 	newUsed.Scan(fmt.Sprintf("%.2f", usedUSD+financedAmount))
-	_, err = h.DB.UpdateCreditLineUsage(ctx, database.UpdateCreditLineUsageParams{
+	_, err = txQueries.UpdateCreditLineUsage(ctx, database.UpdateCreditLineUsageParams{
 		UserID:  uid,
 		Type:    creditLineType,
 		UsedUsd: newUsed,
@@ -274,6 +288,11 @@ func (h *PatientHandler) CreateTransaction(w http.ResponseWriter, r *http.Reques
 	})
 	if err != nil {
 		http.Error(w, "Failed to update credit line: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
 		return
 	}
 

@@ -109,7 +109,7 @@ export default function TriajesPage() {
                     />
                     <div className="flex gap-2 justify-end">
                       <button className="btn btn-ghost btn-sm" onClick={() => setResponding(null)}>{t("cancel")}</button>
-                      <button className="btn btn-primary btn-sm" onClick={() => handleRespond(t.id)} disabled={!notes.trim()}>{t("confirmResponse")}</button>
+                      <button className="btn btn-primary btn-sm" onClick={() => handleRespond(triage.id)} disabled={!notes.trim()}>{t("confirmResponse")}</button>
                     </div>
                   </div>
                 )}

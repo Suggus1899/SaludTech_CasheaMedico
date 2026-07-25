@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"time"
 
@@ -15,17 +17,31 @@ type Claims struct {
 }
 
 func GenerateToken(userID string, role string, cfg *config.Config) (string, error) {
+	jti, err := generateJTI()
+	if err != nil {
+		return "", err
+	}
+
 	expirationTime := time.Now().Add(time.Duration(cfg.JWTExpirationHours) * time.Hour)
 	claims := &Claims{
 		UserID: userID,
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			ID:        jti,
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(cfg.JWTSecret))
+}
+
+func generateJTI() (string, error) {
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
 }
 
 func ValidateToken(tokenString string, cfg *config.Config) (*Claims, error) {

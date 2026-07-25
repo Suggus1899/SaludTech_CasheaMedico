@@ -14,7 +14,7 @@ export default function ComerciosPage() {
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const { data, loading } = useFetchData<any[]>(getApiUrl("admin/merchants"), [refreshTrigger]);
+  const { data, loading } = useFetchData<{ merchants: any[] }>(getApiUrl("admin/merchants"), [refreshTrigger]);
 
   // Modal state
   const [isAddMerchantOpen, setIsAddMerchantOpen] = useState(false);

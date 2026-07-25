@@ -93,5 +93,10 @@ func (h *PatientHandler) Routes() func(r chi.Router) {
 		r.With(healthLimiter.Middleware).Post("/family-members", h.InviteFamilyMember)
 		r.Patch("/family-members/{id}", h.RespondFamilyMember)
 		r.Delete("/family-members/{id}", h.RemoveFamilyMember)
+
+		// Consent tracking
+		r.Get("/consents", h.GetConsents)
+		r.With(healthLimiter.Middleware).Post("/consents", h.GrantConsent)
+		r.Delete("/consents/{id}", h.RevokeConsent)
 	}
 }

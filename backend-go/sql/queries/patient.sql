@@ -128,3 +128,23 @@ INSERT INTO payments (
 ) VALUES (
     $1, $2, $3, $4, $5, false, NOW()
 ) RETURNING *;
+
+-- ════════════════════════════════════════════════════════════
+-- Consent Tracking
+-- ════════════════════════════════════════════════════════════
+
+-- name: ListUserConsents :many
+SELECT id, user_id, consent_type, consent_version, granted, granted_at, revoked_at, created_at, updated_at
+FROM user_consents
+WHERE user_id = $1
+ORDER BY created_at DESC;
+
+-- name: CreateUserConsent :one
+INSERT INTO user_consents (user_id, consent_type, consent_version, granted, granted_at)
+VALUES ($1, $2, $3, $4, NOW())
+RETURNING id, user_id, consent_type, consent_version, granted, granted_at, revoked_at, created_at, updated_at;
+
+-- name: RevokeUserConsent :exec
+UPDATE user_consents
+SET granted = false, revoked_at = NOW(), updated_at = NOW()
+WHERE id = $1 AND user_id = $2;

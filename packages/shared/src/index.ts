@@ -5,4 +5,6 @@ export {
   createSessionHelpers,
 } from "./api";
 export type { FetchState, FetchAction } from "./api";
-export { useFetchData } from "./useFetchData";
+export { useFetchData, useQueryData } from "./useFetchData";
+export type { UseQueryOptions } from "./useQuery";
+export { QueryProvider } from "./QueryProvider";

@@ -23,14 +23,16 @@ type Appointment struct {
 }
 
 type AuditLog struct {
-	ID        int64              `json:"id"`
-	UserID    pgtype.UUID        `json:"user_id"`
-	Action    string             `json:"action"`
-	Entity    string             `json:"entity"`
-	EntityID  pgtype.UUID        `json:"entity_id"`
-	Details   pgtype.Text        `json:"details"`
-	IpAddress pgtype.Text        `json:"ip_address"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	ID         int64              `json:"id"`
+	UserID     pgtype.UUID        `json:"user_id"`
+	Action     string             `json:"action"`
+	Entity     pgtype.Text        `json:"entity"`
+	EntityID   pgtype.UUID        `json:"entity_id"`
+	Details    pgtype.Text        `json:"details"`
+	IpAddress  pgtype.Text        `json:"ip_address"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+	ResourceID pgtype.UUID        `json:"resource_id"`
+	UserAgent  pgtype.Text        `json:"user_agent"`
 }
 
 type CreditLine struct {
@@ -332,4 +334,16 @@ type UserLevelHistory struct {
 	ToLevel   int16              `json:"to_level"`
 	Reason    pgtype.Text        `json:"reason"`
 	ChangedAt pgtype.Timestamptz `json:"changed_at"`
+}
+
+type UserConsent struct {
+	ID             pgtype.UUID        `json:"id"`
+	UserID         pgtype.UUID        `json:"user_id"`
+	ConsentType    string             `json:"consent_type"`
+	ConsentVersion string             `json:"consent_version"`
+	Granted        bool               `json:"granted"`
+	GrantedAt      pgtype.Timestamptz `json:"granted_at"`
+	RevokedAt      pgtype.Timestamptz `json:"revoked_at"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
 }

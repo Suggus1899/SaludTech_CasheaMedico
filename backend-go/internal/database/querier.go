@@ -60,6 +60,9 @@ type Querier interface {
 	DeleteMedicalService(ctx context.Context, arg DeleteMedicalServiceParams) error
 	DeleteMedicalSupply(ctx context.Context, arg DeleteMedicalSupplyParams) error
 	DeleteMedicationReminder(ctx context.Context, arg DeleteMedicationReminderParams) error
+	DeleteExpiredQrTokens(ctx context.Context) error
+	DeleteRevokedConsents(ctx context.Context) error
+	DeleteOldAuditLogs(ctx context.Context) error
 	ExportAllInstallments(ctx context.Context, arg ExportAllInstallmentsParams) ([]ExportAllInstallmentsRow, error)
 	ExportAllTransactions(ctx context.Context, arg ExportAllTransactionsParams) ([]ExportAllTransactionsRow, error)
 	// ─── Export queries (paginated, for CSV) ────────────────────────────────────
@@ -116,6 +119,10 @@ type Querier interface {
 	GetUserByPhone(ctx context.Context, phone string) (User, error)
 	GetUserForTriageEmail(ctx context.Context, id pgtype.UUID) (GetUserForTriageEmailRow, error)
 	IncrementUserTotalPaid(ctx context.Context, arg IncrementUserTotalPaidParams) error
+	InsertAuditLog(ctx context.Context, arg InsertAuditLogParams) error
+	ListUserConsents(ctx context.Context, userID pgtype.UUID) ([]UserConsent, error)
+	CreateUserConsent(ctx context.Context, arg CreateUserConsentParams) (UserConsent, error)
+	RevokeUserConsent(ctx context.Context, arg RevokeUserConsentParams) error
 	ListAllCreditLines(ctx context.Context, arg ListAllCreditLinesParams) ([]ListAllCreditLinesRow, error)
 	// ════════════════════════════════════════════════════════════
 	// Admin: All elder care subscriptions

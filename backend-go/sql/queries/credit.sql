@@ -15,7 +15,11 @@ UPDATE credit_lines
 SET
     used_usd = used_usd + $3,
     status = $4
-WHERE user_id = $1 AND type = $2
+WHERE id = (
+    SELECT id FROM credit_lines
+    WHERE user_id = $1 AND type = $2
+    FOR UPDATE
+)
 RETURNING *;
 
 -- name: CreateTransaction :one

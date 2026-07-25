@@ -305,7 +305,7 @@ export default function PagarPage() {
             {t("enterAmount")}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {t("merchantLabel", { id: merchantId })}
+            {t("merchantLabel", { id: merchantId ?? "" })}
           </p>
         </div>
 

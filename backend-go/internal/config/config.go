@@ -38,6 +38,18 @@ type Config struct {
 	// Required in production when PII encryption is enabled.
 	// Generate with: openssl rand -base64 32
 	DBEncryptionKey string `envconfig:"DB_ENCRYPTION_KEY"`
+
+	// Sentry DSN for error tracking (optional — empty disables Sentry).
+	SentryDSN string `envconfig:"SENTRY_DSN"`
+
+	// Log level: DEBUG, INFO, WARN, ERROR (default: INFO).
+	LogLevel string `envconfig:"LOG_LEVEL" default:"INFO"`
+
+	// App environment: production, development, staging.
+	AppEnv string `envconfig:"APP_ENV" default:"development"`
+
+	// Cron schedule for the data retention worker.
+	RetentionCronSchedule string `envconfig:"RETENTION_CRON_SCHEDULE" default:"@daily"`
 }
 
 func Load() *Config {

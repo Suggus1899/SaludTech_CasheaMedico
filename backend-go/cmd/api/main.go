@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -18,14 +18,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/saludtech/backend-go/internal/admin"
 	"github.com/saludtech/backend-go/internal/auth"
 	"github.com/saludtech/backend-go/internal/bcv"
 	"github.com/saludtech/backend-go/internal/config"
 	"github.com/saludtech/backend-go/internal/database"
-	"github.com/saludtech/backend-go/internal/admin"
+	"github.com/saludtech/backend-go/internal/docs"
 	"github.com/saludtech/backend-go/internal/fakepay"
+	"github.com/saludtech/backend-go/internal/logging"
 	appmw "github.com/saludtech/backend-go/internal/middleware"
 	"github.com/saludtech/backend-go/internal/merchant"
+	"github.com/saludtech/backend-go/internal/monitoring"
 	"github.com/saludtech/backend-go/internal/patient"
 	"github.com/saludtech/backend-go/internal/user"
 	"github.com/saludtech/backend-go/internal/worker"
@@ -34,18 +37,32 @@ import (
 func main() {
 	cfg := config.Load()
 
+	logger := logging.NewLogger(cfg.LogLevel)
+	slog.SetDefault(logger)
+
+	if cfg.SentryDSN != "" {
+		if err := monitoring.InitSentry(cfg.SentryDSN); err != nil {
+			slog.Error("Failed to init Sentry", "error", err)
+		} else {
+			slog.Info("Sentry initialized")
+		}
+	}
+
 	pool, err := pgxpool.New(context.Background(), cfg.DatabaseURL)
 	if err != nil {
-		log.Fatalf("Unable to connect to database: %v", err)
+		slog.Error("Unable to connect to database", "error", err)
+		os.Exit(1)
 	}
 	defer pool.Close()
 
 	if err := pool.Ping(context.Background()); err != nil {
-		log.Fatalf("Database ping failed: %v", err)
+		slog.Error("Database ping failed", "error", err)
+		os.Exit(1)
 	}
 
 	if err := database.EnsureMigrations(context.Background(), pool, "sql/schema"); err != nil {
-		log.Fatalf("Migration error: %v", err)
+		slog.Error("Migration error", "error", err)
+		os.Exit(1)
 	}
 
 	queries := database.New(pool)
@@ -54,6 +71,11 @@ func main() {
 
 	scanner := &worker.InstallmentScanner{Pool: pool, Schedule: cfg.ScannerCronSchedule}
 	scanner.Start()
+
+	retentionWorker := &worker.RetentionWorker{Pool: pool, Schedule: cfg.RetentionCronSchedule}
+	retentionWorker.Start()
+
+	tokenRevoker := auth.NewMemoryTokenRevoker()
 
 	// Parse CORS origins from config
 	allowedOrigins := strings.Split(cfg.CORSAllowedOrigins, ",")
@@ -65,19 +87,25 @@ func main() {
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true, // Required for httpOnly cookies
 		MaxAge:           300,
 	}))
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
+	r.Use(logging.LoggingMiddleware(logger))
+	r.Use(monitoring.SentryMiddleware)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(appmw.CSRFMiddleware)
 
 	// Auth middleware — extracts JWT and injects user_id into context
 	r.Use(auth.Middleware(cfg))
+	r.Use(auth.RevocationMiddleware(tokenRevoker, cfg))
+
+	// Audit logging for state-changing requests
+	r.Use(appmw.AuditMiddleware(queries))
 
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -126,6 +154,10 @@ func main() {
 	r.With(auth.RequireAuth).Put("/api/v1/users/profile-photo", userHandler.UpdateProfilePhoto)
 	r.With(auth.RequireAuth).Patch("/api/v1/users/password", userHandler.ChangePassword)
 
+	// OpenAPI documentation
+	r.Get("/api/v1/docs", docs.SpecHandler())
+	r.Get("/api/v1/docs/ui", docs.SwaggerUIHandler())
+
 	addr := fmt.Sprintf(":%d", cfg.Port)
 	srv := &http.Server{
 		Addr:    addr,
@@ -133,9 +165,10 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("🚀 SaludTech Go Backend running on http://localhost%s", addr)
+		slog.Info("SaludTech Go Backend running", "addr", addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Server error: %v", err)
+			slog.Error("Server error", "error", err)
+			os.Exit(1)
 		}
 	}()
 
@@ -143,15 +176,17 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	log.Println("Shutting down server...")
+	slog.Info("Shutting down server...")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+		slog.Error("Server forced to shutdown", "error", err)
+		os.Exit(1)
 	}
 
-	log.Println("Server exiting")
+	monitoring.FlushSentry()
+	slog.Info("Server exiting")
 }
 
 // registerWithCreditLines wraps the auth register handler and creates
@@ -199,11 +234,11 @@ func registerWithCreditLines(queries *database.Queries, h *auth.AuthHandler, cfg
 				Type:     line.typ,
 				LimitUsd: limitNumeric,
 			}); err != nil {
-				log.Printf("Failed to create %s credit line for user %s: %v", line.typ, resp.User.ID, err)
+				slog.Error("Failed to create credit line", "type", line.typ, "user", resp.User.ID, "error", err)
 			}
 		}
 
-		log.Printf("✅ Created default credit lines for user %s", resp.User.ID)
+		slog.Info("Created default credit lines for user", "user", resp.User.ID)
 	}
 }
 

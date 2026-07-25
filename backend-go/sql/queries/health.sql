@@ -39,15 +39,15 @@ RETURNING *;
 
 -- name: ListMedicalRecords :many
 SELECT * FROM medical_records
-WHERE user_id = $1
+WHERE user_id = $1 AND deleted_at IS NULL
 ORDER BY record_date DESC, created_at DESC
 LIMIT $2 OFFSET $3;
 
 -- name: CountMedicalRecords :one
-SELECT COUNT(*) FROM medical_records WHERE user_id = $1;
+SELECT COUNT(*) FROM medical_records WHERE user_id = $1 AND deleted_at IS NULL;
 
 -- name: GetMedicalRecord :one
-SELECT * FROM medical_records WHERE id = $1 AND user_id = $2;
+SELECT * FROM medical_records WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL;
 
 -- name: CreateMedicalRecord :one
 INSERT INTO medical_records (
@@ -63,7 +63,8 @@ SET record_type = $3, diagnosis = $4, prescription = $5,
 WHERE id = $1 AND user_id = $2;
 
 -- name: DeleteMedicalRecord :exec
-DELETE FROM medical_records WHERE id = $1 AND user_id = $2;
+UPDATE medical_records SET deleted_at = NOW()
+WHERE id = $1 AND user_id = $2;
 
 -- ════════════════════════════════════════════════════════════
 -- Appointments

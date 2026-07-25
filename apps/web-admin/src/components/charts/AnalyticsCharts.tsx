@@ -64,7 +64,7 @@ export function RevenueLineChart({ data }: { data: AnalyticsResponse["revenueByM
             borderRadius: "8px",
             fontSize: "13px",
           }}
-          formatter={(value: number) => [`$${value.toFixed(2)}`, t("revenue")]}
+          formatter={(value) => [`$${Number(value).toFixed(2)}`, t("revenue")]}
         />
         <Line
           type="monotone"
@@ -116,7 +116,7 @@ export function TransactionStatusPie({ data }: { data: AnalyticsResponse["transa
             borderRadius: "8px",
             fontSize: "13px",
           }}
-          formatter={(value: number, _name: string, props: { payload?: { amount?: number } }) => [
+          formatter={(value, _name, props: { payload?: { amount?: number; name?: string } }) => [
             `${value} txns ($${(props?.payload?.amount ?? 0).toFixed(2)})`,
             props?.payload?.name ?? "",
           ]}
@@ -154,9 +154,9 @@ export function InstallmentStatusBar({ data }: { data: AnalyticsResponse["instal
             borderRadius: "8px",
             fontSize: "13px",
           }}
-          formatter={(value: number, name: string) => {
+          formatter={(value, name) => {
             if (name === "count") return [value, t("installments")];
-            return [`$${value.toFixed(2)}`, t("amount")];
+            return [`$${Number(value).toFixed(2)}`, t("amount")];
           }}
         />
         <Bar dataKey="count" radius={[4, 4, 0, 0]}>
@@ -207,7 +207,7 @@ export function TopMerchantsChart({ data }: { data: AnalyticsResponse["topMercha
             borderRadius: "8px",
             fontSize: "13px",
           }}
-          formatter={(value: number) => [`$${value.toFixed(2)}`, t("revenue")]}
+          formatter={(value) => [`$${Number(value).toFixed(2)}`, t("revenue")]}
         />
         <Bar dataKey="revenue" radius={[0, 4, 4, 0]}>
           {chartData.map((_, idx) => (
@@ -294,7 +294,7 @@ export function TriageFunnel({ data }: { data: AnalyticsResponse["triageConversi
             borderRadius: "8px",
             fontSize: "13px",
           }}
-          formatter={(value: number) => [value, t("triages")]}
+          formatter={(value) => [value, t("triages")]}
         />
         <Bar dataKey="count" radius={[4, 4, 0, 0]}>
           {chartData.map((entry, idx) => (
