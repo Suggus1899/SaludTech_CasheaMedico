@@ -210,7 +210,7 @@ export default function PayInstallmentPage({
   const selectedBankOption = bankOptions.find((b) => b.id === selectedBank);
 
   return (
-    <div className="max-w-lg mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-5 sm:space-y-6 px-1">
       <button
         onClick={() => router.back()}
         aria-label={t("back")}
@@ -219,20 +219,20 @@ export default function PayInstallmentPage({
         <ArrowLeft className="w-4 h-4" /> {t("back")}
       </button>
 
-      <h1 className="text-xl font-bold text-foreground">
+      <h1 className="text-xl sm:text-2xl font-bold text-foreground">
         {t("title")}
       </h1>
 
       {/* Summary */}
       <div
         data-tour="amount-summary"
-        className={`p-5 rounded-2xl border bg-base-100 ${
+        className={`p-4 sm:p-5 rounded-2xl border bg-base-100 ${
           isOverdue ? "border-error/30" : "border-border"
         }`}
       >
-        <div className="flex items-center gap-3.5">
+        <div className="flex items-center gap-3 sm:gap-3.5">
           <div
-            className={`p-2.5 rounded-full ${
+            className={`p-2.5 rounded-full shrink-0 ${
               isOverdue ? "bg-error/10 text-error" : "bg-primary/10 text-primary"
             }`}
           >
@@ -242,8 +242,8 @@ export default function PayInstallmentPage({
               <CreditCard className="w-5 h-5" />
             )}
           </div>
-          <div>
-            <p className="text-base font-bold text-foreground font-display">
+          <div className="min-w-0">
+            <p className="text-sm sm:text-base font-bold text-foreground font-display truncate">
               Cuota #{installment.installmentNumber ?? "—"} · {merchant}
             </p>
             <p
@@ -290,7 +290,7 @@ export default function PayInstallmentPage({
 
           {/* Venezuelan banks grid */}
           <p className="text-xs text-muted-foreground mt-2 mb-1.5">{t("venezuelanBanks")}</p>
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-3">
+          <div className="grid grid-cols-2 min-[400px]:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 mb-3">
             {bankOptions
               .filter((b) => b.icon === "building")
               .map((b) => (
@@ -298,13 +298,13 @@ export default function PayInstallmentPage({
                   key={b.id}
                   type="button"
                   onClick={() => setSelectedBank(b.id)}
-                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 transition-all ${
+                  className={`flex flex-col items-center gap-1.5 p-2 sm:p-2.5 rounded-xl border-2 transition-all ${
                     selectedBank === b.id
                       ? "border-primary bg-primary/5 shadow-sm"
                       : "border-border hover:border-primary/40 hover:bg-base-200"
                   }`}
                 >
-                  <BankLogo bankId={b.id} className="w-10 h-10" />
+                  <BankLogo bankId={b.id} className="w-9 h-9 sm:w-10 sm:h-10" />
                   <span className="text-[10px] font-medium text-center leading-tight line-clamp-2">
                     {t(b.id)}
                   </span>
@@ -322,13 +322,13 @@ export default function PayInstallmentPage({
                   key={b.id}
                   type="button"
                   onClick={() => setSelectedBank(b.id)}
-                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 transition-all ${
+                  className={`flex flex-col items-center gap-1.5 p-2 sm:p-2.5 rounded-xl border-2 transition-all ${
                     selectedBank === b.id
                       ? "border-primary bg-primary/5 shadow-sm"
                       : "border-border hover:border-primary/40 hover:bg-base-200"
                   }`}
                 >
-                  <BankLogo bankId={b.id} className="w-10 h-10" />
+                  <BankLogo bankId={b.id} className="w-9 h-9 sm:w-10 sm:h-10" />
                   <span className="text-[10px] font-medium text-center leading-tight">
                     {t(b.id)}
                   </span>
@@ -382,7 +382,8 @@ export default function PayInstallmentPage({
                 onChange={(e) => handleCardNumberChange(e.target.value)}
                 onBlur={() => setTouched((p) => ({ ...p, cardNumber: true }))}
                 placeholder="4111 1111 1111 1111"
-                className={`input input-bordered w-full pr-20 ${
+                inputMode="numeric"
+                className={`input input-bordered w-full pr-16 sm:pr-20 text-sm sm:text-base ${
                   cardNumberError ? "input-error" : touched.cardNumber && !cardNumberError && cardNumber ? "input-success" : ""
                 }`}
               />
@@ -403,10 +404,10 @@ export default function PayInstallmentPage({
             )}
           </div>
           <Input label={t("cardHolder")} value={fullName} onChange={setFullName} type="text" placeholder="APPROVED" />
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <div className="form-control gap-1">
               <label className="label pb-0">
-                <span className="label-text font-medium">{t("expMonth")}</span>
+                <span className="label-text font-medium text-xs sm:text-sm">{t("expMonth")}</span>
               </label>
               <input
                 type="text"
@@ -414,14 +415,15 @@ export default function PayInstallmentPage({
                 onChange={(e) => handleExpMonthChange(e.target.value)}
                 onBlur={() => setTouched((p) => ({ ...p, expMonth: true, expYear: true }))}
                 placeholder="01"
-                className={`input input-bordered w-full ${
+                inputMode="numeric"
+                className={`input input-bordered w-full text-sm sm:text-base ${
                   expError ? "input-error" : touched.expMonth && !expError && expMonth && expYear ? "input-success" : ""
                 }`}
               />
             </div>
             <div className="form-control gap-1">
               <label className="label pb-0">
-                <span className="label-text font-medium">{t("expYear")}</span>
+                <span className="label-text font-medium text-xs sm:text-sm">{t("expYear")}</span>
               </label>
               <input
                 type="text"
@@ -429,14 +431,15 @@ export default function PayInstallmentPage({
                 onChange={(e) => handleExpYearChange(e.target.value)}
                 onBlur={() => setTouched((p) => ({ ...p, expMonth: true, expYear: true }))}
                 placeholder="2027"
-                className={`input input-bordered w-full ${
+                inputMode="numeric"
+                className={`input input-bordered w-full text-sm sm:text-base ${
                   expError ? "input-error" : touched.expYear && !expError && expMonth && expYear ? "input-success" : ""
                 }`}
               />
             </div>
             <div className="form-control gap-1">
               <label className="label pb-0">
-                <span className="label-text font-medium">{t("cvv")}</span>
+                <span className="label-text font-medium text-xs sm:text-sm">{t("cvv")}</span>
               </label>
               <input
                 type="text"
@@ -444,7 +447,8 @@ export default function PayInstallmentPage({
                 onChange={(e) => handleCvvChange(e.target.value)}
                 onBlur={() => setTouched((p) => ({ ...p, cvv: true }))}
                 placeholder={brand === "amex" ? "1234" : "123"}
-                className={`input input-bordered w-full ${
+                inputMode="numeric"
+                className={`input input-bordered w-full text-sm sm:text-base ${
                   cvvError ? "input-error" : touched.cvv && !cvvError && cvv ? "input-success" : ""
                 }`}
               />
@@ -480,7 +484,7 @@ export default function PayInstallmentPage({
       <button
         onClick={() => setShowConfirm(true)}
         disabled={isPaying || !isFormValid}
-        className="btn btn-primary w-full text-base font-bold"
+        className="btn btn-primary w-full text-sm sm:text-base font-bold h-12"
       >
         {isPaying ? <span className="loading loading-spinner loading-sm" /> : null}
         {isPaying
@@ -491,7 +495,7 @@ export default function PayInstallmentPage({
       {/* Confirm modal */}
       {showConfirm && (
         <div className="modal modal-open" role="dialog" aria-modal="true">
-          <div className="modal-box">
+          <div className="modal-box max-w-sm">
             <h3 className="text-lg font-bold font-display">
               {t("confirmTitle")}
             </h3>
@@ -536,10 +540,10 @@ function Row({
   bold?: boolean;
 }) {
   return (
-    <div className="flex justify-between">
-      <span className="text-sm text-muted-foreground">{label}</span>
+    <div className="flex justify-between items-baseline gap-2">
+      <span className="text-xs sm:text-sm text-muted-foreground shrink-0">{label}</span>
       <span
-        className={`text-foreground font-display ${bold ? "text-lg font-bold" : "text-sm font-semibold"}`}
+        className={`text-foreground font-display text-right ${bold ? "text-base sm:text-lg font-bold" : "text-xs sm:text-sm font-semibold"}`}
       >
         {value}
       </span>
