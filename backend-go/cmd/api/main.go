@@ -60,7 +60,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := database.EnsureMigrations(context.Background(), pool, "sql/schema"); err != nil {
+	if err := database.EnsureMigrations(context.Background(), pool, "sql/schema", cfg.DBEncryptionKey); err != nil {
 		slog.Error("Migration error", "error", err)
 		os.Exit(1)
 	}

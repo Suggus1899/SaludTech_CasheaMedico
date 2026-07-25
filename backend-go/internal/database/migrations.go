@@ -16,7 +16,9 @@ import (
 // EnsureMigrations creates the schema_migrations table if it does not exist,
 // then applies every V*.sql file in sql/schema/ that has not been recorded yet.
 // Files are applied in numeric version order (V1, V2, ... V10, V11, ...).
-func EnsureMigrations(ctx context.Context, pool *pgxpool.Pool, schemaDir string) error {
+// If encryptionKey is non-empty, it is set as app.encryption_key GUC inside
+// each migration transaction so pgp_sym_encrypt calls in V21 can backfill.
+func EnsureMigrations(ctx context.Context, pool *pgxpool.Pool, schemaDir string, encryptionKey string) error {
 	// 1. Create tracking table
 	_, err := pool.Exec(ctx, `
 		CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -73,6 +75,14 @@ func EnsureMigrations(ctx context.Context, pool *pgxpool.Pool, schemaDir string)
 		tx, err := pool.Begin(ctx)
 		if err != nil {
 			return fmt.Errorf("begin tx for %s: %w", file, err)
+		}
+
+		// Set encryption key GUC for this transaction so pgp_sym_encrypt works
+		if encryptionKey != "" {
+			if _, err := tx.Exec(ctx, "SET LOCAL app.encryption_key = $1", encryptionKey); err != nil {
+				tx.Rollback(ctx)
+				return fmt.Errorf("set encryption key for %s: %w", file, err)
+			}
 		}
 
 		if _, err := tx.Exec(ctx, string(content)); err != nil {
