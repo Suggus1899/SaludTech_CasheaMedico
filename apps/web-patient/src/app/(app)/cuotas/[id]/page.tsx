@@ -10,9 +10,6 @@ import {
   AlertCircle,
   ArrowLeft,
   ShieldCheck,
-  Building2,
-  Wallet,
-  Globe,
   Check,
 } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../../lib/api";
@@ -28,6 +25,7 @@ import {
   brandLabels,
   type CardBrand,
 } from "../../../../lib/cardValidation";
+import { BankLogo } from "../../../../lib/bankLogos";
 
 const testCards = [
   { label: "Visa", number: "4111111111111111" },
@@ -289,37 +287,59 @@ export default function PayInstallmentPage({
           <label className="label pb-1">
             <span className="label-text font-medium">{t("paymentMethod")}</span>
           </label>
-          <select
-            value={selectedBank}
-            onChange={(e) => setSelectedBank(e.target.value)}
-            className="select select-bordered w-full"
-          >
-            <option value="">{t("selectBank")}</option>
-            <optgroup label={t("venezuelanBanks")}>
-              {bankOptions
-                .filter((b) => b.icon === "building")
-                .map((b) => (
-                  <option key={b.id} value={b.id}>
+
+          {/* Venezuelan banks grid */}
+          <p className="text-xs text-muted-foreground mt-2 mb-1.5">{t("venezuelanBanks")}</p>
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-3">
+            {bankOptions
+              .filter((b) => b.icon === "building")
+              .map((b) => (
+                <button
+                  key={b.id}
+                  type="button"
+                  onClick={() => setSelectedBank(b.id)}
+                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 transition-all ${
+                    selectedBank === b.id
+                      ? "border-primary bg-primary/5 shadow-sm"
+                      : "border-border hover:border-primary/40 hover:bg-base-200"
+                  }`}
+                >
+                  <BankLogo bankId={b.id} className="w-10 h-10" />
+                  <span className="text-[10px] font-medium text-center leading-tight line-clamp-2">
                     {t(b.id)}
-                  </option>
-                ))}
-            </optgroup>
-            <optgroup label={t("international")}>
-              {bankOptions
-                .filter((b) => b.icon !== "building")
-                .map((b) => (
-                  <option key={b.id} value={b.id}>
+                  </span>
+                </button>
+              ))}
+          </div>
+
+          {/* International methods grid */}
+          <p className="text-xs text-muted-foreground mb-1.5">{t("international")}</p>
+          <div className="grid grid-cols-3 gap-2">
+            {bankOptions
+              .filter((b) => b.icon !== "building")
+              .map((b) => (
+                <button
+                  key={b.id}
+                  type="button"
+                  onClick={() => setSelectedBank(b.id)}
+                  className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 transition-all ${
+                    selectedBank === b.id
+                      ? "border-primary bg-primary/5 shadow-sm"
+                      : "border-border hover:border-primary/40 hover:bg-base-200"
+                  }`}
+                >
+                  <BankLogo bankId={b.id} className="w-10 h-10" />
+                  <span className="text-[10px] font-medium text-center leading-tight">
                     {t(b.id)}
-                  </option>
-                ))}
-            </optgroup>
-          </select>
+                  </span>
+                </button>
+              ))}
+          </div>
+
           {selectedBankOption && (
-            <div className="mt-2 flex items-center gap-2 flex-wrap">
-              <span className="badge badge-primary gap-1 py-3">
-                {selectedBankOption.icon === "building" && <Building2 className="w-3.5 h-3.5" />}
-                {selectedBankOption.icon === "wallet" && <Wallet className="w-3.5 h-3.5" />}
-                {selectedBankOption.icon === "globe" && <Globe className="w-3.5 h-3.5" />}
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
+              <span className="badge badge-primary gap-1.5 py-3">
+                <BankLogo bankId={selectedBankOption.id} className="w-5 h-5 !text-[8px]" />
                 {t(selectedBankOption.id)}
               </span>
               <span className="badge badge-outline gap-1 py-3">
