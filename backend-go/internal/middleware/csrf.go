@@ -20,7 +20,7 @@ func GenerateCSRFToken() (string, error) {
 
 func CSRFMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if isBearerAuthRequest(r) {
+		if isBearerAuthRequest(r) || isCSRFExemptPath(r) {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -87,4 +87,22 @@ func isBearerAuthRequest(r *http.Request) bool {
 	}
 	parts := strings.SplitN(authHeader, " ", 2)
 	return len(parts) == 2 && strings.EqualFold(parts[0], "Bearer")
+}
+
+// isCSRFExemptPath returns true for public auth endpoints that don't
+// operate on an existing session. Login/register send credentials in the
+// body (not cookie-based), and logout just clears the cookie.
+func isCSRFExemptPath(r *http.Request) bool {
+	path := r.URL.Path
+	exempt := []string{
+		"/api/v1/auth/login",
+		"/api/v1/auth/register",
+		"/api/v1/auth/logout",
+	}
+	for _, p := range exempt {
+		if path == p {
+			return true
+		}
+	}
+	return false
 }
