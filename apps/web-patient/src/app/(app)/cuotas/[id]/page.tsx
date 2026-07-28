@@ -11,6 +11,9 @@ import {
   ArrowLeft,
   ShieldCheck,
   Check,
+  Smartphone,
+  Copy,
+  ClipboardCheck,
 } from "lucide-react";
 import { getApiUrl, apiFetch } from "../../../../lib/api";
 import { formatCurrency, formatWithVES, formatDate } from "../../../../lib/utils";
@@ -81,6 +84,11 @@ export default function PayInstallmentPage({
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedBank, setSelectedBank] = useState<string>("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [paymentMethodTab, setPaymentMethodTab] = useState<"card" | "pagoMovil">("card");
+  const [pmReference, setPmReference] = useState("");
+  const [pmDate, setPmDate] = useState("");
+  const [pmPhoneFrom, setPmPhoneFrom] = useState("");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -113,11 +121,13 @@ export default function PayInstallmentPage({
   }, [expMonth, expYear, touched.expMonth, touched.expYear]);
 
   const isFormValid =
-    !!selectedBank &&
-    !!fullName.trim() &&
-    isValidCardNumber(cardNumber) &&
-    isValidCvv(cvv, brand) &&
-    isValidExpiration(expMonth, expYear);
+    paymentMethodTab === "pagoMovil"
+      ? !!pmReference.trim() && !!pmPhoneFrom.trim() && !!pmDate
+      : !!selectedBank &&
+        !!fullName.trim() &&
+        isValidCardNumber(cardNumber) &&
+        isValidCvv(cvv, brand) &&
+        isValidExpiration(expMonth, expYear);
 
   const handleCardNumberChange = (v: string) => {
     setCardNumber(formatCardNumber(v));
@@ -139,24 +149,51 @@ export default function PayInstallmentPage({
     setExpYear(digits);
   };
 
+  const handleCopyPagoMovil = async () => {
+    const text = [
+      `${t("pagoMovilBank")}: ${t("pagoMovilBankName")}`,
+      `${t("pagoMovilPhone")}: ${t("pagoMovilPhoneValue")}`,
+      `${t("pagoMovilId")}: ${t("pagoMovilIdValue")}`,
+      `${t("pagoMovilAmount")}: ${installment?.amountVES ? `Bs. ${installment.amountVES}` : ""}`,
+    ].join("\n");
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      setError(t("pagoMovilCopyError"));
+    }
+  };
+
   const handleConfirm = async () => {
     if (!installment) return;
     setError(null);
     setIsPaying(true);
     try {
+      const body =
+        paymentMethodTab === "pagoMovil"
+          ? {
+              installmentId: installment.id,
+              method: "PAGO_MOVIL",
+              reference: pmReference,
+              phone: pmPhoneFrom,
+            }
+          : {
+              installmentId: installment.id,
+              method: "CARD",
+              bankName: selectedBank ? t(selectedBank) : undefined,
+              cardNumber,
+              cvv,
+              expirationMonth: expMonth,
+              expirationYear: expYear,
+              fullName,
+            };
+
       const res = await apiFetch(getApiUrl("patient/payments"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          installmentId: installment.id,
-          method: "CARD",
-          bankName: selectedBank ? t(selectedBank) : undefined,
-          cardNumber,
-          cvv,
-          expirationMonth: expMonth,
-          expirationYear: expYear,
-          fullName,
-        }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -269,8 +306,109 @@ export default function PayInstallmentPage({
         </div>
       </div>
 
-      {/* Payment method — Card form */}
+      {/* Payment method — tabs */}
       <section data-tour="card-form">
+        <div role="tablist" className="tabs tabs-boxed mb-4">
+          <button
+            role="tab"
+            className={`tab ${paymentMethodTab === "card" ? "tab-active" : ""}`}
+            onClick={() => setPaymentMethodTab("card")}
+          >
+            <CreditCard className="w-4 h-4 inline mr-1.5" />
+            {t("methodCard")}
+          </button>
+          <button
+            role="tab"
+            className={`tab ${paymentMethodTab === "pagoMovil" ? "tab-active" : ""}`}
+            onClick={() => setPaymentMethodTab("pagoMovil")}
+          >
+            <Smartphone className="w-4 h-4 inline mr-1.5" />
+            {t("methodPagoMovil")}
+          </button>
+        </div>
+
+      {/* ─── Pago Móvil view ─── */}
+      {paymentMethodTab === "pagoMovil" && (
+        <div className="space-y-4">
+          {/* SaludTech data card */}
+          <div className="p-4 sm:p-5 rounded-2xl border border-border bg-base-100">
+            <h3 className="text-base font-bold text-foreground mb-3 font-display flex items-center gap-2">
+              <Smartphone className="w-5 h-5 text-primary" />
+              {t("pagoMovilTitle")}
+            </h3>
+            <div className="space-y-2.5">
+              <Row label={t("pagoMovilBank")} value={t("pagoMovilBankName")} />
+              <Row label={t("pagoMovilPhone")} value={t("pagoMovilPhoneValue")} />
+              <Row label={t("pagoMovilId")} value={t("pagoMovilIdValue")} />
+              <Row
+                label={t("pagoMovilAmount")}
+                value={installment?.amountVES ? `Bs. ${installment.amountVES}` : "—"}
+                bold
+              />
+            </div>
+            <button
+              onClick={handleCopyPagoMovil}
+              className={`btn ${copied ? "btn-success" : "btn-outline"} btn-sm w-full mt-4`}
+            >
+              {copied ? (
+                <>
+                  <ClipboardCheck className="w-4 h-4" />
+                  {t("pagoMovilCopied")}
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  {t("pagoMovilCopyAll")}
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Instructions */}
+          <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-primary/8">
+            <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+            <p className="text-xs text-primary leading-relaxed whitespace-pre-line">
+              {t("pagoMovilInstructions")}
+            </p>
+          </div>
+
+          {/* Report form */}
+          <div className="space-y-3">
+            <h3 className="text-base font-bold text-foreground font-display">
+              {t("pagoMovilReportTitle")}
+            </h3>
+            <Input
+              label={t("pagoMovilReference")}
+              value={pmReference}
+              onChange={setPmReference}
+              type="text"
+              placeholder={t("pagoMovilReferencePlaceholder")}
+            />
+            <div className="form-control gap-1">
+              <label className="label pb-0">
+                <span className="label-text font-medium">{t("pagoMovilDate")}</span>
+              </label>
+              <input
+                type="date"
+                value={pmDate}
+                onChange={(e) => setPmDate(e.target.value)}
+                className="input input-bordered w-full"
+              />
+            </div>
+            <Input
+              label={t("pagoMovilPhoneFrom")}
+              value={pmPhoneFrom}
+              onChange={setPmPhoneFrom}
+              type="tel"
+              placeholder={t("pagoMovilPhoneFromPlaceholder")}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ─── Card view (existing) ─── */}
+      {paymentMethodTab === "card" && (
+        <>
         <h2 className="text-base font-bold text-foreground mb-3 font-display">
           {t("cardData")}
         </h2>
@@ -499,6 +637,8 @@ export default function PayInstallmentPage({
             <p className="text-xs text-error -mt-2">{cvvError}</p>
           )}
         </div>
+        </>
+      )}
       </section>
 
       {/* Notice */}
@@ -527,7 +667,9 @@ export default function PayInstallmentPage({
         {isPaying ? <span className="loading loading-spinner loading-sm" /> : null}
         {isPaying
           ? t("processing")
-          : t("confirmPay", { amount: formatWithVES(installment.amount, installment.amountVES) })}
+          : paymentMethodTab === "pagoMovil"
+            ? t("pagoMovilReportBtn")
+            : t("confirmPay", { amount: formatWithVES(installment.amount, installment.amountVES) })}
       </button>
 
       {/* Confirm modal */}

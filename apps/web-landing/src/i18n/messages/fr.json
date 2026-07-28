@@ -579,7 +579,26 @@
     "legalFaq": "Questions fréquentes",
     "legalContact": "Contact",
     "copyright": "© {year} SaludTech. Tous droits réservés.",
-    "tagline": "Financement sans intérêt · Nous ne sommes pas une banque · Venezuela"
+    "tagline": "Financement sans intérêt · Nous ne sommes pas une banque · Venezuela",
+    "sectionSupport": "Soutenir",
+    "supportCreator": "Soutenir le créateur"
+  },
+  "Apoya": {
+    "badge": "Soutenez le projet",
+    "titleLine1": "SaludTech est né d'",
+    "titleLine2": "une idée et beaucoup de code",
+    "subtitle": "Ce projet a été construit par une seule personne. Si vous le trouvez utile, vous pouvez offrir un café.",
+    "creatorTag": "Créateur",
+    "creatorTitle": "Gustavo Colina · @Suggus1899",
+    "creatorDesc": "Développeur indépendant, passionné par la santé financière et l'accès aux services médicaux. SaludTech est son projet personnel pour le Venezuela.",
+    "donateTitle": "Offrez un café via Zinli",
+    "donateDesc": "Copiez l'email Zinli et envoyez votre don. Chaque contribution aide à maintenir le projet en vie.",
+    "zinliLabel": "Zinli",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "instructions": "Ouvrez Zinli, sélectionnez envoyer, collez l'email et envoyez le montant que vous souhaitez. Merci !",
+    "thankYou": "Merci pour votre soutien !",
+    "thankYouDesc": "Chaque don garde SaludTech gratuit pour les utilisateurs."
   },
   "Metadata": {
     "title": "SaludTech — Votre santé, en mensualités sans intérêt",

@@ -151,12 +151,15 @@ export function Footer() {
       { label: t("legalFaq"), href: "/faq" },
       { label: t("legalContact"), href: "mailto:hola@saludtech.app" },
     ],
+    [t("sectionSupport")]: [
+      { label: t("supportCreator"), href: "/apoya" },
+    ],
   };
 
   return (
     <footer className="bg-dark text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-6 gap-10 mb-12">
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="mb-4">
