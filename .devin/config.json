@@ -1,0 +1,120 @@
+{
+  "$schema": "https://docs.devin.ai/cli/config.schema.json",
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Exec(git status)",
+      "Exec(git diff)",
+      "Exec(git log)",
+      "Exec(git add)",
+      "Exec(git commit)",
+      "Exec(git push)",
+      "Exec(git restore)",
+      "Exec(git mv)",
+      "Exec(git rm)",
+      "Exec(git branch)",
+      "Exec(git checkout)",
+      "Exec(git grep)",
+      "Exec(go build)",
+      "Exec(go test)",
+      "Exec(go vet)",
+      "Exec(go run)",
+      "Exec(go version)",
+      "Exec(go fmt)",
+      "Exec(sqlc version)",
+      "Exec(sqlc generate)",
+      "Exec(pnpm install)",
+      "Exec(pnpm run)",
+      "Exec(pnpm -r)",
+      "Exec(pnpm build)",
+      "Exec(pnpm dev)",
+      "Exec(pnpm lint)",
+      "Exec(pnpm test)",
+      "Exec(pnpm exec next)",
+      "Exec(pnpm exec tsc)",
+      "Exec(pnpm --filter)",
+      "Exec(pnpm store)",
+      "Exec(npx next)",
+      "Exec(npx)",
+      "Exec(node)",
+      "Exec(Invoke-RestMethod)",
+      "Exec(curl)",
+      "Exec(psql)",
+      "Exec(pg_isready)",
+      "Exec(docker ps)",
+      "Exec(netstat)",
+      "Exec(Test-NetConnection)",
+      "Exec(Get-ChildItem)",
+      "Exec(Get-Content)",
+      "Exec(Get-Item)",
+      "Exec(Get-Random)",
+      "Exec(Set-Location)",
+      "Exec(cd)",
+      "Exec(ls)",
+      "Exec(dir)",
+      "Exec(type)",
+      "Exec(Test-Path)",
+      "Exec(New-Item)",
+      "Exec(New-Object)",
+      "Exec(Copy-Item)",
+      "Exec(Select-Object)",
+      "Exec(Select-String)",
+      "Exec(Where-Object)",
+      "Exec(ForEach-Object)",
+      "Exec(Measure-Object)",
+      "Exec(ConvertTo-Json)",
+      "Exec(ConvertFrom-Json)",
+      "Exec(Write-Output)",
+      "Exec(Write-Host)",
+      "Exec(Start-Sleep)",
+      "Exec(Start-Process)",
+      "Exec(taskkill)",
+      "Exec(mkdir)",
+      "Exec(rm)",
+      "Exec(del)",
+      "Exec(Remove-Item)",
+      "Exec(where)",
+      "Exec(powershell)",
+      "Exec(cmd)"
+    ],
+    "deny": [
+      "Exec(sudo)",
+      "Exec(rm -rf /)",
+      "Exec(git push --force)",
+      "Exec(git push -f)",
+      "Exec(git reset --hard)",
+      "Exec(git rebase)",
+      "Exec(DROP TABLE)",
+      "Exec(DROP SCHEMA)",
+      "Exec(TRUNCATE)"
+    ],
+    "ask": [
+      "Exec(git rebase)",
+      "Exec(git merge)",
+      "Exec(git cherry-pick)",
+      "Exec(git tag)",
+      "Exec(git remote)",
+      "Exec(docker compose down)",
+      "Exec(docker system prune)"
+    ]
+  },
+  "read_config_from": {
+    "cursor": true,
+    "windsurf": true,
+    "claude": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "powershell -ExecutionPolicy Bypass -File \"%APPDATA%\\devin\\hooks\\pre-commit-check.ps1\"",
+            "type": "command",
+            "timeout": 10
+          }
+        ],
+        "matcher": "exec"
+      }
+    ]
+  }
+}

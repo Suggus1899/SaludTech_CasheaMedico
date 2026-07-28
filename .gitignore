@@ -36,7 +36,8 @@ Thumbs.db
 docker-compose.override.yml
 
 # Vercel
-.vercel
+.vercel/*
+!.vercel/project.json
 
 # Agent skills (local only)
 .agents/

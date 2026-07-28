@@ -61,3 +61,8 @@ pnpm install
 - Zinli logo is a placeholder SVG (no official logo found)
 - V21 migration backfills encrypted columns only if `DB_ENCRYPTION_KEY` is set
 - Cross-origin cookies: backend sets httpOnly on Render, frontend sets non-httpOnly on Vercel
+
+## SDD (Spec-Driven Development)
+
+Run `/sdd-init` in a session with cwd at this project to bootstrap SDD.
+Stack: pnpm monorepo (4 web apps + i18n package). Testing: Vitest (web-merchant only; jsdom + @testing-library/react).
