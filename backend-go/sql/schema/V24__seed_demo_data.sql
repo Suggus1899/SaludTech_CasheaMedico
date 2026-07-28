@@ -214,9 +214,9 @@ WHERE m.trade_name = 'Óptica Visión Clara'
 INSERT INTO users (phone, email, password_hash, full_name, national_id, role, kyc_status, level, points, is_active)
 VALUES (
     '+584141234567',
-    'patient@saludtech.com',
+    'carlos.demo@saludtech.com',
     '$2a$10$PxcjHTraZSfrd2Oqxier3u.cWysKXvO//Kj7onHQPWLvyhrE29EF.',
-    'Ana Demo',
+    'Carlos Demo',
     'V-12345678',
     'PATIENT',
     'APPROVED',
@@ -239,7 +239,7 @@ CROSS JOIN (VALUES
   ('MAIN', 500.00, 85.00, 'ACTIVE'),
   ('DAILY', 200.00, 0.00, 'ACTIVE')
 ) AS v(type, limit_usd, used_usd, status)
-WHERE u.email = 'patient@saludtech.com'
+WHERE u.email = 'carlos.demo@saludtech.com'
 ON CONFLICT (user_id, type) DO UPDATE SET
     limit_usd = EXCLUDED.limit_usd,
     used_usd = EXCLUDED.used_usd,
@@ -254,7 +254,7 @@ SELECT 'f1a2b3c4-1111-4222-8333-444455556666',
        50.00 * 0.035, 'Consulta Cardiología - Clínica Santa María',
        NOW() - INTERVAL '14 days'
 FROM users u, merchants m, credit_lines cl
-WHERE u.email = 'patient@saludtech.com'
+WHERE u.email = 'carlos.demo@saludtech.com'
   AND m.trade_name = 'Clínica Santa María'
   AND cl.user_id = u.id AND cl.type = 'MAIN'
 ON CONFLICT (id) DO NOTHING;
@@ -286,7 +286,7 @@ SELECT 'f1a2b3c4-2222-4333-8444-555566667777',
        15.00 * 0.035, 'Hemograma completo - Laboratorio BioSalud',
        NOW() - INTERVAL '7 days'
 FROM users u, merchants m, credit_lines cl
-WHERE u.email = 'patient@saludtech.com'
+WHERE u.email = 'carlos.demo@saludtech.com'
   AND m.trade_name = 'Laboratorio BioSalud'
   AND cl.user_id = u.id AND cl.type = 'MAIN'
 ON CONFLICT (id) DO NOTHING;
@@ -310,7 +310,7 @@ SELECT 'f1a2b3c4-3333-4444-8555-666677778888',
        2.50 * 0.035, 'Ibuprofeno 400mg - Farmacia Salud Total',
        NOW() - INTERVAL '3 days'
 FROM users u, merchants m, credit_lines cl
-WHERE u.email = 'patient@saludtech.com'
+WHERE u.email = 'carlos.demo@saludtech.com'
   AND m.trade_name = 'Farmacia Salud Total'
   AND cl.user_id = u.id AND cl.type = 'DAILY'
 ON CONFLICT (id) DO NOTHING;
@@ -329,3 +329,4 @@ FROM merchants m, users u
 WHERE m.trade_name = 'Clínica Santa María'
   AND u.email = 'merchant@saludtech.com'
 ON CONFLICT (merchant_id, user_id) DO NOTHING;
+
