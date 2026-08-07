@@ -163,10 +163,10 @@ export default function ComerciosPage() {
                           )}
                         </div>
                         <div
-                          className="p-2 rounded-lg shrink-0"
+                          className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold shrink-0"
                           style={{ backgroundColor: `${cfg.color}1A`, color: cfg.color }}
                         >
-                          <Icon className="w-4 h-4" />
+                          {m.tradeName.slice(0, 2).toUpperCase()}
                         </div>
                       </div>
                       <p className="text-xs font-semibold text-primary mt-3">

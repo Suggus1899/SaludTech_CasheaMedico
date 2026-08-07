@@ -203,6 +203,10 @@ export default function TriajePage() {
             className="range range-primary range-xs"
             step={1}
           />
+          <div className="flex justify-between text-xs text-muted-foreground mt-1">
+            <span>Leve</span>
+            <span>Severo</span>
+          </div>
         </div>
 
         {error && (
@@ -243,9 +247,12 @@ export default function TriajePage() {
             <span className="loading loading-spinner text-primary" />
           </div>
         ) : !triages || triages.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">
-            {t("noHistory")}
-          </p>
+          <div className="flex flex-col items-center py-12 gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground/40">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+            <p className="text-sm text-muted-foreground">{t("noHistory")}</p>
+          </div>
         ) : (
           <ul className="space-y-3">
             {triages.map((triage) => {

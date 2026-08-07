@@ -247,6 +247,12 @@ export default function PatientRegisterPage() {
             ) : null}
             {isLoading ? t("creatingAccount") : t("createAccount")}
           </button>
+          <p className="text-center text-sm text-muted-foreground">
+            ¿Ya tienes cuenta?{" "}
+            <button type="button" onClick={() => router.push("/login")} className="font-bold text-primary hover:underline">
+              Iniciar sesión
+            </button>
+          </p>
         </form>
       </main>
     </div>
@@ -272,7 +278,7 @@ function PasswordStrength({ password }: { password: string }) {
     t("strengthStrong"),
   ];
   const strengthLabel = strengthLabels[passed];
-  const strengthColor = ["bg-red-500", "bg-red-500", "bg-yellow-500", "bg-blue-500", "bg-green-500"][passed];
+  const strengthColor = ["bg-error", "bg-error", "bg-warning", "bg-info", "bg-success"][passed];
 
   return (
     <div className="space-y-2">

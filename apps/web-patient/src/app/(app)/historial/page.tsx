@@ -26,6 +26,8 @@ export default function MedicalRecordsPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [filterType, setFilterType] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     recordType: "CONSULTATION",
@@ -52,8 +54,15 @@ export default function MedicalRecordsPage() {
 
   useEffect(() => { fetchRecords(); }, []);
 
+  const displayed = filterType ? records.filter((r) => r.record_type === filterType) : records;
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.diagnosis.trim()) {
+      setFormError("El diagnóstico es obligatorio");
+      return;
+    }
+    setFormError(null);
     setSaving(true);
     try {
       const res = await apiFetch(getApiUrl("patient/medical-records"), {
@@ -118,7 +127,13 @@ export default function MedicalRecordsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {records.map((r) => {
+          <div className="flex flex-wrap gap-2">
+            <button onClick={() => setFilterType("")} className={`btn btn-xs ${filterType === "" ? "btn-primary" : "btn-outline"}`}>Todos</button>
+            {Object.entries(recordTypeConfig).map(([k, v]) => (
+              <button key={k} onClick={() => setFilterType(k)} className={`btn btn-xs ${filterType === k ? "btn-primary" : "btn-outline"}`}>{t(v.labelKey)}</button>
+            ))}
+          </div>
+          {displayed.map((r) => {
             const cfg = recordTypeConfig[r.record_type] || recordTypeConfig.OTHER;
             const Icon = cfg.icon;
             return (
@@ -190,7 +205,8 @@ export default function MedicalRecordsPage() {
               </div>
               <div className="form-control gap-1">
                 <label className="label pb-0"><span className="label-text font-medium">{t("diagnosis")}</span></label>
-                <textarea value={form.diagnosis} onChange={(e) => setForm({ ...form, diagnosis: e.target.value })} rows={2} className="textarea textarea-bordered w-full text-sm" />
+                <textarea value={form.diagnosis} onChange={(e) => { setForm({ ...form, diagnosis: e.target.value }); setFormError(null); }} rows={2} className={`textarea textarea-bordered w-full text-sm${formError ? " textarea-error" : ""}`} />
+                {formError && <p className="text-xs text-error mt-1">{formError}</p>}
               </div>
               <div className="form-control gap-1">
                 <label className="label pb-0"><span className="label-text font-medium">{t("prescription")}</span></label>
