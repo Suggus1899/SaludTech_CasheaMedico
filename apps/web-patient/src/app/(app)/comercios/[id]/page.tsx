@@ -259,8 +259,22 @@ export default function MerchantDetailPage({
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <span className="loading loading-spinner text-primary" />
+        <div className="space-y-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="p-4 rounded-2xl border border-border bg-base-100">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 space-y-2">
+                  <div className="skeleton h-4 w-3/4 rounded" />
+                  <div className="skeleton h-3 w-1/2 rounded" />
+                  <div className="skeleton h-3 w-1/3 rounded" />
+                </div>
+                <div className="space-y-2 text-right">
+                  <div className="skeleton h-5 w-16 rounded" />
+                  <div className="skeleton h-7 w-20 rounded" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : tab === "services" ? (
         <div className="space-y-3">

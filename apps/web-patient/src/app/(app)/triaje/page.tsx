@@ -243,9 +243,19 @@ export default function TriajePage() {
         </h2>
 
         {loading ? (
-          <div className="flex justify-center py-8">
-            <span className="loading loading-spinner text-primary" />
-          </div>
+          <ul className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <li key={i} className="p-4 rounded-2xl border border-border bg-base-100 space-y-3">
+                <div className="flex justify-between">
+                  <div className="skeleton h-5 w-16 rounded-full" />
+                  <div className="skeleton h-5 w-20 rounded-full" />
+                </div>
+                <div className="skeleton h-4 w-full rounded" />
+                <div className="skeleton h-3 w-24 rounded" />
+                <div className="skeleton h-8 w-full rounded" />
+              </li>
+            ))}
+          </ul>
         ) : !triages || triages.length === 0 ? (
           <div className="flex flex-col items-center py-12 gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground/40">

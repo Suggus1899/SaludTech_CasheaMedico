@@ -110,8 +110,29 @@ export default function ComerciosPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <span className="loading loading-spinner text-primary" />
+        <div className="space-y-6">
+          {[...Array(2)].map((_, i) => (
+            <section key={i}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="skeleton w-8 h-8 rounded-lg" />
+                <div className="skeleton h-5 w-28 rounded" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {[...Array(3)].map((_, j) => (
+                  <div key={j} className="p-4 rounded-2xl border border-border bg-base-100">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 space-y-2">
+                        <div className="skeleton h-4 w-3/4 rounded" />
+                        <div className="skeleton h-3 w-1/2 rounded" />
+                      </div>
+                      <div className="skeleton w-10 h-10 rounded-xl" />
+                    </div>
+                    <div className="skeleton h-3 w-20 rounded mt-3" />
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
       ) : Object.keys(grouped).length === 0 ? (
         <div className="flex flex-col items-center py-12 gap-3">

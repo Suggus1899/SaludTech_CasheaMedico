@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DollarSign, Users, Store, AlertTriangle, TrendingUp, TrendingDown, Search, CreditCard, BarChart3 } from "lucide-react";
 import { useFetchData } from "@saludtech/shared";
@@ -19,11 +20,38 @@ export default function DashboardPage() {
   const t = useTranslations("Dashboard");
   const tCommon = useTranslations("Common");
   const [searchTerm, setSearchTerm] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const { data: stats, loading: statsLoading } = useFetchData<DashboardStats>(getApiUrl("admin/dashboard"));
   const { data: usersData, loading: usersLoading } = useFetchData<AdminUsersResponse>(getApiUrl("admin/users?limit=5&offset=0"));
-  const { data: analytics, loading: analyticsLoading } = useFetchData<AnalyticsResponse>(getApiUrl("admin/analytics"));
+  const analyticsParams = new URLSearchParams();
+  if (dateFrom) analyticsParams.set("from", dateFrom);
+  if (dateTo) analyticsParams.set("to", dateTo);
+  const analyticsUrl = getApiUrl(`admin/analytics${analyticsParams.toString() ? `?${analyticsParams}` : ""}`);
+  const { data: analytics, loading: analyticsLoading } = useFetchData<AnalyticsResponse>(analyticsUrl, [dateFrom, dateTo]);
 
-  if (statsLoading || usersLoading) return <div className="p-8 text-center text-muted-foreground">{t("loading")}</div>;
+  if (statsLoading || usersLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="card bg-base-100 border border-base-300 shadow-sm">
+              <div className="card-body p-4 space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="skeleton h-4 w-24 rounded" />
+                  <div className="skeleton w-8 h-8 rounded-lg" />
+                </div>
+                <div className="skeleton h-9 w-20 rounded" />
+                <div className="skeleton h-3 w-32 rounded" />
+                <div className="skeleton h-1.5 w-full rounded-full mt-1" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="skeleton h-48 w-full rounded-2xl" />
+      </div>
+    );
+  }
 
   const users: AdminUser[] = usersData?.users || [];
   const filtered = users.filter(
@@ -102,9 +130,14 @@ export default function DashboardPage() {
 
       {/* Analytics Charts */}
       <div className="space-y-6">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <BarChart3 className="w-5 h-5 text-primary" />
           <h2 className="text-xl font-bold font-(family-name:--font-syne)">{t("analytics")}</h2>
+          <div className="ml-auto flex items-center gap-2">
+            <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="input input-bordered input-sm text-sm" />
+            <span className="text-xs text-muted-foreground">→</span>
+            <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="input input-bordered input-sm text-sm" />
+          </div>
         </div>
 
         {/* Revenue + Transaction Status */}
@@ -185,7 +218,10 @@ export default function DashboardPage() {
         <div className="card bg-base-100 border border-base-300 shadow-sm lg:col-span-4">
           <div className="card-body">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="card-title font-(family-name:--font-syne)">{t("recentUsers")}</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="card-title font-(family-name:--font-syne)">{t("recentUsers")}</h3>
+                <Link href="/pacientes" className="text-xs font-semibold text-primary hover:underline">Ver todos →</Link>
+              </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 opacity-40" />
                 <input

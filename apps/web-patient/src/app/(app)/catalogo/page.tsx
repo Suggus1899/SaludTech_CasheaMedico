@@ -136,8 +136,19 @@ export default function CatalogoPage() {
 
       {/* Results */}
       {loading ? (
-        <div className="flex justify-center py-12">
-          <span className="loading loading-spinner text-primary" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="p-4 rounded-2xl border border-border bg-base-100">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 space-y-2">
+                  <div className="skeleton h-4 w-3/4 rounded" />
+                  <div className="skeleton h-3 w-full rounded" />
+                  <div className="skeleton h-3 w-1/2 rounded" />
+                </div>
+                <div className="skeleton h-8 w-16 rounded" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : results.length === 0 ? (
         <div className="flex flex-col items-center py-12 gap-3">

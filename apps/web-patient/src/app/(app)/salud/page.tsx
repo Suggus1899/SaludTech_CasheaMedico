@@ -101,8 +101,20 @@ export default function HealthProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
-        <span className="loading loading-spinner text-primary" />
+      <div className="space-y-6">
+        <div className="skeleton h-8 w-28 rounded" />
+        <div className="space-y-1">
+          <div className="skeleton h-6 w-48 rounded" />
+          <div className="skeleton h-4 w-64 rounded" />
+        </div>
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="card bg-base-100 border border-base-300">
+            <div className="card-body p-4 space-y-3">
+              <div className="skeleton h-5 w-32 rounded" />
+              <div className="skeleton h-10 w-full rounded" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
