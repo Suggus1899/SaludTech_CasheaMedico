@@ -66,16 +66,15 @@ func main() {
 	}
 
 	queries := database.New(pool)
+	tokenRevoker := auth.NewMemoryTokenRevoker()
 
-	authHandler := &auth.AuthHandler{DB: queries, Cfg: cfg}
+	authHandler := &auth.AuthHandler{DB: queries, Cfg: cfg, Revoker: tokenRevoker}
 
 	scanner := &worker.InstallmentScanner{Pool: pool, Schedule: cfg.ScannerCronSchedule}
 	scanner.Start()
 
 	retentionWorker := &worker.RetentionWorker{Pool: pool, Schedule: cfg.RetentionCronSchedule}
 	retentionWorker.Start()
-
-	tokenRevoker := auth.NewMemoryTokenRevoker()
 
 	// Parse CORS origins from config
 	allowedOrigins := strings.Split(cfg.CORSAllowedOrigins, ",")

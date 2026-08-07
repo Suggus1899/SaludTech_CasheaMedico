@@ -58,8 +58,9 @@ func clearAuthCookie(w http.ResponseWriter, r *http.Request) {
 }
 
 type AuthHandler struct {
-	DB  database.Querier
-	Cfg *config.Config
+	DB      database.Querier
+	Cfg     *config.Config
+	Revoker TokenRevoker
 }
 
 type LoginRequest struct {
@@ -178,8 +179,25 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Logout clears the jwt_token cookie.
+// Logout clears the jwt_token cookie and revokes the token by jti.
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	tokenString := ""
+	if cookie, err := r.Cookie("jwt_token"); err == nil && cookie.Value != "" {
+		tokenString = cookie.Value
+	}
+	if tokenString == "" {
+		if authHeader := r.Header.Get("Authorization"); authHeader != "" {
+			if parts := strings.SplitN(authHeader, " ", 2); len(parts) == 2 && strings.EqualFold(parts[0], "Bearer") {
+				tokenString = parts[1]
+			}
+		}
+	}
+	if tokenString != "" && h.Revoker != nil {
+		if claims, err := ValidateToken(tokenString, h.Cfg); err == nil && claims.ID != "" {
+			h.Revoker.Revoke(claims.ID, claims.ExpiresAt.Time)
+		}
+	}
+
 	clearAuthCookie(w, r)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
