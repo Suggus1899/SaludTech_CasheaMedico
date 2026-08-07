@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"crypto/rand"
+	"crypto/subtle"
 	"encoding/hex"
 	"net/http"
 	"strings"
@@ -63,7 +64,7 @@ func CSRFMiddleware(next http.Handler) http.Handler {
 				return
 			}
 
-			if !strings.EqualFold(cookie.Value, headerToken) {
+			if subtle.ConstantTimeCompare([]byte(cookie.Value), []byte(headerToken)) != 1 {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusForbidden)
 				w.Write([]byte(`{"error":"CSRF token mismatch"}`))

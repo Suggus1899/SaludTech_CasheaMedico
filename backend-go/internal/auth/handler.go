@@ -232,7 +232,8 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if msg := validatePasswordComplexity(req.Password); msg != "" {
-		http.Error(w, `{"error":"`+msg+`"}`, http.StatusBadRequest)
+		b, _ := json.Marshal(map[string]string{"error": msg})
+		http.Error(w, string(b), http.StatusBadRequest)
 		return
 	}
 
@@ -276,7 +277,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		Role:         "PATIENT",
 	})
 	if err != nil {
-		log.Printf("Failed to create user (phone=%s, email=%s, national_id=%s): %v", req.Phone, req.Email, req.IdentityDocument, err)
+		log.Printf("Failed to create user: %v", err)
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
 		return
 	}

@@ -71,13 +71,7 @@ func isAuditable(method string) bool {
 	}
 }
 
-// clientIP extracts the client IP, honouring X-Forwarded-For when present.
+// clientIP returns the client IP already set by middleware.RealIP.
 func clientIP(r *http.Request) string {
-	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
-		if idx := strings.Index(xff, ","); idx > 0 {
-			return strings.TrimSpace(xff[:idx])
-		}
-		return strings.TrimSpace(xff)
-	}
 	return r.RemoteAddr
 }
