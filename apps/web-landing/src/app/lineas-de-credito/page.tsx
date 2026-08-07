@@ -24,6 +24,7 @@ import {
   CreditCard,
   Buildings,
 } from "@phosphor-icons/react";
+import Image from "next/image";
 import Link from "next/link";
 import SimuladorCuotas from "../../components/SimuladorCuotas";
 import SharedLayout from "../../components/SharedLayout";
@@ -37,25 +38,36 @@ function Hero() {
         <div className="absolute -top-20 right-0 w-96 h-96 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full bg-secondary/10 blur-3xl" />
       </div>
-      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/15 border border-primary/30 mb-6">
-          <Medal className="w-4 h-4 text-primary" weight="duotone" />
-          <span className="text-primary text-xs font-semibold tracking-widest uppercase">{t("badge")}</span>
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-10 items-center">
+        <div>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/15 border border-primary/30 mb-6">
+            <Medal className="w-4 h-4 text-primary" weight="duotone" />
+            <span className="text-primary text-xs font-semibold tracking-widest uppercase">{t("badge")}</span>
+          </div>
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+            {t("titleLine1")}
+            <br />
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-primary to-secondary">
+              {t("titleLine2")}
+            </span>
+          </h1>
+          <p className="text-slate-300 text-xl mb-8 leading-relaxed">
+            {t("subtitle")}
+          </p>
+          <a href="#simulador" className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-secondary text-white font-bold text-base hover:bg-secondary-dark transition-colors">
+            {t("calculateInstallments")}
+            <ArrowRight className="w-5 h-5" />
+          </a>
         </div>
-        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-          {t("titleLine1")}
-          <br />
-          <span className="bg-clip-text text-transparent bg-linear-to-r from-primary to-secondary">
-            {t("titleLine2")}
-          </span>
-        </h1>
-        <p className="text-slate-300 text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
-          {t("subtitle")}
-        </p>
-        <a href="#simulador" className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-secondary text-white font-bold text-base hover:bg-secondary-dark transition-colors">
-          {t("calculateInstallments")}
-          <ArrowRight className="w-5 h-5" />
-        </a>
+        <div className="hidden md:flex justify-center">
+          <Image
+            src="/assets/payment_illustration.png"
+            alt="Payment illustration"
+            width={420}
+            height={320}
+            className="w-full max-w-sm rounded-3xl shadow-2xl"
+          />
+        </div>
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Logo } from "@saludtech/ui";
 import { CheckCircle, ShieldCheck, Lightning, Globe } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
@@ -38,6 +39,17 @@ export default function Descarga() {
         <p className="text-slate-500 text-lg mb-10 max-w-xl mx-auto">
           {t("subtitle")}
         </p>
+
+        {/* App preview */}
+        <div className="relative max-w-xs mx-auto mb-8">
+          <Image
+            src="/assets/hero_banner.png"
+            alt="SaludTech app preview"
+            width={320}
+            height={200}
+            className="w-full rounded-2xl shadow-xl border border-slate-200"
+          />
+        </div>
 
         {/* CTA buttons */}
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10">

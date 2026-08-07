@@ -14,6 +14,7 @@ import {
   Person,
   Stethoscope,
 } from "@phosphor-icons/react";
+import Image from "next/image";
 import SharedLayout from "../../components/SharedLayout";
 import { useTranslations } from "next-intl";
 
@@ -84,9 +85,13 @@ function Telemedicina() {
               {/* Doctor badge */}
               <div className="absolute -bottom-4 -right-4 bg-white rounded-2xl p-4 shadow-xl border border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center">
-                    <UserCheck className="w-5 h-5 text-primary" />
-                  </div>
+                  <Image
+                    src="/assets/doctor_avatar.png"
+                    alt="Doctor"
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
                   <div>
                     <p className="text-xs text-slate-500">{t("doctorReviewed")}</p>
                     <p className="text-sm font-bold text-dark">{t("reviewedTime")}</p>
