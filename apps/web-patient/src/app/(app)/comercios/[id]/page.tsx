@@ -63,6 +63,7 @@ export default function MerchantDetailPage({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [userLevel, setUserLevel] = useState(1);
+  const [merchantName, setMerchantName] = useState("");
 
   useEffect(() => {
     const user = getStoredUser<UserResponse>();
@@ -72,12 +73,14 @@ export default function MerchantDetailPage({
   useEffect(() => {
     (async () => {
       try {
-        const [svcRes, supRes] = await Promise.all([
+        const [svcRes, supRes, mRes] = await Promise.all([
           apiFetch(getApiUrl(`patient/merchants/${id}/services`)),
           apiFetch(getApiUrl(`patient/merchants/${id}/supplies`)),
+          apiFetch(getApiUrl(`patient/merchants/${id}`)),
         ]);
         if (svcRes.ok) setServices(await svcRes.json());
         if (supRes.ok) setSupplies(await supRes.json());
+        if (mRes.ok) { const m = await mRes.json(); setMerchantName(m.tradeName || ""); }
       } catch {
         // ignore
       } finally {
@@ -225,13 +228,17 @@ export default function MerchantDetailPage({
   }
 
   return (
-    <div className="space-y-5">
+    <div className={`space-y-5${cart.length > 0 ? " pb-24" : ""}`}>
       <button
         onClick={() => router.back()}
         className="btn btn-ghost btn-sm -ml-2"
       >
         <ArrowLeft className="w-4 h-4" /> {tCommon("back")}
       </button>
+
+      {merchantName && (
+        <h1 className="text-xl font-bold text-foreground font-display">{merchantName}</h1>
+      )}
 
       {/* Tabs */}
       <div data-tour="merchant-tabs" className="tabs tabs-boxed">

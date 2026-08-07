@@ -25,6 +25,7 @@ export default function MedicalRecordsPage() {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     recordType: "CONSULTATION",
@@ -71,15 +72,17 @@ export default function MedicalRecordsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm(t("deleteConfirm"))) return;
+  const handleDelete = (id: string) => setDeleteId(id);
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await apiFetch(getApiUrl(`patient/medical-records/${id}`), {
-        method: "DELETE",
-      });
+      await apiFetch(getApiUrl(`patient/medical-records/${deleteId}`), { method: "DELETE" });
       fetchRecords();
     } catch {
       // ignore
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -206,6 +209,21 @@ export default function MedicalRecordsPage() {
             </form>
           </div>
           <div className="modal-backdrop" onClick={() => setShowAdd(false)} />
+        </div>
+      )}
+
+      {deleteId && (
+        <div className="modal modal-open" role="dialog" aria-modal="true">
+          <div className="modal-box max-w-sm">
+            <p className="font-semibold text-sm">{t("deleteConfirm")}</p>
+            <div className="modal-action">
+              <button onClick={() => setDeleteId(null)} className="btn btn-ghost btn-sm">{tCommon("cancel")}</button>
+              <button onClick={confirmDelete} className="btn btn-error btn-sm">
+                <Trash2 className="w-3.5 h-3.5" /> Eliminar
+              </button>
+            </div>
+          </div>
+          <div className="modal-backdrop" onClick={() => setDeleteId(null)} />
         </div>
       )}
     </div>

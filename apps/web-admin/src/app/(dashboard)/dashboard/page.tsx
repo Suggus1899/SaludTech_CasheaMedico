@@ -43,7 +43,7 @@ export default function DashboardPage() {
             sub: t("kpiTotalTransactions"),
             icon: DollarSign,
             trend: "up",
-            progress: 100,
+            progress: 0,
           },
           {
             title: t("kpiPatients"),
@@ -51,7 +51,7 @@ export default function DashboardPage() {
             sub: t("kpiUsersTotal", { count: stats?.users || 0 }),
             icon: Users,
             trend: "up",
-            progress: 100,
+            progress: stats?.users ? Math.min(((stats?.patients ?? 0) / stats.users) * 100, 100) : 0,
           },
           {
             title: t("kpiActiveMerchants"),
@@ -59,7 +59,7 @@ export default function DashboardPage() {
             sub: t("kpiMerchantsTotal", { count: stats?.merchants || 0 }),
             icon: Store,
             trend: "neutral",
-            progress: 100,
+            progress: stats?.merchants ? Math.min(((stats?.activeMerchants ?? 0) / stats.merchants) * 100, 100) : 0,
           },
           {
             title: t("kpiOverdueInstallments"),
@@ -184,7 +184,19 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-7">
         <div className="card bg-base-100 border border-base-300 shadow-sm lg:col-span-4">
           <div className="card-body">
-            <h3 className="card-title font-(family-name:--font-syne)">{t("recentUsers")}</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="card-title font-(family-name:--font-syne)">{t("recentUsers")}</h3>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 opacity-40" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Buscar..."
+                  className="input input-bordered input-sm pl-9 w-44 text-sm"
+                />
+              </div>
+            </div>
             {filtered.length === 0 ? (
               <div className="text-center py-12 opacity-40">
                 <Search className="w-10 h-10 mx-auto mb-3" />

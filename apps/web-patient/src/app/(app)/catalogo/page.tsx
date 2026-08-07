@@ -147,10 +147,11 @@ export default function CatalogoPage() {
           <p className="text-sm text-muted-foreground">{t("noResults")}</p>
         </div>
       ) : (
-        <div data-tour="catalog-results" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <>
           <p className="text-xs text-muted-foreground">
             {t("resultsCount", { count: results.length })}
           </p>
+          <div data-tour="catalog-results" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {tab === "services"
             ? services.map((svc) => (
                 <Link
@@ -234,7 +235,8 @@ export default function CatalogoPage() {
                   </div>
                 </Link>
               ))}
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
