@@ -114,9 +114,12 @@ export default function ComerciosPage() {
           <span className="loading loading-spinner text-primary" />
         </div>
       ) : Object.keys(grouped).length === 0 ? (
-        <p className="text-center text-muted-foreground py-8 text-sm">
-          {t("noMerchants")}
-        </p>
+        <div className="flex flex-col items-center py-12 gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground/40">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <p className="text-sm text-muted-foreground">{t("noMerchants")}</p>
+        </div>
       ) : (
         <div data-tour="merchant-list" className="space-y-6">
           {Object.entries(grouped).map(([category, items]) => {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { Mail, Lock, Eye, EyeOff, AlertCircle, HeartPulse, ShieldCheck, Clock } from "lucide-react";
 import { Logo } from "@saludtech/ui";
 import { getApiUrl, setSession } from "../../lib/api";
@@ -71,6 +72,20 @@ export default function PatientLoginPage() {
 
         {/* Middle: Value proposition */}
         <div className="relative z-10 space-y-8">
+          <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 w-fit">
+            <Image
+              src="/assets/doctor_avatar.png"
+              alt=""
+              aria-hidden
+              width={36}
+              height={36}
+              className="w-9 h-9 rounded-full object-cover"
+            />
+            <div>
+              <p className="text-white text-xs font-semibold">Dra. María González</p>
+              <p className="text-white/50 text-[11px]">Médico verificado · SaludTech</p>
+            </div>
+          </div>
           <div>
             <h1 className="text-4xl font-bold text-white leading-tight mb-4">
               {t("heroTitle1")}

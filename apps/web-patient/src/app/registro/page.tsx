@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   Check,
 } from "lucide-react";
+import { Logo } from "@saludtech/ui";
 import { getApiUrl, setSession } from "../../lib/api";
 import { registerSchema } from "../../lib/validations";
 import type { UserResponse } from "../../types/patient";
@@ -120,7 +121,7 @@ export default function PatientRegisterPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-base-100/80 backdrop-blur border-b border-border">
-        <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-3">
+        <div className="max-w-md mx-auto px-4 h-14 flex items-center">
           <button
             onClick={() => router.back()}
             aria-label={t("back")}
@@ -128,10 +129,12 @@ export default function PatientRegisterPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-bold text-foreground font-display">
-            {t("title")}
-          </h1>
+          <div className="flex-1 flex justify-center">
+            <Logo size="sm" />
+          </div>
+          <div className="w-9" />
         </div>
+        <h1 className="sr-only">{t("title")}</h1>
       </header>
 
       <main className="max-w-md mx-auto px-4 py-6">
