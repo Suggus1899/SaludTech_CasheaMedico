@@ -211,7 +211,7 @@ WHERE m.trade_name = 'Óptica Visión Clara'
 
 -- ─── Demo patient user ────────────────────────────────────────
 -- Password: Demo1234 (bcrypt cost 10)
-INSERT INTO users (phone, email, password_hash, full_name, national_id, role, kyc_status, level, points, is_active)
+INSERT INTO users (phone, email, password_hash, full_name, national_id, role, level, points, is_active)
 VALUES (
     '+584141234567',
     'carlos.demo@saludtech.com',
@@ -219,14 +219,12 @@ VALUES (
     'Carlos Demo',
     'V-12345678',
     'PATIENT',
-    'APPROVED',
     2,
     150,
     TRUE
 )
 ON CONFLICT (email) DO UPDATE SET
     password_hash = EXCLUDED.password_hash,
-    kyc_status = EXCLUDED.kyc_status,
     level = EXCLUDED.level,
     points = EXCLUDED.points,
     is_active = EXCLUDED.is_active;

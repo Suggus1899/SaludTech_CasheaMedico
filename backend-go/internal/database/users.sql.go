@@ -276,9 +276,7 @@ func (q *Queries) UpdateUserProfilePhoto(ctx context.Context, arg UpdateUserProf
 
 const verifyEmail = `-- name: VerifyEmail :exec
 UPDATE users
-SET
-    is_email_verified = TRUE,
-    kyc_status = 'APPROVED'
+SET is_email_verified = TRUE
 WHERE id = $1
 `
 
